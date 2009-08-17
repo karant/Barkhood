@@ -1,24 +1,9 @@
-# == Schema Information
-# Schema version: 20080916002106
-#
-# Table name: galleries
-#
-#  id               :integer(4)      not null, primary key
-#  person_id        :integer(4)      
-#  title            :string(255)     
-#  description      :string(255)     
-#  photos_count     :integer(4)      default(0), not null
-#  primary_photo_id :integer(4)      
-#  created_at       :datetime        
-#  updated_at       :datetime        
-#
-
 class Gallery < ActiveRecord::Base
   include ActivityLogger
   
   attr_accessible :title, :description
   
-  belongs_to :person
+  belongs_to :dog
   has_many :photos, :dependent => :destroy, :order => :position
   has_many :activities, :foreign_key => "item_id", :dependent => :destroy,
                         :conditions => "item_type = 'Gallery'"
@@ -26,7 +11,7 @@ class Gallery < ActiveRecord::Base
 
   validates_length_of :title, :maximum => 255, :allow_nil => true
   validates_length_of :description, :maximum => 1000, :allow_nil => true
-  validates_presence_of :person_id
+  validates_presence_of :dog_id
 
   before_create :handle_nil_description
   after_create :log_activity
@@ -78,7 +63,7 @@ class Gallery < ActiveRecord::Base
     end
 
     def log_activity
-      activity = Activity.create!(:item => self, :person => person)
-      add_activities(:activity => activity, :person => person)
+      activity = Activity.create!(:item => self, :dog => dog)
+      add_activities(:activity => activity, :dog => dog)
     end
 end

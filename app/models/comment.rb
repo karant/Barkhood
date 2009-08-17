@@ -16,15 +16,15 @@ class Comment < ActiveRecord::Base
   include ActivityLogger
   extend PreferencesHelper
   
-  attr_accessor :commented_person, :send_mail
+  attr_accessor :commented_dog, :send_mail
 
   attr_accessible :body
   
   belongs_to :commentable, :polymorphic => true
-  belongs_to :commenter, :class_name => "Person",
+  belongs_to :commenter, :class_name => "Dog",
                          :foreign_key => "commenter_id"
 
-  belongs_to :person, :counter_cache => true
+  belongs_to :dog, :counter_cache => true
   belongs_to :post
   belongs_to :event
 
@@ -39,24 +39,24 @@ class Comment < ActiveRecord::Base
   
   after_create :log_activity, :send_receipt_reminder
     
-  # Return the person for the thing commented on.
-  # For example, for blog post comments it's the blog's person
-  # For wall comments, it's the person himself.
-  def commented_person
-    @commented_person ||= case commentable.class.to_s
-                          when "Person"
-                            commentable
-                          when "BlogPost"
-                            commentable.blog.person
-                          when "Event"
-                            commentable.person
-                          end
+  # Return the dog for the thing commented on.
+  # For example, for blog post comments it's the blog's dog
+  # For wall comments, it's the dog.
+  def commented_dog
+    @commented_dog ||= case commentable.class.to_s
+                         when "Dog"
+                           commentable
+                         when "BlogPost"
+                           commentable.blog.dog
+                         when "Event"
+                           commentable.dog
+                         end
   end
   
   private
     
     def wall_comment?
-      commentable.class.to_s == "Person"
+      commentable.class.to_s == "Dog"
     end
   
     def blog_post_comment?
@@ -69,30 +69,30 @@ class Comment < ActiveRecord::Base
     
     def notifications?
       if wall_comment?
-        commented_person.wall_comment_notifications?
+        commented_dog.wall_comment_notifications?
       elsif blog_post_comment?
-        commented_person.blog_comment_notifications?
+        commented_dog.blog_comment_notifications?
       end
     end
   
     def log_activity
-      activity = Activity.create!(:item => self, :person => commenter)
-      add_activities(:activity => activity, :person => commenter)
-      unless commented_person.nil? or commenter == commented_person
-        add_activities(:activity => activity, :person => commented_person,
-                       :include_person => true)
+      activity = Activity.create!(:item => self, :dog => commenter)
+      add_activities(:activity => activity, :dog => commenter)
+      unless commented_dog.nil? or commenter == commented_dog
+        add_activities(:activity => activity, :dog => commented_dog,
+                       :include_dog => true)
       end
     end
     
     def send_receipt_reminder
-      return if commenter == commented_person
+      return if commenter == commented_dog
       if wall_comment?
         @send_mail ||= Comment.global_prefs.email_notifications? &&
-                       commented_person.wall_comment_notifications?
+                       commented_dog.owner.wall_comment_notifications?
         PersonMailer.deliver_wall_comment_notification(self) if @send_mail
       elsif blog_post_comment?
         @send_mail ||= Comment.global_prefs.email_notifications? &&
-                       commented_person.blog_comment_notifications?
+                       commented_dog.owner.blog_comment_notifications?
         PersonMailer.deliver_blog_comment_notification(self) if @send_mail
       end
     end

@@ -1,25 +1,3 @@
-# == Schema Information
-# Schema version: 20080916002106
-#
-# Table name: communications
-#
-#  id                   :integer(4)      not null, primary key
-#  subject              :string(255)     
-#  content              :text            
-#  parent_id            :integer(4)      
-#  sender_id            :integer(4)      
-#  recipient_id         :integer(4)      
-#  sender_deleted_at    :datetime        
-#  sender_read_at       :datetime        
-#  recipient_deleted_at :datetime        
-#  recipient_read_at    :datetime        
-#  replied_at           :datetime        
-#  type                 :string(255)     
-#  created_at           :datetime        
-#  updated_at           :datetime        
-#  conversation_id      :integer(4)      
-#
-
 class Message < Communication
   extend PreferencesHelper
   
@@ -34,8 +12,8 @@ class Message < Communication
 
   attr_accessible :subject, :content
   
-  belongs_to :sender, :class_name => 'Person', :foreign_key => 'sender_id'
-  belongs_to :recipient, :class_name => 'Person',
+  belongs_to :sender, :class_name => 'Dog', :foreign_key => 'sender_id'
+  belongs_to :recipient, :class_name => 'Dog',
                          :foreign_key => 'recipient_id'
   belongs_to :conversation
   validates_presence_of :subject, :content
@@ -56,21 +34,21 @@ class Message < Communication
     @parent = message
   end
   
-  # Return the sender/recipient that *isn't* the given person.
-  def other_person(person)
-    person == sender ? recipient : sender
+  # Return the sender/recipient that *isn't* the given dog.
+  def other_dog(dog)
+    dog == sender ? recipient : sender
   end
 
-  # Put the message in the trash for the given person.
-  def trash(person, time=Time.now)
-    case person
+  # Put the message in the trash for the given dog.
+  def trash(dog, time=Time.now)
+    case dog
     when sender
       self.sender_deleted_at = time
     when recipient
       self.recipient_deleted_at = time
     else
       # Given our controller before filters, this should never happen...
-      raise ArgumentError,  "Unauthorized person"
+      raise ArgumentError,  "Unauthorized dog"
     end
     save!
   end
@@ -82,8 +60,8 @@ class Message < Communication
   end
   
   # Return true if the message has been trashed.
-  def trashed?(person)
-    case person
+  def trashed?(dog)
+    case dog
     when sender
       !sender_deleted_at.nil? and sender_deleted_at > Person::TRASH_TIME_AGO
     when recipient
@@ -107,9 +85,9 @@ class Message < Communication
   end
   
   # Return true if pair of people is valid.
-  def valid_reply_pair?(person, other)
-    ((recipient == person and sender == other) or
-     (recipient == other  and sender == person))
+  def valid_reply_pair?(dog, other)
+    ((recipient == dog and sender == other) or
+     (recipient == other  and sender == dog))
   end
   
   # Return true if the message has been replied to.
@@ -117,9 +95,9 @@ class Message < Communication
     !replied_at.nil?
   end
   
-  # Return true if the message is new for the given person.
-  def new?(person)
-    not read? and person != sender
+  # Return true if the message is new for the given dog.
+  def new?(dog)
+    not read? and dog != sender
   end
   
   # Mark a message as read.

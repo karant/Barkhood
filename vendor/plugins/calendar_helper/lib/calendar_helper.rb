@@ -105,14 +105,7 @@ module CalendarHelper
     else
       colspan=7
     end
-    cal << %(<th colspan="#{colspan}" class="#{options[:month_name_class]}">)
-    logger.debug "URL #{options[:month_url]}"
-    unless options[:month_url]
-      cal << "#{Date::MONTHNAMES[options[:month]]}"
-    else
-      cal << %(<a href="#{options[:month_url]}">#{Date::MONTHNAMES[options[:month]]}</a>)
-    end
-    cal << %(</th>)
+    cal << %(<th colspan="#{colspan}" class="#{options[:month_name_class]}">#{Date::MONTHNAMES[options[:month]]}</th>)
     cal << %(<th colspan="2">#{options[:next_month_text]}</th>) if options[:next_month_text]
     cal << %(</tr><tr class="#{options[:day_name_class]}">)
     day_names.each do |d|
@@ -135,9 +128,10 @@ module CalendarHelper
     first.upto(last) do |cur|
       cell_text, cell_attrs = block.call(cur)
       cell_text  ||= cur.mday
-      cell_attrs ||= {:class => options[:day_class]}
+      cell_attrs ||= {}
+      cell_attrs[:class] ||= options[:day_class]
       cell_attrs[:class] += " weekendDay" if [0, 6].include?(cur.wday) 
-      cell_attrs[:class] += " today" if (cur == Date.today) and options[:show_today]  
+      cell_attrs[:class] += " today" if (cur == (Time.respond_to?(:zone) ? Time.zone.now.to_date : Date.today)) and options[:show_today]
       cell_attrs = cell_attrs.map {|k, v| %(#{k}="#{v}") }.join(" ")
       cal << "<td #{cell_attrs}>#{cell_text}</td>"
       cal << "</tr><tr>" if cur.wday == last_weekday

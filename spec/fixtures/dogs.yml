@@ -1,0 +1,48 @@
+dana:
+  owner: quentin
+  name: Dana
+  description: I'm Dana!
+  dob: <%= 2.years.ago.to_s(:db) %>
+  sex: Female
+  breed: german_pointer
+  
+nola:
+  owner: quentin
+  name: Nola
+  description: I'm Nola!
+  dob: <%= 3.years.ago.to_s(:db) %>
+  sex: Female
+  breed: newfoundland
+  
+max:
+  owner: aaron
+  name: Max
+  description: I'm Max!
+  dob: <%= 5.years.ago.to_s(:db) %>
+  sex: Male
+  breed: bulldog
+  
+parker:
+  owner: aaron
+  name: Parker
+  description: I'm Parker!
+  dob: <%= 11.years.ago.to_s(:db) %>
+  sex: Male
+  breed: bulldog
+  
+deactivated:
+  owner: quentin
+  name: Deactivated
+  description: I've been deactivated.
+  dob: <%= 2.years.ago.to_s :db %>
+  sex: Male
+  breed: bulldog
+  deactivated: true
+  
+deactivated_owner:
+  owner: deactivated
+  name: Deactivated Owner
+  description: My owner is deactivated.
+  dob: <%= 1.year.ago.to_s :db %>
+  sex: Female
+  breed: bulldog

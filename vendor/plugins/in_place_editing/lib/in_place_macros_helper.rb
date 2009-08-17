@@ -40,6 +40,12 @@ module InPlaceMacrosHelper
     function << "'#{url_for(options[:url])}'"
 
     js_options = {}
+
+    if protect_against_forgery?
+      options[:with] ||= "Form.serialize(form)"
+      options[:with] += " + '&authenticity_token=' + encodeURIComponent('#{form_authenticity_token}')"
+    end
+
     js_options['cancelText'] = %('#{options[:cancel_text]}') if options[:cancel_text]
     js_options['okText'] = %('#{options[:save_text]}') if options[:save_text]
     js_options['loadingText'] = %('#{options[:loading_text]}') if options[:loading_text]
@@ -50,9 +56,10 @@ module InPlaceMacrosHelper
     js_options['externalControl'] = "'#{options[:external_control]}'" if options[:external_control]
     js_options['loadTextURL'] = "'#{url_for(options[:load_text_url])}'" if options[:load_text_url]        
     js_options['ajaxOptions'] = options[:options] if options[:options]
-    js_options['evalScripts'] = options[:script] if options[:script]
+    js_options['htmlResponse'] = !options[:script] if options[:script]
     js_options['callback']   = "function(form) { return #{options[:with]} }" if options[:with]
     js_options['clickToEditText'] = %('#{options[:click_to_edit_text]}') if options[:click_to_edit_text]
+    js_options['textBetweenControls'] = %('#{options[:text_between_controls]}') if options[:text_between_controls]
     function << (', ' + options_for_javascript(js_options)) unless js_options.empty?
     
     function << ')'
@@ -62,10 +69,12 @@ module InPlaceMacrosHelper
   
   # Renders the value of the specified object and method with in-place editing capabilities.
   def in_place_editor_field(object, method, tag_options = {}, in_place_editor_options = {})
-    tag = ::ActionView::Helpers::InstanceTag.new(object, method, self)
-    tag_options = {:tag => "span", :id => "#{object}_#{method}_#{tag.object.id}_in_place_editor", :class => "in_place_editor_field"}.merge!(tag_options)
-    in_place_editor_options[:url] = in_place_editor_options[:url] || url_for({ :action => "set_#{object}_#{method}", :id => tag.object.id })
-    tag.to_content_tag(tag_options.delete(:tag), tag_options) +
-    in_place_editor(tag_options[:id], in_place_editor_options)
+    instance_tag = ::ActionView::Helpers::InstanceTag.new(object, method, self)
+    tag_options = {:tag => "span",
+                   :id => "#{object}_#{method}_#{instance_tag.object.id}_in_place_editor",
+                   :class => "in_place_editor_field"}.merge!(tag_options)
+    in_place_editor_options[:url] = in_place_editor_options[:url] || url_for({ :action => "set_#{object}_#{method}", :id => instance_tag.object.id })
+    tag = content_tag(tag_options.delete(:tag), h(instance_tag.value(instance_tag.object)),tag_options)
+    return tag + in_place_editor(tag_options[:id], in_place_editor_options)
   end
 end

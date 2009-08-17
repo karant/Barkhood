@@ -1,21 +1,3 @@
-# == Schema Information
-# Schema version: 20080916002106
-#
-# Table name: events
-#
-#  id                    :integer(4)      not null, primary key
-#  title                 :string(255)     default(""), not null
-#  description           :string(255)     
-#  person_id             :integer(4)      not null
-#  start_time            :datetime        not null
-#  end_time              :datetime        
-#  reminder              :boolean(1)      
-#  created_at            :datetime        
-#  updated_at            :datetime        
-#  event_attendees_count :integer(4)      default(0)
-#  privacy               :integer(4)      not null
-#
-
 class Event < ActiveRecord::Base
   include ActivityLogger
 
@@ -25,24 +7,24 @@ class Event < ActiveRecord::Base
   MAX_TITLE_LENGTH = 40
   PRIVACY = { :public => 1, :contacts => 2 }
 
-  belongs_to :person
+  belongs_to :dog
   has_many :event_attendees
-  has_many :attendees, :through => :event_attendees, :source => :person
+  has_many :attendees, :through => :event_attendees, :source => :dog
   has_many :comments, :as => :commentable, :order => 'created_at DESC'
   has_many :activities, :foreign_key => "item_id", :dependent => :destroy,
                         :conditions => "item_type = 'Event'"
   
 
-  validates_presence_of :title, :start_time, :person, :privacy
+  validates_presence_of :title, :start_time, :dog, :privacy
   validates_length_of :title, :maximum => MAX_TITLE_LENGTH
   validates_length_of :description, :maximum => MAX_DESCRIPTION_LENGTH, :allow_blank => true
 
-  named_scope :person_events, 
-              lambda { |person| { :conditions => ["person_id = ? OR (privacy = ? OR (privacy = ? AND (person_id IN (?))))", 
-                                                  person.id,
+  named_scope :dog_events, 
+              lambda { |dog| { :conditions => ["dog_id = ? OR (privacy = ? OR (privacy = ? AND (dog_id IN (?))))", 
+                                                  dog.id,
                                                   PRIVACY[:public], 
                                                   PRIVACY[:contacts], 
-                                                  person.contact_ids] } }
+                                                  dog.contact_ids] } }
 
   named_scope :period_events,
               lambda { |date_from, date_until| { :conditions => ['start_time >= ? and start_time <= ?',
@@ -66,22 +48,22 @@ class Event < ActiveRecord::Base
     end
   end
   
-  def attend(person)
-    self.event_attendees.create!(:person => person)
+  def attend(dog)
+    self.event_attendees.create!(:dog => dog)
   rescue ActiveRecord::RecordInvalid
     nil
   end
 
-  def unattend(person)
-    if event_attendee = self.event_attendees.find_by_person_id(person)
+  def unattend(dog)
+    if event_attendee = self.event_attendees.find_by_dog_id(dog)
         event_attendee.destroy
     else
       nil
     end
   end
 
-  def attending?(person)
-    self.attendee_ids.include?(person[:id])
+  def attending?(dog)
+    self.attendee_ids.include?(dog[:id])
   end
 
   def only_contacts?
@@ -91,7 +73,7 @@ class Event < ActiveRecord::Base
   private
 
     def log_activity
-      add_activities(:item => self, :person => self.person)
+      add_activities(:item => self, :dog => self.dog)
     end
 
 end

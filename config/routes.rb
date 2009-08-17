@@ -1,4 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :breeds
+
+  map.resources :dogs
+
   map.resources :categories
   map.resources :links
   map.resources :events, :member => { :attend => :get, 

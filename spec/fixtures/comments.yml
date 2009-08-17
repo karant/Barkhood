@@ -1,19 +1,19 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 wall_comment:
-  commenter: aaron
+  commenter: nola
   body: MyText
-  commentable: quentin
-  commentable_type: Person
+  commentable: dana
+  commentable_type: Dog
 
 blog_comment:
-  commenter: aaron
+  commenter: nola
   body: MyText
   commentable: blog_post
   commentable_type: BlogPost
 
 event_comment:
-  commenter: aaron
+  commenter: nola
   body: MyText
   commentable: public
   commentable_type: Event

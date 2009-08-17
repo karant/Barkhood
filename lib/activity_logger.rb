@@ -6,38 +6,38 @@ module ActivityLogger
   # his contacts' feeds but not his.
   # The :include_person option is to handle the case when add_activities
   # should include the person as well.  This happens when
-  # someone comments on a person's blog post or wall.  In that case, when
+  # someone comments on a dog's blog post or wall.  In that case, when
   # adding activities to the contacts of the wall's or post's owner,
   # we should include the owner as well, so that he sees in his feed
   # that a comment has been made.
   def add_activities(options = {})
-    person = options[:person]
-    include_person = options[:include_person]
+    dog = options[:dog]
+    include_dog = options[:include_dog]
     activity = options[:activity] ||
-               Activity.create!(:item => options[:item], :person => person)
+               Activity.create!(:item => options[:item], :dog => dog)
     
-    people_ids = people_to_add(person, activity, include_person)
-    do_feed_insert(people_ids, activity.id) unless people_ids.empty?
+    dogs_ids = dogs_to_add(dog, activity, include_dog)
+    do_feed_insert(dogs_ids, activity.id) unless dogs_ids.empty?
   end
   
   private
   
-    # Return the ids of the people whose feeds need to be updated.
-    # The key step is the subtraction of people who already have the activity.
-    def people_to_add(person, activity, include_person)
-      all = person.contacts.map(&:id)
-      all.push(person.id) if include_person
+    # Return the ids of the dogs whose feeds need to be updated.
+    # The key step is the subtraction of dogs who already have the activity.
+    def dogs_to_add(dog, activity, include_dog)
+      all = dog.contacts.map(&:id)
+      all.push(dog.id) if include_dog
       all - already_have_activity(all, activity)
     end
   
-    # Return the ids of people who already have the given feed activity.
-    # The results of the query are Feed objects with only a person_id
-    # attribute (due to the "DISTINCT person_id" clause), which we extract
-    # using map(&:person_id).
-    def already_have_activity(people, activity)
-      Feed.find(:all, :select => "DISTINCT person_id",
-                      :conditions => ["person_id IN (?) AND activity_id = ?",
-                                      people, activity]).map(&:person_id)    
+    # Return the ids of dogs who already have the given feed activity.
+    # The results of the query are Feed objects with only a dog_id
+    # attribute (due to the "DISTINCT dog_id" clause), which we extract
+    # using map(&:dog_id).
+    def already_have_activity(dogs, activity)
+      Feed.find(:all, :select => "DISTINCT dog_id",
+                      :conditions => ["dog_id IN (?) AND activity_id = ?",
+                                      dogs, activity]).map(&:dog_id)    
     end
   
     # Return the SQL values string needed for the SQL VALUES clause.
@@ -55,9 +55,9 @@ module ActivityLogger
       array_of_values.inspect[1...-1].gsub('[', '(').gsub(']', ')')
     end
   
-    def do_feed_insert(people_ids, activity_id)
-      sql = %(INSERT INTO feeds (person_id, activity_id) 
-              VALUES #{values(people_ids, activity_id)})
+    def do_feed_insert(dog_ids, activity_id)
+      sql = %(INSERT INTO feeds (dog_id, activity_id) 
+              VALUES #{values(dog_ids, activity_id)})
       ActiveRecord::Base.connection.execute(sql)
     end
 end

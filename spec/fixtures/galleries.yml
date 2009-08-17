@@ -7,16 +7,16 @@
 #   column: value
 
 valid_gallery:
-    person: quentin
+    dog: dana
     title: "Title"
     description: "Some description"
     
-aarons_gallery:
-    person: aaron
+nolas_gallery:
+    dog: nola
     title: "Another title"
     description: "Another description"
 
 invalid_gallery:
-    person_id: NULL
+    dog_id: NULL
     title: "Title"
     description: "Some description"

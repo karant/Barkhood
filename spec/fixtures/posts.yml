@@ -2,18 +2,18 @@
 
 forum:
   topic: one
-  person: quentin
+  dog: dana
   body: MyText
   type: ForumPost
 
 forum_2:
   topic: two
-  person: aaron
+  dog: nola
   body: FooBar
   type: ForumPost
 
 blog_post:
   blog: one
-  person_id: quentin
+  dog: dana
   body: MyText
   type: BlogPost
