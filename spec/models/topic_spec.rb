@@ -3,9 +3,9 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe Topic do
   
   before(:each) do
-    @person = people(:quentin)
+    @dog = dogs(:dana)
     @topic = forums(:one).topics.build(:name => "A topic")
-    @topic.person = @person
+    @topic.dog = @dog
   end
 
   it "should be valid" do
@@ -28,17 +28,17 @@ describe Topic do
   
   it "should destroy associated posts" do
     @topic.save!
-    post = @topic.posts.unsafe_create(:body => "body", :person => @person)
+    post = @topic.posts.unsafe_create(:body => "body", :dog => @dog)
     # See the custom model matcher DestroyAssociated, located in
     # spec/matchers/custom_model_matchers.rb.
     @topic.should destroy_associated(:posts)
   end
   
-  it "should belong to a person" do
-    quentin = people(:quentin)
+  it "should belong to a dog" do
+    dana = dogs(:dana)
     topic = Topic.new
-    topic.person = quentin
-    topic.person.should == quentin
+    topic.dog = dana
+    topic.dog.should == dana
   end
   
   describe "associations" do

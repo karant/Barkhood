@@ -39,7 +39,7 @@ describe BlogPost do
     end
     
     it "should add an activity to the poster" do
-      @post.blog.person.recent_activity.should contain(@activity)
+      @post.blog.dog.recent_activity.should contain(@activity)
     end
   end
   
@@ -48,7 +48,7 @@ describe BlogPost do
     before(:each) do
       @post.save
       @comment = @post.comments.unsafe_create(:body => "The body",
-                                              :commenter => people(:aaron))
+                                              :commenter => dogs(:nola))
     end
     
     it "should have associated comments" do
@@ -58,7 +58,7 @@ describe BlogPost do
     it "should add activities to the poster" do
       @post.comments.each do |comment|
         activity = Activity.find_by_item_id(comment)
-        @post.blog.person.activities.should contain(activity)
+        @post.blog.dog.activities.should contain(activity)
       end
     end
     

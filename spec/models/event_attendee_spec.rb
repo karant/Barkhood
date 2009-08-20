@@ -2,10 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe EventAttendee do
   before(:each) do
-    @person = people(:aaron)
+    @dog = dogs(:dana)
     @event = events(:public)
     @event_attendee = EventAttendee.new(:event => @event,
-                                        :person => @person)
+                                        :dog => @dog)
   end
   
   it 'should be valid' do
@@ -23,7 +23,7 @@ describe EventAttendee do
     end
     
     it "should add an activity to the attendee" do
-      @event_attendee.person.recent_activity.should contain(@activity)
+      @event_attendee.dog.recent_activity.should contain(@activity)
     end
   end
 end

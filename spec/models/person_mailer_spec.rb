@@ -29,7 +29,7 @@ describe PersonMailer do
    
    describe "message notification" do
      before(:each) do
-       @message = people(:quentin).received_messages.first
+       @message = dogs(:dana).received_messages.first
        @email = PersonMailer.create_message_notification(@message)
      end
    
@@ -38,7 +38,7 @@ describe PersonMailer do
      end
    
      it "should have the right recipient" do
-       @email.to.first.should == @message.recipient.email
+       @email.to.first.should == @message.recipient.owner.email
      end
 
      it "should have the right domain in the body" do
@@ -49,19 +49,19 @@ describe PersonMailer do
    describe "connection request" do
      
      before(:each) do
-       @person  = people(:quentin)
-       @contact = people(:aaron)
-       Connection.request(@person, @contact)
-       @connection = Connection.conn(@contact, @person)
+       @dog  = dogs(:dana)
+       @contact = dogs(:max)
+       Connection.request(@dog, @contact)
+       @connection = Connection.conn(@contact, @dog)
        @email = PersonMailer.create_connection_request(@connection)
      end
      
      it "should have the right recipient" do
-       @email.to.first.should == @contact.email
+       @email.to.first.should == @contact.owner.email
      end
      
      it "should have the right requester" do
-       @email.body.should =~ /#{@person.name}/
+       @email.body.should =~ /#{@dog.name}/
      end
      
      it "should have a URL to the connection" do
@@ -75,7 +75,7 @@ describe PersonMailer do
      
      it "should have a link to the recipient's preferences" do
        prefs_url = "http://#{@server}"
-       prefs_url += "/people/#{@contact.to_param}/edit"
+       prefs_url += "/dogs/#{@contact.to_param}/edit"
        @email.body.should =~ /#{prefs_url}/
      end
    end
@@ -85,12 +85,12 @@ describe PersonMailer do
      before(:each) do
        @comment = comments(:blog_comment)
        @email = PersonMailer.create_blog_comment_notification(@comment)
-       @recipient = @comment.commented_person
+       @recipient = @comment.commented_dog
        @commenter = @comment.commenter
      end
      
      it "should have the right recipient" do
-       @email.to.first.should == @recipient.email
+       @email.to.first.should == @recipient.owner.email
      end
      
      it "should have the right commenter" do
@@ -105,7 +105,7 @@ describe PersonMailer do
      end
      
      it "should have a link to the recipient's preferences" do
-       prefs_url = "http://#{@server}/people/"
+       prefs_url = "http://#{@server}/dogs/"
        prefs_url += "#{@recipient.to_param}/edit"
        @email.body.should =~ /#{prefs_url}/
      end
@@ -116,12 +116,12 @@ describe PersonMailer do
      before(:each) do
        @comment = comments(:wall_comment)
        @email = PersonMailer.create_wall_comment_notification(@comment)
-       @recipient = @comment.commented_person
+       @recipient = @comment.commented_dog
        @commenter = @comment.commenter
      end
      
      it "should have the right recipient" do
-       @email.to.first.should == @recipient.email
+       @email.to.first.should == @recipient.owner.email
      end
      
      it "should have the right commenter" do
@@ -130,12 +130,12 @@ describe PersonMailer do
      
      it "should have a link to the comment" do
        url = "http://#{@server}"
-       url += "/people/#{@comment.commentable.to_param}#wall"
+       url += "/dogs/#{@comment.commentable.to_param}#wall"
        @email.body.should =~ /#{url}/
      end
      
      it "should have a link to the recipient's preferences" do
-       prefs_url = "http://#{@server}/people/#{@recipient.to_param}/edit"
+       prefs_url = "http://#{@server}/dogs/#{@recipient.to_param}/edit"
        @email.body.should =~ /#{prefs_url}/
      end
    end

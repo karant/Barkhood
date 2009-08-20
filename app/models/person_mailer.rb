@@ -21,7 +21,7 @@ class PersonMailer < ActionMailer::Base
     recipients   message.recipient.owner.email
     subject      formatted_subject("New message")
     body         "server" => server, "message" => message,
-                 "preferences_note" => preferences_note(message.recipient.owner)
+                 "preferences_note" => preferences_note(message.recipient)
   end
   
   def connection_request(connection)
@@ -31,7 +31,7 @@ class PersonMailer < ActionMailer::Base
     body         "server" => server,
                  "connection" => connection,
                  "url" => edit_connection_path(connection),
-                 "preferences_note" => preferences_note(connection.dog.owner)
+                 "preferences_note" => preferences_note(connection.dog)
   end
   
   def blog_comment_notification(comment)
@@ -42,7 +42,7 @@ class PersonMailer < ActionMailer::Base
                  "url" => 
                  blog_post_path(comment.commentable.blog, comment.commentable),
                  "preferences_note" => 
-                    preferences_note(comment.commented_dog.owner)
+                    preferences_note(comment.commented_dog)
   end
   
   def wall_comment_notification(comment)
@@ -50,9 +50,9 @@ class PersonMailer < ActionMailer::Base
     recipients   comment.commented_dog.owner.email
     subject      formatted_subject("New wall comment")
     body         "server" => server, "comment" => comment,
-                 "url" => person_path(comment.commentable, :anchor => "wall"),
+                 "url" => dog_path(comment.commentable, :anchor => "wall"),
                  "preferences_note" => 
-                    preferences_note(comment.commented_dog.owner)
+                    preferences_note(comment.commented_dog)
   end
   
   def email_verification(ev)
@@ -72,7 +72,7 @@ class PersonMailer < ActionMailer::Base
       "#{label}#{text}"
     end
   
-    def preferences_note(person)
-      %(To change your email notification preferences, visit http://#{server}/people/#{person.to_param}/edit#email_prefs)
+    def preferences_note(dog)
+      %(To change your email notification preferences, visit http://#{server}/dogs/#{dog.to_param}/edit#email_prefs)
     end
 end

@@ -12,7 +12,7 @@ describe Gallery do
   it "should require person_id" do
     @gallery = galleries(:invalid_gallery)
     @gallery.should_not be_valid
-    @gallery.errors.on(:person_id).should_not be_empty
+    @gallery.errors.on(:dog_id).should_not be_empty
   end
     
   it "should have a max title length" do
@@ -28,7 +28,7 @@ describe Gallery do
   end
   
   it "should have an activity" do
-    @gallery = Gallery.unsafe_create(:person => people(:kelly))
+    @gallery = Gallery.unsafe_create(:dog => dogs(:parker))
     Activity.find_by_item_id(@gallery).should_not be_nil
   end
 end

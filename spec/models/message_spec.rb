@@ -3,8 +3,8 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe Message do
   
   before(:each) do
-    @sender    = people(:quentin)
-    @recipient = people(:aaron)
+    @sender    = dogs(:dana)
+    @recipient = dogs(:max)
     @message   = new_message
   end
   
@@ -45,11 +45,11 @@ describe Message do
     @message.should_not be_trashed(@message.sender)
   end
   
-  it "should description not be able to trash as another user" do
-    kelly = people(:kelly)
-    kelly.should_not == @message.sender
-    kelly.should_not == @message.recipient
-    lambda { @message.trash(kelly) }.should raise_error(ArgumentError)
+  it "should description not be able to trash as another dog" do
+    parker = dogs(:parker)
+    parker.should_not == @message.sender
+    parker.should_not == @message.recipient
+    lambda { @message.trash(parker) }.should raise_error(ArgumentError)
   end
   
   it "should untrash messages" do
@@ -70,7 +70,7 @@ describe Message do
 
   it "should not allow anyone but recipient to reply" do
     @message.save!
-    @next_message = create_message(:sender    => people(:kelly),
+    @next_message = create_message(:sender    => dogs(:parker),
                                    :recipient => @message.sender,
                                    :parent    => @message)
     @next_message.should_not be_reply
@@ -89,7 +89,7 @@ describe Message do
   it "should assign conversation ids properly" do
     @message.save!
     @message.conversation.should_not be_nil
-    @next_message = create_message(:sender    => people(:kelly),
+    @next_message = create_message(:sender    => dogs(:parker),
                                    :recipient => @message.sender,
                                    :parent    => @message)
     @next_message.conversation.should == @message.conversation
@@ -111,8 +111,8 @@ describe Message do
     end
     
     it "should not send an email when recipient's notifications are off" do
-      @recipient.toggle!(:message_notifications)
-      @recipient.message_notifications.should == false
+      @recipient.owner.toggle!(:message_notifications)
+      @recipient.owner.message_notifications.should == false
       lambda do
         @message.save
       end.should_not change(@emails, :length)

@@ -5,7 +5,7 @@ describe ForumPost do
   before(:each) do
     @post = ForumPost.new(:body => "Hey there")
     @post.topic  = topics(:one)
-    @post.person = people(:quentin)
+    @post.dog = dogs(:nola)
   end
   
   it "should be valid" do
@@ -34,7 +34,7 @@ describe ForumPost do
     end
     
     it "should add an activity to the poster" do
-      @post.person.recent_activity.should contain(@activity)
+      @post.dog.recent_activity.should contain(@activity)
     end
   end
 end

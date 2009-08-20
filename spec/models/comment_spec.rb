@@ -6,7 +6,7 @@ describe Comment do
     before(:each) do
       @post = posts(:blog_post)
       @comment = @post.comments.unsafe_build(:body => "Hey there",
-                                             :commenter => people(:aaron))
+                                             :commenter => dogs(:max))
     end
   
     it "should be valid" do
@@ -41,7 +41,7 @@ describe Comment do
       end
     
       it "should add an activity to the poster" do
-        @comment.commentable.blog.person.activities.
+        @comment.commentable.blog.dog.activities.
           should contain(@activity)
       end
 
@@ -53,11 +53,11 @@ describe Comment do
     describe "feed items for contacts" do
       it %(should not have duplicate items when a contact comments
            on a blog) do
-        @person = @post.blog.person
+        @dog = @post.blog.dog
         @commenter = @comment.commenter
-        Connection.connect(@person, @commenter)
+        Connection.connect(@dog, @commenter)
         @comment.save!
-        @person.activities.should have_distinct_elements
+        @dog.activities.should have_distinct_elements
       end
     end
     
@@ -67,7 +67,7 @@ describe Comment do
         @emails = ActionMailer::Base.deliveries
         @emails.clear
         @global_prefs = Preference.find(:first)
-        @recipient = @comment.commented_person
+        @recipient = @comment.commented_dog
       end
       
       it "should send an email when global/recipient notifications are on" do
@@ -78,8 +78,8 @@ describe Comment do
       end
       
       it "should not send an email when recipient's notifications are off" do
-        @recipient.toggle!(:blog_comment_notifications)
-        @recipient.blog_comment_notifications.should == false
+        @recipient.owner.toggle!(:blog_comment_notifications)
+        @recipient.owner.blog_comment_notifications.should == false
         lambda do
           @comment.save
         end.should_not change(@emails, :length)
@@ -94,7 +94,7 @@ describe Comment do
       
       it "should not send an email for an own-comment" do
         lambda do
-          commenter = @post.blog.person
+          commenter = @post.blog.dog
           comment = @post.comments.unsafe_create(:body => "Hey there",
                                                  :commenter => commenter)
         end.should_not change(@emails, :length)
@@ -105,9 +105,9 @@ describe Comment do
   describe "wall comments" do
   
     before(:each) do
-      @person = people(:quentin)
-      @comment = @person.comments.unsafe_build(:body => "Hey there",
-                                               :commenter => people(:aaron))
+      @dog = dogs(:max)
+      @comment = @dog.comments.unsafe_build(:body => "Hey there",
+                                               :commenter => dogs(:dana))
     end
   
     it "should be valid" do
@@ -115,7 +115,7 @@ describe Comment do
     end
   
     it "should require a body" do
-      comment = @person.comments.new
+      comment = @dog.comments.new
       comment.should_not be_valid
       comment.errors.on(:body).should_not be_empty
     end
@@ -125,9 +125,9 @@ describe Comment do
     end
   
     it "should increase the comment count" do
-      old_count = @person.comments.count
+      old_count = @dog.comments.count
       @comment.save!
-      @person.comments.count.should == old_count + 1
+      @dog.comments.count.should == old_count + 1
     end
   
     describe "associations" do
@@ -147,7 +147,7 @@ describe Comment do
         @emails = ActionMailer::Base.deliveries
         @emails.clear
         @global_prefs = Preference.find(:first)
-        @recipient = @comment.commented_person
+        @recipient = @comment.commented_dog
       end
     
       it "should send an email when global/recipient notifications are on" do
@@ -158,8 +158,8 @@ describe Comment do
       end
     
       it "should not send an email when recipient's notifications are off" do
-        @recipient.toggle!(:wall_comment_notifications)
-        @recipient.wall_comment_notifications.should == false
+        @recipient.owner.toggle!(:wall_comment_notifications)
+        @recipient.owner.wall_comment_notifications.should == false
         lambda do
           @comment.save
         end.should_not change(@emails, :length)
@@ -174,8 +174,8 @@ describe Comment do
       
       it "should not send an email for an own-comment" do
         lambda do
-          @person.comments.create(:body => "Hey there",
-                                  :commenter => @person)
+          @dog.comments.create(:body => "Hey there",
+                                  :commenter => @dog)
         end.should_not change(@emails, :length)
       end
     end
@@ -184,26 +184,26 @@ describe Comment do
   describe "feed items for contacts" do
 
     before(:each) do
-      @person = people(:quentin)
-      @contact = people(:aaron)
-      @second_contact = people(:kelly)
-      Connection.connect(@person, @contact)
-      Connection.connect(@person, @second_contact)
+      @dog = dogs(:dana)
+      @contact = dogs(:max)
+      @second_contact = dogs(:parker)
+      Connection.connect(@dog, @contact)
+      Connection.connect(@dog, @second_contact)
     end
     
     # When one of your contacts comments on his own wall,
     # an activity might get created for both the commenter and the commented.
-    # Here they are the same person, so only one item should be craeted.
+    # Here they are the same dog, so only one item should be created.
     it "should not have duplicate feed items when commenting on own wall" do
-      Connection.connected?(@person, @contact).should be_true
+      Connection.connected?(@dog, @contact).should be_true
       @contact.comments.create(:body => "Hey there", :commenter => @contact)
-      @person.activities.should have_distinct_elements
+      @dog.activities.should have_distinct_elements
     end
     
-    it %(should not have duplicate feed items for Quentin
-         when Kelly comments on Aaron's wall) do
+    it %(should not have duplicate feed items for Dana
+         when Parker comments on Max's wall) do
       @contact.comments.create(:body => "bar", :commenter => @second_contact)
-      @person.activities.should have_distinct_elements
+      @dog.activities.should have_distinct_elements
     end
   end
 end

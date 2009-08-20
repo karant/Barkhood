@@ -4,7 +4,7 @@ describe Photo do
   
   before(:each) do
     @filename = "rails.png"
-    @person = people(:quentin)
+    @dog = dogs(:dana)
     @gallery = galleries(:valid_gallery)
     @image = uploaded_file(@filename, "image/png")
   end
@@ -13,8 +13,8 @@ describe Photo do
     new_photo.should be_valid
   end
   
-  it "should be invalid without person_id" do
-    @person = nil
+  it "should be invalid without dog_id" do
+    @dog = nil
     new_photo.should_not be_valid
   end
   
@@ -24,8 +24,8 @@ describe Photo do
   end
   
   
-  it "should have an associated person" do
-    new_photo.person.should == @person
+  it "should have an associated dog" do
+    new_photo.dog.should == @dog
   end
   
   it "should not have default AttachmentFu errors for an empty image" do
@@ -39,7 +39,7 @@ describe Photo do
   
     def new_photo(options = {})
       Photo.new({ :uploaded_data => @image,
-                  :person        => @person,
+                  :dog        => @dog,
                   :gallery       => @gallery }.merge(options))
     end
 end

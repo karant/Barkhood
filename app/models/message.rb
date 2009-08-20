@@ -63,10 +63,10 @@ class Message < Communication
   def trashed?(dog)
     case dog
     when sender
-      !sender_deleted_at.nil? and sender_deleted_at > Person::TRASH_TIME_AGO
+      !sender_deleted_at.nil? and sender_deleted_at > Dog::TRASH_TIME_AGO
     when recipient
       !recipient_deleted_at.nil? and 
-       recipient_deleted_at > Person::TRASH_TIME_AGO
+       recipient_deleted_at > Dog::TRASH_TIME_AGO
     end
   end
   
@@ -142,7 +142,7 @@ class Message < Communication
     def send_receipt_reminder
       return if sender == recipient
       @send_mail ||= !Message.global_prefs.nil? && Message.global_prefs.email_notifications? &&
-                     recipient.message_notifications?
+                     recipient.owner.message_notifications?
       PersonMailer.deliver_message_notification(self) if @send_mail
     end
 end
