@@ -8,18 +8,15 @@
         <%= f.label :name %>
         <%= f.text_field :name, :maxlength => Person::MAX_NAME %>
       </div>
-      
+	  
+	  <div class="form_row">
+        <%= f.label :address %>
+        <%= f.text_field :address, :maxlength => Person::MAX_ADDRESS %>
+      </div>
+	
       <div class="form_row">
         <%= f.label :email %>
         <%= f.text_field :email, :maxlength => Person::MAX_EMAIL %>
-      </div>
-      
-    <h3>Public Description</h3>
-      <p class="meta">This is what other users of the system see as your 
-        description.</p>
-      <div class="form_row">
-        <p><%= formatting_note %></p>
-        <%= f.text_area :description  %>
       </div>
 
       <%- if global_prefs.email_notifications? -%>

@@ -4,11 +4,11 @@
   </div>
   <p>
   <%= link_to h(gallery.title), gallery_path(gallery), :class => 'gallery_title' %>
-  <% if current_person?(gallery.person) %>
+  <% if current_person?(gallery.dog.owner) %>
       <%= link_to image_tag("icons/picture_edit.png", :class => 'actioner'),  
         edit_gallery_path(gallery),
         :title => 'Edit Gallery' %>
-      <%- if @person.galleries.count > 1 -%>
+      <%- if @dog.galleries.count > 1 -%>
       <%= link_to image_tag("icons/picture_delete.png", :class => 'actioner'), 
                   gallery,
                   :method => :delete, 

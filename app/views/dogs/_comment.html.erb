@@ -3,12 +3,12 @@
     <%= image_link(comment.commenter, :image => :thumbnail) %>
   </div>
   <p class="meta published">
-    <%= person_link comment.commenter %> said
+    <%= dog_link comment.commenter %> said
     <%= time_ago_in_words(comment.created_at) %> ago
-    <%- if (current_person?(comment.commentable) or
-            current_person?(comment.commenter)) -%>
+    <%- if (current_person?(comment.commentable.owner) or
+            current_person?(comment.commenter.owner)) -%>
       <%= link_to image_tag("icons/comment_delete.png", :class => 'actioner'), 
-                  person_comment_path(@person, comment),
+                  dog_comment_path(@dog, comment),
                   :method => :delete,
                   :confirm => 'Delete this wall comment?',
                   :title => 'Delete wall comment' %>

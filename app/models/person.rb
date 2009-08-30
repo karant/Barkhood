@@ -4,25 +4,30 @@ class Person < ActiveRecord::Base
   attr_accessor :password, :verify_password, :new_password
   attr_accessible :email, :password, :password_confirmation, :connection_notifications,
                   :message_notifications, :wall_comment_notifications,
-                  :blog_comment_notifications, :address
+                  :blog_comment_notifications, :address, :identity_url, :name
   MAX_EMAIL = MAX_PASSWORD = 40
+  MAX_NAME = 40
+  MAX_ADDRESS = 120
   EMAIL_REGEX = /\A[A-Z0-9\._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}\z/i
   TIME_AGO_FOR_MOSTLY_ACTIVE = 1.month.ago
+  FEED_SIZE = 10
 
   has_many :dogs, :foreign_key => 'owner_id', :dependent => :destroy
   has_many :email_verifications
  
-  validates_presence_of     :email
+  validates_presence_of     :email, :name, :address
   validates_presence_of     :password,              :if => :password_required?
   validates_presence_of     :password_confirmation, :if => :password_required?
   validates_length_of       :password, :within => 4..MAX_PASSWORD,
                                        :if => :password_required?
   validates_confirmation_of :password, :if => :password_required?
   validates_length_of       :email, :within => 6..MAX_EMAIL
+  validates_length_of       :name,  :maximum => MAX_NAME
   validates_format_of       :email,
                             :with => EMAIL_REGEX,
                             :message => "must be a valid email address"
   validates_uniqueness_of   :email
+  validates_uniqueness_of   :identity_url, :allow_nil => true
 
   acts_as_mappable :default_units => :miles, 
                    :default_formula => :sphere, 
@@ -69,13 +74,40 @@ class Person < ActiveRecord::Base
                    :order => :created_at)
     end
   end
+  
+  # Params for use in urls.
+  # Profile urls have the form '/people/1-michael-hartl'.
+  # This works automagically because Person.find(params[:id]) implicitly
+  # converts params[:id] into an int, and in Ruby
+  # '1-michael-hartl'.to_i == 1
+  def to_param
+    "#{id}-#{name.to_safe_uri}"
+  end
+
+  ## Feeds
+
+  # Return a activity feed for all of person's dogs.
+  def feed
+    activities = Activity.find(:all, :conditions => ["activities.dog_id IN (?) AND dogs.deactivated = ?", dog_ids, false],
+                                     :order => 'activities.created_at DESC',
+                                     :limit => Dog::FEED_SIZE,
+                                     :include => :dog)
+    len = activities.length
+    if len < FEED_SIZE
+      # Mix in some global activities for smaller feeds.
+      global = Activity.global_feed[0...(Activity::GLOBAL_FEED_SIZE-len)]
+      (activities + global).uniq.sort_by { |a| a.created_at }.reverse
+    else
+      activities
+    end
+  end
 
   ## Authentication methods
 
   # Authenticates a user by their email address and unencrypted password.
   # Returns the user or nil.
   def self.authenticate(email, password)
-    u = find_by_email(email.downcase.strip) # need to get the salt
+    u = find_by_email_and_identity_url(email.downcase.strip, nil) # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
 
@@ -159,6 +191,17 @@ class Person < ActiveRecord::Base
     end
   end
   
+  # Return the common connections with the given dog.
+  def common_contacts_with(other_dog, options = {})
+    # I tried to do this in SQL for efficiency, but failed miserably.
+    # Horrifyingly, MySQL lacks support for the INTERSECT keyword.
+    common_contacts = []
+    dogs.each do |dog|
+      common_contacts << (dog.contacts & other_dog.contacts)
+    end
+    return common_contacts.flatten.uniq.paginate(options)
+  end  
+  
   protected
 
     ## Callbacks
@@ -182,7 +225,8 @@ class Person < ActiveRecord::Base
     ## Other private method(s)
 
     def password_required?
-      crypted_password.blank? || !password.blank? || !verify_password.nil?
+      (crypted_password.blank? && identity_url.nil?) || !password.blank? ||
+      !verify_password.nil?
     end
     
     class << self

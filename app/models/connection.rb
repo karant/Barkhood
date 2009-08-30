@@ -33,6 +33,15 @@ class Connection < ActiveRecord::Base
     
     alias exist? exists?
   
+    def exists_with_person?(dog, person)
+      result = false
+      person.dogs.each do |contact|
+        result = exists?(dog, contact)
+        break if result
+      end
+      return result
+    end
+  
     # Make a pending connection request.
     def request(dog, contact, send_mail = nil)
       if send_mail.nil?
@@ -98,8 +107,35 @@ class Connection < ActiveRecord::Base
       exist?(dog, contact) and accepted?(dog, contact)
     end
     
+    def connected_with_person?(dog, person)
+      result = false
+      person.dogs.each do |contact|
+        result = connected?(dog, contact)
+        break if result
+      end
+      return result
+    end
+    
     def pending?(dog, contact)
       exist?(dog, contact) and conn(contact,dog).status == PENDING
+    end
+    
+    def pending_with_dog?(person, contact)
+      result = false
+      person.dogs.each do |dog|
+        result = pending?(dog, contact)
+        break if result
+      end
+      return result
+    end
+    
+    def pending_with_person?(dog, person)
+      result = false
+      person.dogs.each do |contact|
+        result = pending?(dog, contact)
+        break if result
+      end
+      return result
     end
   end
   

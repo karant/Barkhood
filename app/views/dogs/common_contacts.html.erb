@@ -1,9 +1,9 @@
 <%- column_div :type => :primary do -%>
-<h2>Common contacts with <%= @person.name %></h2>
+<h2>Common contacts with <%= @dog.name %></h2>
 <% unless @common_contacts.empty? -%>
   <%= will_paginate(@common_contacts) %>
-  <ul class="list people">
-    <%= render :partial => 'people/person',
+  <ul class="list dogs">
+    <%= render :partial => 'dogs/dog',
                :collection => @common_contacts %>
   </ul>
   <%= will_paginate(@common_contacts) %>

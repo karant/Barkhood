@@ -115,7 +115,7 @@ class Dog < ActiveRecord::Base
   # converts params[:id] into an int, and in Ruby
   # '1-dana'.to_i == 1
   def to_param
-    "#{id}-#{name.to_safe_uri}"
+    "#{id}-#{name.to_safe_uri rescue nil}"
   end
 
   ## Feeds
@@ -239,10 +239,14 @@ class Dog < ActiveRecord::Base
   end
 
   # Return the common connections with the given dog.
-  def common_contacts_with(other_dog, options = {})
+  def common_contacts_with(other_person, options = {})
     # I tried to do this in SQL for efficiency, but failed miserably.
     # Horrifyingly, MySQL lacks support for the INTERSECT keyword.
-    (contacts & other_dog.contacts).paginate(options)
+    common_contacts = []
+    other_person.dogs.each do |dog|
+      common_contacts << (contacts & dog.contacts)
+    end
+    return common_contacts.flatten.uniq.paginate(options)
   end
   
   protected

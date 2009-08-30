@@ -1,18 +1,15 @@
-<h1>Listing dogs</h1>
+<%- column_div :type => :primary do -%>
+  <% unless @dogs.empty? -%>
+    <h2>Dogs</h2>
+    <%= will_paginate %>
+    <ul class="list dogs">
+      <%= render :partial => @dogs %>
+    </ul>
+    <%= will_paginate %>
+  <% end -%>
+<%- end -%>
 
-<table>
-  <tr>
-  </tr>
-
-<% @dogs.each do |dog| %>
-  <tr>
-    <td><%= link_to 'Show', dog %></td>
-    <td><%= link_to 'Edit', edit_dog_path(dog) %></td>
-    <td><%= link_to 'Destroy', dog, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
-</table>
-
-<br />
-
-<%= link_to 'New dog', new_dog_path %>
+<%- column_div :type => :secondary do -%>
+  <%= render :partial => 'searches/box' %>
+  <%= render :partial => 'shared/minifeed' %>
+<%- end -%>

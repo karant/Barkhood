@@ -1,85 +1,113 @@
 class DogsController < ApplicationController
-  # GET /dogs
-  # GET /dogs.xml
+  
+  skip_before_filter :admin_warning, :only => [ :show, :update ]
+  before_filter :login_required, :only => [ :new, :show, :edit, :update, :create,
+                                            :common_contacts ]
+  before_filter :correct_user_required, :only => [ :edit, :update ]
+  before_filter :setup
+  before_filter :get_breeds, :only => [ :new, :edit, :update, :create ]
+  
   def index
-    @dogs = Dog.all
+    @dogs = Dog.mostly_active(params[:page])
 
     respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @dogs }
+      format.html
     end
   end
-
-  # GET /dogs/1
-  # GET /dogs/1.xml
+  
   def show
     @dog = Dog.find(params[:id])
-
+    unless @dog.active? or current_person.admin? or @dog.owner == current_person
+      flash[:error] = "That dog is not active"
+      redirect_to home_url and return
+    end
+    if logged_in?
+      @some_contacts = @dog.some_contacts
+      page = params[:page]
+      @common_contacts = current_person.common_contacts_with(@dog,
+                                                             :page => page)
+      # Use the same max number as in basic contacts list.
+      num_contacts = Dog::MAX_DEFAULT_CONTACTS
+      @some_common_contacts = @common_contacts[0...num_contacts]
+      @blog = @dog.blog
+      @posts = @dog.blog.posts.paginate(:page => params[:page])
+      @galleries = @dog.galleries.paginate(:page => params[:page])
+    end
     respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @dog }
+      format.html
     end
   end
 
-  # GET /dogs/new
-  # GET /dogs/new.xml
   def new
-    @dog = Dog.new
+    @body = "register single-col"
+    @dog = current_person.dogs.build
 
     respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @dog }
+      format.html
     end
   end
 
-  # GET /dogs/1/edit
-  def edit
-    @dog = Dog.find(params[:id])
-  end
-
-  # POST /dogs
-  # POST /dogs.xml
   def create
-    @dog = Dog.new(params[:dog])
-
+    @dog = current_person.dogs.build(params[:dog])
     respond_to do |format|
       if @dog.save
-        flash[:notice] = 'Dog was successfully created.'
-        format.html { redirect_to(@dog) }
-        format.xml  { render :xml => @dog, :status => :created, :location => @dog }
+        flash[:notice] = "You dog profile has been created."
+        format.html { redirect_back_or_default(home_url) }
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @dog.errors, :status => :unprocessable_entity }
+        @body = "register single-col"
+        format.html { render :action => 'new' }
       end
     end
   end
 
-  # PUT /dogs/1
-  # PUT /dogs/1.xml
+  def edit
+    @dog = current_person.dogs.find(params[:id])
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def update
-    @dog = Dog.find(params[:id])
-
+    @dog = current_person.dogs.find(params[:id])
     respond_to do |format|
-      if @dog.update_attributes(params[:dog])
-        flash[:notice] = 'Dog was successfully updated.'
+      if !preview? and @dog.update_attributes(params[:dog])
+        flash[:success] = 'Dog profile updated!'
         format.html { redirect_to(@dog) }
-        format.xml  { head :ok }
       else
+        if preview?
+          @preview = @dog.description = params[:dog][:description]
+        end
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @dog.errors, :status => :unprocessable_entity }
       end
     end
   end
-
-  # DELETE /dogs/1
-  # DELETE /dogs/1.xml
-  def destroy
+  
+  def common_contacts
     @dog = Dog.find(params[:id])
-    @dog.destroy
-
+    @common_contacts = @dog.common_contacts_with(current_person,
+                                                    :page => params[:page])
     respond_to do |format|
-      format.html { redirect_to(dogs_url) }
-      format.xml  { head :ok }
+      format.html
     end
   end
+  
+  private
+
+    def setup
+      @body = "dog"
+    end
+    
+    def get_breeds
+      @breeds = Breed.find(:all)
+    end
+  
+    def correct_user_required
+      redirect_to home_url unless current_person.dogs.include? Dog.find(params[:id])
+    end
+    
+    def preview?
+      params["commit"] == "Preview"
+    end
+
 end

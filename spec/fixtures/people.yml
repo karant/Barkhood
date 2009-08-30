@@ -2,7 +2,9 @@
 <% password = Person.encrypt('test').inspect %>
 
 quentin:
+  name: Quentin
   email: quentin@example.com
+  address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>
   created_at: <%= 5.days.ago.to_s :db %>
   last_logged_in_at: <%= 1.day.ago.to_s :db %>
@@ -14,7 +16,9 @@ quentin:
   email_verified: true
 
 aaron:
+  name: Aaron
   email: aaron@example.com
+  address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>
   created_at: <%= 1.day.ago.to_s :db %>
   deactivated: false
@@ -25,7 +29,9 @@ aaron:
   email_verified: true
 
 kelly:
+  name: Kelly
   email: kelly@example.com
+  address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>
   created_at: <%= 1.day.ago.to_s :db %>
   deactivated: false
@@ -35,7 +41,9 @@ kelly:
   blog_comment_notifications: true
   
 admin:
+  name: Admin
   email: admin@example.com
+  address: 4188 Justin Way, Sacramento CA 95826
   admin: true
   crypted_password: <%= password %>
   created_at: <%= 5.days.ago.to_s :db %>
@@ -46,13 +54,17 @@ admin:
   blog_comment_notifications: true
 
 deactivated:
+  name: Deactivated
   email: deactivated@example.com
+  address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>
   created_at: <%= 1.day.ago.to_s :db %>
   deactivated: true
 
 email_unverified:
+  name: Email Unverified
   email: inactive@example.com
+  address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>
   created_at: <%= 1.day.ago.to_s :db %>
   email_verified: false 

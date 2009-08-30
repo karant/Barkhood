@@ -1,0 +1,13 @@
+<ul>
+	<% @person.dogs.each do |dog| %>
+		<li class="vcard dog">
+		  <div class="profile-image">
+		    <%= image_link dog, :class => "photo", :image => :thumbnail %>
+		  </div>
+		  <p><%= person_link dog, :class => "url fn" %></p>
+		  <%= display(truncate(dog.description, :length => 150),
+		              :class => "note") %>
+		  <div class="clear"></div>
+		</li>
+	<% end %>
+</ul>

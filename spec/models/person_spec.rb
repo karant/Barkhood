@@ -35,6 +35,11 @@ describe Person do
       end.should raise_error(ActiveRecord::StatementInvalid)
     end
 
+    it "should require name" do
+      p = create_person(:name => nil)
+      p.errors.on(:name).should_not be_nil
+    end
+
     it "should strip spaces in email field" do
       create_person(:email => 'example@example.com ').should be_valid
     end
@@ -42,6 +47,65 @@ describe Person do
     it "should allow a plus sign in the email address" do
       create_person(:email => 'foo+bar@example.com').should be_valid
     end
+  end
+  
+  describe "length validations" do
+    it "should enforce a maximum name length" do
+      @person.should have_maximum(:name, Person::MAX_NAME)
+    end
+  end  
+  
+  describe "utility methods" do
+    it "should have the right to_param method" do
+      # Person params should have the form '1-michael-hartl'.
+      param = "#{@person.id}-quentin"
+      @person.to_param.should == param
+    end
+ 
+    it "should have a safe uri" do
+      @person.name = "Michael & Hartl"
+      param = "#{@person.id}-michael-and-hartl"
+      @person.to_param.should == param
+    end
+  end  
+  
+  describe "associations" do
+    before(:each) do
+      @contact = dogs(:buba)
+    end
+    
+    it "should have dogs" do
+      @person.dogs.should == [dogs(:deactivated), dogs(:dana), dogs(:nola)]
+    end
+
+    describe "common contacts" do
+
+      before(:each) do
+        @parker = dogs(:parker)
+        @nola = dogs(:nola)
+        Connection.connect(@parker, @contact)
+        Connection.connect(@nola, @contact)
+      end
+
+      it "should have common contacts with someone" do
+        common_contacts = @person.common_contacts_with(@parker)
+        common_contacts.size.should == 1
+        common_contacts.should be_a_kind_of(WillPaginate::Collection)
+        common_contacts.should == [@contact]
+      end
+      
+      it "should not include non-common contacts" do
+        sharik = dogs(:sharik)
+        Connection.connect(@parker, sharik)
+        @person.common_contacts_with(@parker).should_not contain(sharik)
+      end
+
+      it "should exclude dogs with deactivated owners from common contacts" do
+        @contact.owner.toggle!(:deactivated)
+        common_contacts = @person.common_contacts_with(@parker)
+        common_contacts.should be_empty
+      end   
+    end    
   end
 
   describe "authentication" do
@@ -241,6 +305,7 @@ describe Person do
 
     def create_person(options = {})
       record = Person.new({ :email => 'quire@example.com',
+                            :name => 'Name',
                             :password => 'quire',
                             :password_confirmation => 'quire',
                             :address => '4188 Justin Way, Sacramento CA 95826'}.merge(options))

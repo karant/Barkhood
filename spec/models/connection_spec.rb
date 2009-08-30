@@ -41,6 +41,31 @@ describe Connection do
       end.should_not change(@emails, :length)
     end
     
+    it "should determine if dog has connections (active or pending) to any of person's dogs" do
+      Connection.request(@dog, @contact)
+      Connection.exists_with_person?(@dog, people(:aaron)).should == true
+      Connection.exists_with_person?(@dog, people(:kelly)).should == false
+    end
+    
+    it "should determine if dog has active connections to any of person's dogs" do
+      Connection.connect(@dog, @contact)
+      Connection.request(@dog, dogs(:buba))
+      Connection.connected_with_person?(@dog, people(:aaron)).should == true
+      Connection.connected_with_person?(@dog, people(:kelly)).should == false
+    end
+    
+    it "should determine if any of person's dogs have pending connections requested by the viewed dog" do
+      Connection.request(@dog, @contact)
+      Connection.pending_with_dog?(people(:aaron), @dog).should == true
+      Connection.pending_with_dog?(people(:kelly), @dog).should == false      
+    end
+    
+    it "should determine if the viewed dog has pending connections requested by the person" do
+      Connection.request(@dog, @contact)
+      Connection.pending_with_person?(@contact, people(:quentin)).should == true
+      Connection.pending_with_person?(@contact, people(:kelly)).should == false      
+    end
+    
     describe "connect method" do
       it "should not send an email when contact's notifications are off" do
         @contact.owner.toggle!(:connection_notifications)

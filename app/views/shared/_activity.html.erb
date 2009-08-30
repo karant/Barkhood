@@ -8,7 +8,7 @@
   </p>
   <p class="meta published clear">
     <%= time_ago_in_words(activity.created_at).capitalize %> ago
-     <%- if current_person?(activity.person) -%>
+     <%- if current_person?(activity.dog.owner) -%>
       <%= link_to(image_tag("icons/comment_delete.png",
                              :class => 'actioner'), 
                    activity_path(activity), 

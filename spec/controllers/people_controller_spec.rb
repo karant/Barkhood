@@ -12,12 +12,6 @@ describe PeopleController do
   
   describe "people pages" do
     integrate_views
-        
-    it "should have a working index" do
-      get :index
-      response.should be_success
-      response.should render_template("index")
-    end
 
     it "should have a working new page" do
       get :new
@@ -97,6 +91,14 @@ describe PeopleController do
       end.should_not change(Person, :count)
     end
     
+    it 'requires address on signup' do
+      lambda do
+        create_person(:address => nil)
+        assigns[:person].errors.on(:address).should_not be_nil
+        response.should be_success
+      end.should_not change(Person, :count)
+    end
+    
     describe "email verifications" do
       
       before(:each) do
@@ -146,7 +148,7 @@ describe PeopleController do
           
         it "should not have an auth token" do
           create_person
-          response.cookies["auth_token"].should == []
+          response.cookies["auth_token"].should == nil
         end
         
         it "should verify a person even if they're logged in" do
@@ -178,18 +180,11 @@ describe PeopleController do
       response.should be_success
       response.should render_template("edit")
     end
-    
-    it "should allow mass assignment to name" do
-      put :update, :id => @person, :person => { :name => "Foo Bar" },
-                   :type => "info_edit"
-      assigns(:person).name.should == "Foo Bar"
-      response.should redirect_to(person_url(assigns(:person)))
-    end
       
-    it "should allow mass assignment to description" do
-      put :update, :id => @person, :person => { :description => "Me!" },
+    it "should allow mass assignment to address" do
+      put :update, :id => @person, :person => { :address => "111 Capitol Ave, Sacramento CA" },
                    :type => "info_edit"
-      assigns(:person).description.should == "Me!"
+      assigns(:person).address.should == "111 Capitol Ave, Sacramento CA"
       response.should redirect_to(person_url(assigns(:person)))
     end
     
@@ -244,28 +239,15 @@ describe PeopleController do
       get :show, :id => @person
       response.should redirect_to(home_url)
     end
-    
-    it "should display break up link if connected" do
-      login_as(@person)
-      @contact = people(:aaron)
-      conn = Connection.connect(@person, @contact)
-      get :show, :id => @contact.reload
-      response.should have_tag("a[href=?]", connection_path(conn))
-    end
-    
-    it "should not display break up link if not connected" do
-      login_as(@person)
-      @contact = people(:aaron)
-      get :show, :id => @contact.reload
-      response.should_not have_tag("a", :text => "Remove Connection")
-    end
   end
   
   private
 
     def create_person(options = {})
-      person_hash = { :name => "Quire", :email => 'quire@foo.com',
-                      :password => 'quux', :password_confirmation => 'quux' }
+      person_hash = { :email => 'quire@foo.com',
+                      :name => 'Quire',
+                      :password => 'quux', :password_confirmation => 'quux',
+                      :address => '4188 Justin Way, Sacramento CA 95826'}
       post :create, :person => person_hash.merge(options)
       assigns(:person)
     end

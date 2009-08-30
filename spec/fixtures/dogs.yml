@@ -30,6 +30,22 @@ parker:
   sex: Male
   breed: bulldog
   
+buba:
+  owner: kelly
+  name: Buba
+  description: I'm Buba!
+  dob: <%= 5.years.ago.to_s(:db) %>
+  sex: Male
+  breed: bulldog
+  
+sharik:
+  owner: kelly
+  name: Sharik
+  description: I'm Sharik!
+  dob: <%= 2.weeks.ago.to_s(:db) %>
+  sex: Male
+  breed: bulldog
+  
 deactivated:
   owner: quentin
   name: Deactivated

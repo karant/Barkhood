@@ -1,0 +1,80 @@
+<h2><span class="fn n"><%= @dog.name %></span>'s Profile</h2>
+<%- if current_person?(@dog.owner) || current_person.admin? -%>
+  <div class="button_container">
+<%- end -%>
+<%- if current_person.admin? -%>
+  <%- activity = activated_status(@dog) -%>
+  <%= link_to activity,
+              admin_dog_path(@dog, :task => "deactivated"),
+              :method => :put %>
+  <%= "|" if current_person?(@dog.owner) %>
+<%- end -%>
+<%- if current_person?(@dog.owner) -%>
+  <%= link_to "Edit profile", edit_dog_path(@dog) %> |
+  <%= link_to "Change photo", @dog.galleries.first %>
+<%- end -%>
+<%- if current_person?(@dog.owner) || current_person.admin? -%>
+    <div class="clear"></div>
+  </div>
+<%- end -%>
+<%- if admin? and not @dog.active? -%>
+  <p class="error">This dog is not active</p>
+<%- end -%>
+<%- if current_person?(@dog.owner) && @dog.description.blank? -%>
+  <div class="error">
+    Your dog's description is blank.
+    <%= link_to "Click here to add a description",
+      edit_dog_path(@dog) %>
+  </div>
+<%- end -%>
+ 
+<div class="toolbox">
+  <%= image_tag @dog.main_photo, :class => "profile-image photo",
+                                    :alt => h(@dog.name) %>
+  <%- unless current_person?(@dog.owner) -%>
+    <h3><%= @dog.name %></h3>
+    <ul class="tools">
+      <%- if logged_in? -%>
+        <%- unless Connection.exists_with_person?(@dog, current_person) -%>
+          <li><%= link_to "Request Connection",
+                          dog_connections_path(@dog),
+                          :method => :post %></li>
+        <%- end -%>
+        <%- if Connection.connected_with_person?(@dog, current_person) -%>
+          <li>You're connected!
+		  <% current_person.dogs.each do |dog| %>
+		  	<% if Connection.connected?(@dog, dog) %>
+	          <%= link_to image_tag('icons/user_delete.png'),
+	                      connection_path(Connection.conn(dog,
+	                                                      @dog)),
+	                          :method => :delete,
+	                      :title => "Remove connection",
+	             :confirm => "Are you sure you want to remove this connection?" %>
+		  	<% end %>
+		  <% end %>
+          </li>
+        <%- end -%>
+          <%- if Connection.pending_with_dog?(current_person, @dog) -%>
+          <li>
+            <%= h @dog.name %> has contacted you
+            <br />
+			<% current_person.dogs.each do |dog| %>
+				<% if Connection.pending?(dog, @dog) %>
+		            (<%= link_to "respond to contact request for " + h(dog.name),
+		                         edit_connection_path(Connection.conn(dog,
+		                                                              @dog)) %>)
+				<% end %>
+			<% end %>
+          </li>
+          <%- end -%>
+          <%- if Connection.pending_with_person?(@dog, current_person) -%>
+          <li>
+            You've contacted <%= h @dog.name %>
+          </li>
+          <%- end -%>
+        <li><%= email_link(@dog) %></li>
+      <%- end -%>
+    </ul>
+  <%- end -%>
+</div>
+<%= display @dog.description %>

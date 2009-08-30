@@ -7,31 +7,11 @@ class PeopleController < ApplicationController
   before_filter :correct_user_required, :only => [ :edit, :update ]
   before_filter :setup
   
-  def index
-    @people = Person.mostly_active(params[:page])
-
-    respond_to do |format|
-      format.html
-    end
-  end
-  
   def show
     @person = Person.find(params[:id])
     unless @person.active? or current_person.admin?
       flash[:error] = "That person is not active"
       redirect_to home_url and return
-    end
-    if logged_in?
-      @some_contacts = @person.some_contacts
-      page = params[:page]
-      @common_contacts = current_person.common_contacts_with(@person,
-                                                             :page => page)
-      # Use the same max number as in basic contacts list.
-      num_contacts = Person::MAX_DEFAULT_CONTACTS
-      @some_common_contacts = @common_contacts[0...num_contacts]
-      @blog = @person.blog
-      @posts = @person.blog.posts.paginate(:page => params[:page])
-      @galleries = @person.galleries.paginate(:page => params[:page])
     end
     respond_to do |format|
       format.html
@@ -115,13 +95,10 @@ class PeopleController < ApplicationController
     respond_to do |format|
       case params[:type]
       when 'info_edit'
-        if !preview? and @person.update_attributes(params[:person])
+        if @person.update_attributes(params[:person])
           flash[:success] = 'Profile updated!'
           format.html { redirect_to(@person) }
         else
-          if preview?
-            @preview = @person.description = params[:person][:description]
-          end
           format.html { render :action => "edit" }
         end
       when 'password_edit'
@@ -139,15 +116,6 @@ class PeopleController < ApplicationController
     end
   end
   
-  def common_contacts
-    @person = Person.find(params[:id])
-    @common_contacts = @person.common_contacts_with(current_person,
-                                                    :page => params[:page])
-    respond_to do |format|
-      format.html
-    end
-  end
-  
   private
 
     def setup
@@ -156,9 +124,5 @@ class PeopleController < ApplicationController
   
     def correct_user_required
       redirect_to home_url unless Person.find(params[:id]) == current_person
-    end
-    
-    def preview?
-      params["commit"] == "Preview"
     end
 end

@@ -20,6 +20,12 @@
       <span class="small">(will be displayed)</span></label>
     <%= f.text_field :name, :maxlength => Person::MAX_NAME %>
   </div>
+  
+  <div class="form_row">
+    <label for="address">Address 
+      <span class="small">(used to locate other dogs near you)</span></label>
+    <%= f.text_field :address, :maxlength => Person::MAX_ADDRESS %>
+  </div>
 
   <div class="form_row">
     <%= submit_tag 'Sign up', :class => "button" %>

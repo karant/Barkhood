@@ -119,14 +119,14 @@ module ApplicationHelper
     concat(content_tag(:div, capture(&block), options))
   end
 
-  def email_link(person, options = {})
+  def email_link(dog, options = {})
     reply = options[:replying_to]
     use_image = options[:use_image].nil? || options[:use_image]
     to_all = options[:to_all]
     if reply
       path = reply_message_path(reply)
     else
-      path = new_person_message_path(person)
+      path = new_dog_message_path(dog)
     end
     img = image_tag("icons/email_add.png")
     if reply.nil?

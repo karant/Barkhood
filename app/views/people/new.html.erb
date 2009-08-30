@@ -18,11 +18,17 @@
     <%= f.text_field :email, :maxlength => Person::MAX_EMAIL %>
     <%= set_focus_to "person_email" %>  
   </div>
-
+  
   <div class="form_row">
-    <label for="person_name">Name 
+    <label for="person_name">Name
       <span class="small">(will be displayed)</span></label>
     <%= f.text_field :name, :maxlength => Person::MAX_NAME %>
+  </div>
+
+  <div class="form_row">
+    <label for="person_address">Address 
+      <span class="small">(will be used to locate other dogs near you)</span></label>
+    <%= f.text_field :address, :maxlength => Person::MAX_ADDRESS %>
   </div>
 
   <div class="form_row">

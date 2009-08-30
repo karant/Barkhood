@@ -120,7 +120,7 @@ describe Dog do
   describe "associations" do
 
     before(:each) do
-      @contact = dogs(:max)
+      @contact = dogs(:buba)
     end
 
     # TODO: make custom matchers to get @contact.should have_requested_contacts
@@ -138,38 +138,34 @@ describe Dog do
     describe "common contacts" do
 
       before(:each) do
-        @nola = dogs(:nola)
+        @current_user = people(:aaron)
+        @max = dogs(:max)
         Connection.connect(@dog, @contact)
-        Connection.connect(@nola, @contact)
+        Connection.connect(@max, @contact)
       end
 
       it "should have common contacts with someone" do
-        common_contacts = @dog.common_contacts_with(@nola)
+        common_contacts = @dog.common_contacts_with(@current_user)
         common_contacts.size.should == 1
         common_contacts.should be_a_kind_of(WillPaginate::Collection)
         common_contacts.should == [@contact]
       end
 
       it "should not include non-common contacts" do
-        parker = dogs(:parker)
-        Connection.connect(@dog, parker)
-        @dog.common_contacts_with(@nola).should_not contain(parker)
+        sharik = dogs(:sharik)
+        Connection.connect(@dog, sharik)
+        @dog.common_contacts_with(@current_user).should_not contain(sharik)
       end
 
       it "should exclude dogs with deactivated owners from common contacts" do
         @contact.owner.toggle!(:deactivated)
-        common_contacts = @dog.common_contacts_with(@nola)
+        common_contacts = @dog.common_contacts_with(@current_user)
         common_contacts.should be_empty
       end
       
-      it "should exclude the dog being viewed" do
-        Connection.connect(@dog, @nola)
-        @dog.common_contacts_with(@nola).should_not contain(@nola)
-      end
-      
-      it "should exclude the dog doing the viewing" do
-        Connection.connect(@dog, @nola)
-        @dog.common_contacts_with(@nola).should_not contain(@dog)
+      it "should exclude the dogs of owner doing the viewing" do
+        Connection.connect(@dog, @max)
+        @dog.common_contacts_with(@current_user).should_not contain(@max)
       end
     end
   end

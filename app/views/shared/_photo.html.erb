@@ -10,7 +10,7 @@
     <%= link_to image_tag(photo.public_filename(:thumbnail)),
                 '#gpu' + photo_id(photo), :rel => 'facebox' %>
   </div>
-  <%- if current_person?(photo.person) -%>
+  <%- if current_person?(photo.dog.owner) -%>
   <div class='gallPhotoMeta'>
       <%= link_to image_tag("icons/picture_edit.png", :class => 'actioner'), 
                   edit_photo_path(photo),

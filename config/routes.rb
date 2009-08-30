@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :breeds
 
-  map.resources :dogs
+  map.resources :dogs, :member => { :common_contacts => :get }
 
   map.resources :categories
   map.resources :links
@@ -29,18 +29,18 @@ ActionController::Routing::Routes.draw do |map|
                                       :common_contacts => :get }
   map.connect 'people/verify/:id', :controller => 'people',
                                    :action => 'verify_email'
-  map.resources :people do |person|
-     person.resources :messages
-     person.resources :galleries
-     person.resources :connections
-     person.resources :comments
+  map.resources :dogs do |dog|
+     dog.resources :messages
+     dog.resources :galleries
+     dog.resources :connections
+     dog.resources :comments
   end
   
   map.resources :galleries do |gallery|
     gallery.resources :photos
   end
   map.namespace :admin do |admin|
-    admin.resources :people, :preferences
+    admin.resources :people, :dogs, :preferences
     admin.resources :forums do |forums|
       forums.resources :topics do |topic|
         topic.resources :posts

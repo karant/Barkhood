@@ -1,12 +1,37 @@
-<h1>Editing dog</h1>
+<%- column_div :type => :primary do -%>
+  <h2>Edit <%=h @dog.name %>'s Profile</h2>
 
-<% form_for(@dog) do |f| %>
-  <%= f.error_messages %>
-
-  <p>
-    <%= f.submit 'Update' %>
-  </p>
-<% end %>
-
-<%= link_to 'Show', @dog %> |
-<%= link_to 'Back', dogs_path %>
+  <div id="profile_edit">
+    <%= error_messages_for :dog %>
+    <% form_for @dog do |f| %>
+      <div class="form_row">
+        <%= f.label :name %>
+        <%= f.text_field :name, :maxlength => Dog::MAX_NAME %>
+      </div>
+      
+      <div class="form_row">
+        <%= f.label :breed %>
+        <%= f.select :breed_id, @breeds.map{|b| [b.name, b.id]} %>
+      </div>
+	  
+      <div class="form_row">
+        <%= f.label :date_of_birth %>
+        <%= f.date_select :dob %>
+      </div>	  
+      
+    <h3>Public Description</h3>
+      <p class="meta">This is what other users of the system see as your dog's
+        description.</p>
+      <div class="form_row">
+        <p><%= formatting_note %></p>
+        <%= f.text_area :description %>
+      </div>
+  
+      <div class="form_row">
+        <%= f.submit "Update", :class => "button" %>
+        <%= link_to "Cancel", @dog %>
+        <input type="hidden" name="type" value="info_edit" />
+      </div>
+  <% end %>
+  </div>
+<%- end -%>
