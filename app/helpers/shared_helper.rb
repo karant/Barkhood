@@ -5,8 +5,8 @@ module SharedHelper
     logged_in? and person == current_person
   end
   
-  # Return true if a person is connected to (or is) the current person
-  def connected_to?(person)
-    current_person?(person) or Connection.connected?(person, current_person)
+  # Return true if a dog is connected to (or is) the current person
+  def connected_to?(dog)
+    current_person?(dog.owner) or Connection.connected_with_person?(dog, current_person)
   end
 end

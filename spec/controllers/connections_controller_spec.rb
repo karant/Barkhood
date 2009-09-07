@@ -4,8 +4,9 @@ describe ConnectionsController do
   integrate_views
   
   before(:each) do
-    @person  = login_as(:quentin)
-    @contact = people(:aaron)
+    login_as(:quentin)
+    @dog = dogs(:dana)
+    @contact = dogs(:max)
   end
   
   it "should protect the create page" do
@@ -15,9 +16,9 @@ describe ConnectionsController do
   end
   
   it "should create a new connection request" do
-    Connection.should_receive(:request).with(@person, @contact).
+    Connection.should_receive(:request).with(@dog, @contact).
       and_return(true)
-    post :create, :person_id => @contact
+    post :create, :dog_id => @dog, :contact_id => @contact
     response.should redirect_to(home_url)
   end
   
@@ -25,8 +26,8 @@ describe ConnectionsController do
     integrate_views
     
     before(:each) do
-      Connection.request(@person, @contact)
-      @connection = Connection.conn(@person, @contact)
+      Connection.request(@dog, @contact)
+      @connection = Connection.conn(@dog, @contact)
     end
     
     it "should get the edit page" do
@@ -53,8 +54,8 @@ describe ConnectionsController do
     end
   
     it "should end a connection" do
-      delete :destroy, :id => @connection
-      response.should redirect_to(person_connections_url(@person))
+      delete :destroy, :id => @connection, :dog_id => @dog
+      response.should redirect_to(dog_connections_url(@dog))
     end
   end  
 end

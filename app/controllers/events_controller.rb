@@ -46,7 +46,8 @@ class EventsController < ApplicationController
   end
 
   def create
-    @event = Event.new(params[:event].merge(:person => current_person))
+    @event = Event.new(params[:event])
+    @event.dog = current_person.dogs.find(params[:event][:dog_id])
 
     respond_to do |format|
       if @event.save
@@ -83,8 +84,9 @@ class EventsController < ApplicationController
   end
 
   def attend
-    if @event.attend(current_person)
-      flash[:notice] = "You are attending this event."
+    @dog = current_person.dogs.find(params[:dog_id])
+    if @event.attend(@dog)
+      flash[:notice] = "#{h(@dog.name)} is now attending this event."
       redirect_to @event
     else
       flash[:error] = "You can only attend once."
@@ -93,8 +95,9 @@ class EventsController < ApplicationController
   end
 
   def unattend
-    if @event.unattend(current_person)
-      flash[:notice] = "You are not attending this event."
+    @dog = current_person.dogs.find(params[:dog_id])
+    if @event.unattend(@dog)
+      flash[:notice] = "#{h(@dog.name)} is no longer attending this event."
       redirect_to @event
     else
       flash[:error] = "You are not attending this event."
@@ -111,18 +114,18 @@ class EventsController < ApplicationController
   
     def authorize_show
       if (@event.only_contacts? and
-          not (@event.person.contact_ids.include?(current_person.id) or
-               current_person?(@event.person) or current_person.admin?))
+          not (current_person.dogs.any?{|dog| @event.dog.contact_ids.include?(dog.id)} or
+               current_person?(@event.dog.owner) or current_person.admin?))
         redirect_to home_url 
       end
     end
   
     def authorize_change
-      redirect_to home_url unless current_person?(@event.person)
+      redirect_to home_url unless current_person?(@event.dog.owner)
     end
 
     def authorize_destroy
-      can_destroy = current_person?(@event.person) || current_person.admin?
+      can_destroy = current_person?(@event.dog.owner) || current_person.admin?
       redirect_to home_url unless can_destroy
     end
 

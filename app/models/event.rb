@@ -25,6 +25,13 @@ class Event < ActiveRecord::Base
                                                   PRIVACY[:public], 
                                                   PRIVACY[:contacts], 
                                                   dog.contact_ids] } }
+                                                  
+  named_scope :person_events,
+              lambda { |person| { :conditions => ["dog_id IN (?) OR (privacy = ? OR (privacy = ? AND (dog_id IN (?))))", 
+                                                  person.dog_ids,
+                                                  PRIVACY[:public], 
+                                                  PRIVACY[:contacts], 
+                                                  person.contact_ids] } }  
 
   named_scope :period_events,
               lambda { |date_from, date_until| { :conditions => ['start_time >= ? and start_time <= ?',

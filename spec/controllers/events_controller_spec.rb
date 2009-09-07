@@ -5,6 +5,7 @@ describe EventsController do
   
   before(:each) do
     @person = login_as(:aaron)
+    @dog = dogs(:max)
   end
 
   def mock_event(stubs={})
@@ -12,7 +13,7 @@ describe EventsController do
       :save => true,
       :update_attributes => true,
       :destroy => true,
-      :person => @person,
+      :dog => @dog,
       :to_xml => '',
       :start_time => Time.now,
       :attendees => [],
@@ -94,10 +95,11 @@ describe EventsController do
     end
 
     it "should allow to see private events if contact" do
-      contact = login_as(:quentin)
+      login_as(:quentin)
+      contact = dogs(:dana)
       Event.should_receive(:find).and_return(mock_event)
       mock_event.should_receive(:only_contacts?).and_return(true)
-      Connection.connect(@person,contact)
+      Connection.connect(@dog,contact)
       get :show, :id => "1"
       response.should be_success
     end
@@ -195,19 +197,21 @@ describe EventsController do
     describe "with successful save" do
   
       it "should create a new event" do
-        Event.should_receive(:new).with({'these' => 'params','person' => @person}).and_return(mock_event)
-        post :create, :event => {:these => 'params'}
+        Event.should_receive(:new).with({'these' => 'params','dog_id' => @dog.id}).and_return(mock_event)
+        mock_event.should_receive(:dog=).with(@dog)
+        post :create, :event => {:these => 'params', :dog_id => @dog.id}
       end
 
       it "should assign the created event for the view" do
         Event.stub!(:new).and_return(mock_event)
-        post :create, :event => {}
-        assigns(:event).should equal(mock_event)
+        mock_event.should_receive(:dog=).with(@dog)
+        post :create, :event => { :dog_id => @dog }
       end
 
       it "should redirect to the created event" do
         Event.stub!(:new).and_return(mock_event)
-        post :create, :event => {}
+        mock_event.should_receive(:dog=).with(@dog)
+        post :create, :event => { :dog_id => @dog }
         response.should redirect_to(event_url(mock_event))
       end
       
@@ -216,19 +220,22 @@ describe EventsController do
     describe "with failed save" do
 
       it "should create a new event" do
-        Event.should_receive(:new).with({'these' => 'params','person' => @person}).and_return(mock_event(:save => false))
-        post :create, :event => {:these => 'params'}
+        Event.should_receive(:new).with({'these' => 'params', 'dog_id' => @dog.id}).and_return(mock_event(:save => false))
+        mock_event.should_receive(:dog=).with(@dog)
+        post :create, :event => {:these => 'params', :dog_id => @dog.id}
       end
 
       it "should assign the invalid event for the view" do
         Event.stub!(:new).and_return(mock_event(:save => false))
-        post :create, :event => {}
+        mock_event.should_receive(:dog=).with(@dog)
+        post :create, :event => { :dog_id => @dog }
         assigns(:event).should equal(mock_event)
       end
 
       it "should re-render the 'new' template" do
         Event.stub!(:new).and_return(mock_event(:save => false))
-        post :create, :event => {}
+        mock_event.should_receive(:dog=).with(@dog)
+        post :create, :event => { :dog_id => @dog }
         response.should render_template('new')
       end
       

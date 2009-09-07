@@ -27,7 +27,7 @@ class CommentsController < ApplicationController
   # Used for both wall and blog comments.
   def create
     @comment = parent.comments.build(params[:comment])
-    @comment.commenter = current_person
+    @comment.commenter = current_person.dogs.find(params[:commenter_id])
     
     respond_to do |format|
       if @comment.save
@@ -53,7 +53,7 @@ class CommentsController < ApplicationController
   
     def get_instance_vars
       if wall?
-        @person = Person.find(params[:person_id])
+        @dog = Dog.find(params[:dog_id])
       elsif blog?
         @blog = Blog.find(params[:blog_id])
         @post = Post.find(params[:post_id])
@@ -62,22 +62,22 @@ class CommentsController < ApplicationController
       end
     end
   
-    def person
+    def dog
       if wall?
-        @person
+        @dog
       elsif blog?
-        @blog.person 
+        @blog.dog 
       elsif event?
-        @event.person
+        @event.dog
       end
     end
     
     # Require the users to be connected.
     def connection_required
       if wall?
-        unless connected_to?(person)
+        unless connected_to?(dog)
           flash[:notice] = "You must be contacts to complete that action"
-          redirect_to @person
+          redirect_to @dog
         end
       end
     end
@@ -85,9 +85,9 @@ class CommentsController < ApplicationController
     def authorized_to_destroy?
       @comment = Comment.find(params[:id])
       if wall?
-        current_person?(person) or current_person?(@comment.commenter)
+        current_person?(dog.owner) or current_person?(@comment.commenter)
       elsif blog?
-        current_person?(person)
+        current_person?(dog.owner)
       end
     end
     
@@ -100,7 +100,7 @@ class CommentsController < ApplicationController
     # Return the comments array for the given resource.
     def resource_comments
       if wall?
-        @person.comments
+        @dog.comments
       elsif blog?
         @post.comments.paginate(:page => params[:page])
       elsif
@@ -111,7 +111,7 @@ class CommentsController < ApplicationController
     # Return a the parent (person or blog post) of the comment.
     def parent
       if wall?
-        @person
+        @dog
       elsif blog?
         @post
       elsif event?
@@ -139,7 +139,7 @@ class CommentsController < ApplicationController
     # Return the URL for the resource comments.
     def comments_url
       if wall?
-        (person_url @person)+'#tWall'  # go directly to comments tab
+        (dog_url @dog)+'#tWall'  # go directly to comments tab
       elsif blog?
         blog_post_url(@blog, @post)
       elsif event?
@@ -149,7 +149,7 @@ class CommentsController < ApplicationController
 
     # True if resource lives on a wall.
     def wall?
-      !params[:person_id].nil?
+      !params[:dog_id].nil?
     end
 
     # True if resource lives in a blog.

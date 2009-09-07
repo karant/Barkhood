@@ -13,6 +13,7 @@ class Person < ActiveRecord::Base
   FEED_SIZE = 10
 
   has_many :dogs, :foreign_key => 'owner_id', :dependent => :destroy
+  has_many :contacts, :through => :dogs, :source => :connections
   has_many :email_verifications
  
   validates_presence_of     :email, :name, :address

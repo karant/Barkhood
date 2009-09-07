@@ -1,6 +1,6 @@
 <%- column_div :type => :primary do -%>
-<h2>Contacts for <%= h @person.name %></h2>
-<% if @person.connections.count > Person::MAX_DEFAULT_CONTACTS %>
+<h2>Contacts for <%= h @dog.name %></h2>
+<% if @dog.connections.count > Dog::MAX_DEFAULT_CONTACTS %>
   <%= will_paginate @contacts %>
 <% end %>
 
@@ -8,7 +8,7 @@
     <%= render :partial => 'shared/contacts_grid',
                :locals => { :contacts => @contacts } %>
 
-  <% if @person.connections.count > Person::MAX_DEFAULT_CONTACTS %>
+  <% if @dog.connections.count > Dog::MAX_DEFAULT_CONTACTS %>
     <%= will_paginate @contacts %>
   <% end %>
 <% else %>

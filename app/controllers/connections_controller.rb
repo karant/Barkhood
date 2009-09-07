@@ -7,7 +7,7 @@ class ConnectionsController < ApplicationController
   
   # Show all the contacts for a person.
   def index
-    @contacts = @person.contacts.paginate(:page => params[:page],
+    @contacts = @dog.contacts.paginate(:page => params[:page],
                                           :per_page => RASTER_PER_PAGE)
   end
   
@@ -21,10 +21,11 @@ class ConnectionsController < ApplicationController
   end
   
   def create
-    @contact = Person.find(params[:person_id])
+    @dog = Dog.find(params[:dog_id])
+    @contact = Dog.find(params[:contact_id])
 
     respond_to do |format|
-      if Connection.request(current_person, @contact)
+      if Connection.request(@dog, @contact)
         flash[:notice] = 'Connection request sent!'
         format.html { redirect_to(home_url) }
       else
@@ -45,7 +46,7 @@ class ConnectionsController < ApplicationController
       when "Accept"
         @connection.accept
         flash[:notice] = %(Accepted connection with
-                           <a href="#{person_url(contact)}">#{name}</a>)
+                           <a href="#{dog_url(contact)}">#{name}</a>)
       when "Decline"
         @connection.breakup
         flash[:notice] = "Declined connection with #{name}"
@@ -55,11 +56,12 @@ class ConnectionsController < ApplicationController
   end
 
   def destroy
+    @dog = Dog.find(params[:dog_id])
     @connection.breakup
     
     respond_to do |format|
       flash[:success] = "Ended connection with #{@connection.contact.name}"
-      format.html { redirect_to( person_connections_url(current_person)) }
+      format.html { redirect_to( dog_connections_url(@dog)) }
     end
   end
 
@@ -71,9 +73,9 @@ class ConnectionsController < ApplicationController
     end
 
     def authorize_view
-      @person = Person.find(params[:person_id])
-      unless (current_person?(@person) or
-              Connection.connected?(@person, current_person))
+      @dog = Dog.find(params[:dog_id])
+      unless (current_person?(@dog.owner) or
+              Connection.connected_with_person?(@dog, current_person))
         redirect_to home_url
       end
     end
@@ -81,8 +83,8 @@ class ConnectionsController < ApplicationController
     # Make sure the current person is correct for this connection.
     def authorize_person
       @connection = Connection.find(params[:id],
-                                    :include => [:person, :contact])
-      unless current_person?(@connection.person)
+                                    :include => [:dog, :contact])
+      unless current_person?(@connection.dog.owner)
         flash[:error] = "Invalid connection."
         redirect_to home_url
       end
@@ -91,12 +93,12 @@ class ConnectionsController < ApplicationController
       redirect_to home_url
     end
     
-    # Redirect if the target person is inactive.
+    # Redirect if the target dog is inactive.
     # Suppose Alice sends Bob a connection request, but then the admin 
     # deactivates Alice.  We don't want Bob to be able to make the connection.
     def redirect_for_inactive
-      if @connection.contact.deactivated?
-        flash[:error] = "Invalid connection request: person deactivated"
+      unless @connection.contact.active?
+        flash[:error] = "Invalid connection request: dog profile deactivated"
         redirect_to home_url
       end
     end
