@@ -7,7 +7,7 @@ module MessagesHelper
   end
 
   def message_icon(message)
-    if message.new?(current_person)
+    if message.new?(@dog)
       image_tag("icons/email_add.png", :class => "icon")
     elsif message.replied_to?
       image_tag("icons/email_go.png", :class => "icon")

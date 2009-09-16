@@ -1,6 +1,10 @@
 <% form_for :post, :url => url, 
                    :html => { :method => method,
                               :id => "blogpost" }  do |f| %>
+  <div class="form_row">
+    <%= f.label :from %>
+    <%= f.select :dog_id, current_person.dogs.map{|d| [d.name, d.id]} %>
+  </div>
 
   <div class="form_row">
     <%= f.label :title %>

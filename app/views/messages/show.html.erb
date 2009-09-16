@@ -1,5 +1,5 @@
 <%- column_div :type => :primary do -%>
-  <% if current_person?(@message.sender) %>
+  <% if current_person?(@message.sender.owner) %>
     <% heading = "Message sent to #{h @message.recipient.name}" %>
   <% else %>
     <% heading = "Message from #{h @message.sender.name}" %>

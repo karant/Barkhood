@@ -10,8 +10,8 @@ class GalleriesController < ApplicationController
   
   def index
     @body = "galleries"
-    @person = Person.find(params[:person_id])
-    @galleries = @person.galleries.paginate :page => params[:page]
+    @dog = Dog.find(params[:dog_id])
+    @galleries = @dog.galleries.paginate :page => params[:page]
   end
   
   def new
@@ -19,7 +19,8 @@ class GalleriesController < ApplicationController
   end
   
   def create
-    @gallery = current_person.galleries.build(params[:gallery])
+    @dog = current_person.dogs.find(params[:gallery][:dog_id])
+    @gallery = @dog.galleries.build(params[:gallery])
     respond_to do |format|
       if @gallery.save
         flash[:success] = "Gallery successfully created"
@@ -47,16 +48,17 @@ class GalleriesController < ApplicationController
   end
   
   def destroy
-    if current_person.galleries.count == 1
+    @dog = current_person.dogs.find(params[:dog_id])
+    if @dog.galleries.count == 1
       flash[:error] = "You can't delete the final gallery"
-    elsif Gallery.find(params[:id]).destroy
+    elsif @dog.galleries.find(params[:id]).destroy
       flash[:success] = "Gallery successfully deleted"
     else
       flash[:error] = "Gallery could not be deleted"
     end
 
     respond_to do |format|
-      format.html { redirect_to person_galleries_path(current_person) }
+      format.html { redirect_to dog_galleries_path(@dog) }
     end
 
   end
@@ -67,10 +69,10 @@ class GalleriesController < ApplicationController
       @gallery = Gallery.find(params[:id])
       if @gallery.nil?
         flash[:error] = "No gallery found"
-        redirect_to person_galleries_path(current_person)
-      elsif @gallery.person != current_person
+        redirect_to dog_galleries_path(current_user.dogs.first)
+      elsif @gallery.dog.owner != current_person
         flash[:error] = "You are not the owner of this gallery"
-        redirect_to person_galleries_path(@gallery.person)
+        redirect_to dog_galleries_path(@gallery.dog)
       end
     end
 end

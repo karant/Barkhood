@@ -3,7 +3,7 @@
 <%- else -%>
   <h2><%= @dog.name %>'s Recent Activity</h2>
 
-  <%- unless @dog.last_logged_in_at.nil? or current_person?(@dog.owner) -%>
+  <%- unless @dog.owner.last_logged_in_at.nil? or current_person?(@dog.owner) -%>
     <p class="meta">
       <%= @dog.name %> last logged in 
       <%= time_ago_in_words(@dog.owner.last_logged_in_at) %> ago

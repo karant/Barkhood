@@ -6,6 +6,9 @@ class Dog < ActiveRecord::Base
   attr_accessible :name, :description, :dob, :breed_id, :identity_url
   # Indexed fields for Sphinx
   is_indexed :fields => [ 'name', 'description', 'deactivated'],
+             :include => [
+               {:association_name => 'breed', :field => 'name', :as => 'breed_name'}
+             ],
              :conditions => "deactivated = false"
   MAX_NAME = 40
   MAX_DESCRIPTION = 5000

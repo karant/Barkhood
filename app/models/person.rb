@@ -192,6 +192,15 @@ class Person < ActiveRecord::Base
     end
   end
   
+  def has_unread_messages?
+    sql = %(recipient_id IN (:dog_ids)
+            AND sender_id NOT IN (:dog_ids)
+            AND recipient_deleted_at IS NOT NULL
+            AND recipient_read_at IS NULL)
+    conditions = [sql, { :dog_ids => dog_ids }]
+    Message.count(:all, :conditions => conditions) > 0
+  end  
+  
   # Return the common connections with the given dog.
   def common_contacts_with(other_dog, options = {})
     # I tried to do this in SQL for efficiency, but failed miserably.

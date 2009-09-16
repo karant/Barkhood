@@ -8,7 +8,7 @@ atom_feed do |feed|
       entry.content(post.body, :type => 'html')
 
       entry.author do |author|
-        author.name(post.person.name)
+        author.name(post.dog.name)
       end
     end
   end

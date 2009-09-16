@@ -7,7 +7,8 @@ class PhotosController < ApplicationController
   before_filter :correct_gallery_requried, :only => [:new, :create]
   
   def index
-    redirect_to person_galleries_path(current_person)
+    @dog = current_person.dogs.find(params[:dog_id])
+    redirect_to dog_galleries_path(@dog)
   end
   
   def show
@@ -37,7 +38,8 @@ class PhotosController < ApplicationController
       redirect_to gallery_path(Gallery.find(params[:gallery_id])) and return
     end
 
-    photo_data = params[:photo].merge(:person => current_person)
+    @dog = current_person.dogs.find(Gallery.find(params[:gallery_id]).dog_id)
+    photo_data = params[:photo].merge(:dog => @dog)
     @photo = @gallery.photos.build(photo_data)
 
     respond_to do |format|
@@ -64,8 +66,9 @@ class PhotosController < ApplicationController
   end
 
   def destroy
+    @dog = current_person.dogs.find(params[:dog_id])
     @gallery = @photo.gallery
-    redirect_to person_galleries_path(current_person) and return if @photo.nil?
+    redirect_to dog_galleries_path(@dog) and return if @photo.nil?
     @photo.destroy
     flash[:success] = "Photo deleted"
     respond_to do |format|
@@ -74,16 +77,17 @@ class PhotosController < ApplicationController
   end
   
   def set_primary
+    @dog = current_person.dogs.find(params[:dog_id])
     @photo = Photo.find(params[:id])
     if @photo.nil? or @photo.primary?
-      redirect_to person_galleries_path(current_person) and return
+      redirect_to dog_galleries_path(@dog) and return
     end
     # This should only have one entry, but be paranoid.
     @old_primary = @photo.gallery.photos.select(&:primary?)
     respond_to do |format|
       if @photo.update_attributes(:primary => true)
         @old_primary.each { |p| p.update_attributes!(:primary => false) }
-        format.html { redirect_to(person_galleries_path(current_person)) }
+        format.html { redirect_to(dog_galleries_path(@dog)) }
         flash[:success] = "Gallery thumbnail set"
       else    
         format.html do
@@ -95,18 +99,19 @@ class PhotosController < ApplicationController
   end
   
   def set_avatar
+    @dog = current_person.dogs.find(params[:dog_id])
     @photo = Photo.find(params[:id])
     if @photo.nil? or @photo.avatar?
-      redirect_to current_person and return
+      redirect_to @dog and return
     end
     # This should only have one entry, but be paranoid.
-    @old_primary = current_person.photos.select(&:avatar?)
+    @old_primary = @dog.photos.select(&:avatar?)
   
     respond_to do |format|
       if @photo.update_attributes!(:avatar => true)
         @old_primary.each { |p| p.update_attributes!(:avatar => false) }
         flash[:success] = "Profile photo set"
-        format.html { redirect_to current_person }
+        format.html { redirect_to @dog }
       else    
         format.html do
           flash[:error] = "Invalid image!"
@@ -122,7 +127,7 @@ class PhotosController < ApplicationController
       @photo = Photo.find(params[:id])
       if @photo.nil?
         redirect_to home_url
-      elsif !current_person?(@photo.person)
+      elsif !current_person?(@photo.dog.owner)
         redirect_to home_url
       end
     end
@@ -133,7 +138,7 @@ class PhotosController < ApplicationController
         redirect_to home_path
       else
         @gallery = Gallery.find(params[:gallery_id])
-        if @gallery.person != current_person
+        if @gallery.dog.owner != current_person
           flash[:error] = "You cannot add photos to this gallery"
           redirect_to gallery_path(@gallery)
         end

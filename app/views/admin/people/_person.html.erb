@@ -1,5 +1,5 @@
 <li class="vcard person">
-  <%= person_link_with_image person, :class => "url fn" %> &mdash;
+  <%= person_link person, :class => "url fn" %> &mdash;
   <%- activity = activated_status(person) -%>
   <%= link_to activity, 
               admin_person_path(person, :task => "deactivated"),
@@ -10,12 +10,9 @@
               admin_person_path(person, :task => "admin"),
               :method => :put %>
   <p class="person_meta">
-    <strong>Forum Posts:</strong> 
-    <%= person.forum_posts_count -%> | 
-    <strong>Blog Posts:</strong> 
-    <%= link_to person.blog.posts.count.to_s, blog_path(person) -%> |
-    <strong>Connections:</strong> 
-      <%= link_to person.connections.count,
-                  person_connections_path(person) -%>
+  	<strong>Dogs (<%=h person.dogs.count %>):</strong>
+	<% person.dogs.each do |dog| %>
+		<%= dog_link_with_image dog %>
+	<% end %>
   </p>
 </li>

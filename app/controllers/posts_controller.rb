@@ -102,17 +102,17 @@ class PostsController < ApplicationController
       if forum?
         true  # This will change once there are groups
       elsif blog?
-        redirect_to home_url unless current_person?(@blog.person)
+        redirect_to home_url unless current_person?(@blog.dog.owner)
       end
     end
 
     # Make sure the current user is authorized to edit a post.
     def authorize_change
       if forum?
-        authorized = current_person?(@post.person) || current_person.admin?
+        authorized = current_person?(@post.dog.owner) || current_person.admin?
         redirect_to home_url unless authorized
       elsif blog?
-        authorized = current_person?(@blog.person) && valid_post?
+        authorized = current_person?(@blog.dog.owner) && valid_post?
         redirect_to home_url unless authorized
       end
     end
@@ -157,7 +157,7 @@ class PostsController < ApplicationController
     def new_resource_post
       if forum?
         post = @topic.posts.build(params[:post])
-        post.person = current_person
+        post.dog = current_person.dogs.find(params[:post][:dog_id])
       elsif blog?
         post = @blog.posts.new(params[:post])
       end

@@ -10,7 +10,7 @@ atom_feed do |feed|
       entry.content(bdy, :type => 'html')
 
       entry.author do |author|
-        author.name(topic.person.name)
+        author.name(topic.dog.name)
       end
     end
   end

@@ -1,6 +1,6 @@
 <li class="message">
   <div class="profile-image">
-    <%= image_link message.other_person(current_person),
+    <%= image_link message.other_dog(@dog),
                    :image => :thumbnail,
                    :image_options => { :class => "photo" } %>
   </div>
@@ -10,12 +10,12 @@
   </p>
   <p>
     <%= message_icon(message) %>
-    <%- if current_person?(message.sender) -%>
+    <%- if current_person?(message.sender.owner) -%>
       <span class="label">To:</span>
-      <%= person_link message.recipient, :class => "url fn" %>
+      <%= dog_link message.recipient, :class => "url fn" %>
     <%- else -%>
       <span class="label">From:</span>
-      <%= person_link message.sender, :class => "url fn" %>
+      <%= dog_link message.sender, :class => "url fn" %>
     <%- end -%>
 <br />
   <span class="tools meta">
@@ -23,7 +23,7 @@
     <%= link_to image_tag("icons/email_edit.png", :class => 'actioner'), 
                 reply_message_path(message),
                 :title => "Reply to this message" %>
-    <% unless message.trashed?(current_person) -%>
+    <% unless message.trashed?(@dog) -%>
       <%= link_to image_tag("icons/email_delete.png", :class => 'actioner'), 
                   message_path(message), 
                   :method => :delete, 

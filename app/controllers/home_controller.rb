@@ -4,11 +4,12 @@ class HomeController < ApplicationController
   def index
     @body = "home"
     @topics = Topic.find_recent
-    @members = Person.find_recent
+    @members = Dog.find_recent
     if logged_in?
       @feed = current_person.feed
-      @some_contacts = current_person.some_contacts
-      @requested_contacts = current_person.requested_contacts
+      # @some_contacts = current_person.some_contacts
+      # @requested_contacts = current_person.requested_contacts
+      @dogs = current_person.dogs
     else
       @feed = Activity.global_feed
     end    

@@ -19,7 +19,7 @@ describe PhotosController do
   describe "when not logged in" do
       
     it "should protect the index page" do
-      get :index
+      get :index, :dog_id => dogs(:dana)
       response.should redirect_to(login_url)
     end
   end
@@ -30,17 +30,18 @@ describe PhotosController do
     before(:each) do
 
       @person = login_as(:quentin)
+      @dog = dogs(:dana)
       @gallery = galleries(:valid_gallery)
       
       @filename = "rails.png"
       @image = uploaded_file(@filename, "image/png")
       @primary = Photo.create(:uploaded_data => @image,
-                              :person => people(:quentin),
+                              :dog => @dog,
                               :gallery => @gallery,
                               :avatar => true, 
                               :primary => true)
       @secondary = Photo.create(:uploaded_data => @image,
-                                :person => people(:quentin),
+                                :dog => @dog,
                                 :gallery => @gallery,
                                 :avatar => false,
                                 :primary => false)
@@ -70,20 +71,20 @@ describe PhotosController do
       image = uploaded_file("rails.png")
       lambda do
         post :create, :photo => { :uploaded_data => image},
-                      :gallery_id => @gallery
+                      :gallery_id => @gallery, :dog_id => @dog
       end.should change(Photo, :count).by(1)
     end
     
     it "should handle empty photo upload" do
       lambda do
         post :create, :photo => { :uploaded_data => nil },
-                      :gallery_id => @gallery
+                      :gallery_id => @gallery, :dog_id => @dog
         response.should render_template("new")
       end.should_not change(Photo, :count)
     end
         
     it "should handle nil photo parameter" do
-      post :create, :photo => nil, :gallery_id => @gallery
+      post :create, :photo => nil, :gallery_id => @gallery, :dog_id => @dog
       response.should redirect_to(gallery_url(@gallery))
       flash[:error].should_not be_nil
     end
@@ -91,7 +92,7 @@ describe PhotosController do
     it "should destroy a photo" do
       Photo.should_receive(:find).and_return(@secondary)
       @secondary.should_receive(:destroy).and_return(true)
-      delete :destroy, :id => @secondary
+      delete :destroy, :id => @secondary, :dog_id => @dog
     end
     
     it "should require the correct user to edit" do
@@ -102,8 +103,8 @@ describe PhotosController do
     end
     
     it "should be able to set the photo as avatar" do
-      put :set_avatar, :id => @secondary.id
-      response.should redirect_to(person_path(@person))
+      put :set_avatar, :id => @secondary.id, :dog_id => @dog
+      response.should redirect_to(dog_path(@dog))
       @secondary = Photo.find(@secondary.id)
       @secondary.avatar.should be_true
       @primary = Photo.find(@primary.id)
@@ -111,8 +112,8 @@ describe PhotosController do
     end
     
     it "should be able to set the photo as primary for the gallery" do
-      put :set_primary, :id => @secondary
-      response.should redirect_to(person_galleries_url(@person))
+      put :set_primary, :id => @secondary, :dog_id => @dog
+      response.should redirect_to(dog_galleries_url(@dog))
       
       @secondary = Photo.find(@secondary.id)
       @secondary.primary.should be_true

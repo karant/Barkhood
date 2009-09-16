@@ -5,6 +5,7 @@ describe TopicsController do
 
   before(:each) do
     @topic = topics(:one)
+    @dog = dogs(:dana)
   end
   
   it "should require login for new" do
@@ -18,17 +19,17 @@ describe TopicsController do
     with_options :forum_id => forums(:one) do |page|
       page.get    :new
       page.get    :edit,    :id => @topic
-      page.post   :create,  :topic => { :name => "The topic" }
+      page.post   :create,  :topic => { :name => "The topic", :dog_id => @dog }
       page.put    :update,  :id => @topic
       page.delete :destroy, :id => @topic
     end
   end  
   
-  it "should associate a person to a topic" do
+  it "should associate a dog to a topic" do
     person = login_as(:quentin)
     with_options :forum_id => forums(:one) do |page|
-      page.post :create, :topic => { :name => "The topic" }
-      assigns(:topic).person.should == person
+      page.post :create, :topic => { :name => "The topic", :dog_id => @dog }
+      assigns(:topic).dog.should == @dog
     end
   end
   

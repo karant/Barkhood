@@ -10,13 +10,18 @@
     <%= set_focus_to "gallery_title" %>
 
     <div class="form_row">
+      <label for="dog">Dog</label>
+      <%= f.select :dog_id, current_person.dogs.map{|d| [d.name, d.id]} %>
+    <div>
+
+    <div class="form_row">
       <label for="description">Description</label>
       <%= f.text_area :description, :rows => 5 %>
     <div>
 
     <div class="form_row">
       <%= f.submit "Create", :class => "button" %>
-      <%= link_to "Cancel", person_galleries_path(current_person) %>
+      <%= link_to "Cancel", dog_galleries_path(current_person.dogs.first) %>
     </div>
   <%- end -%>
 <%- end -%>

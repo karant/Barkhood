@@ -32,7 +32,7 @@ class TopicsController < ApplicationController
 
   def create
     @topic = @forum.topics.new(params[:topic])
-    @topic.person = current_person
+    @topic.dog = current_person.dogs.find(params[:topic][:dog_id])
 
     respond_to do |format|
       if @topic.save

@@ -11,7 +11,7 @@ class SearchesController < ApplicationController
     model = strip_admin(params[:model])
     page  = params[:page] || 1
 
-    unless %(Person Message ForumPost).include?(model)
+    unless %(Dog Message ForumPost).include?(model)
       flash[:error] = "Invalid search"
       redirect_to home_url and return
     end
@@ -21,21 +21,21 @@ class SearchesController < ApplicationController
       @results = []
     else
       filters = {}
-      if model == "Person" and current_person.admin?
+      if model == "Dog" and current_person.admin?
         # Find all people, including deactivated and email unverified.
-        model = "AllPerson"
+        model = "AllDog"
       elsif model == "Message"
-        filters['recipient_id'] = current_person.id
+        filters['recipient_id'] = current_person.dog_ids
       end
       @search = Ultrasphinx::Search.new(:query => query, 
                                         :filters => filters,
                                         :page => page,
                                         :class_names => model)
       @search.run
-      @results = @search.results
-      if model == "AllPerson"
-        # Convert to people so that the routing works.
-        @results.map!{ |person| Person.find(person) }
+      @results = @search.results  
+      if model == "AllDog"
+        # Convert to dogs so that the routing works.
+        @results.map!{ |dog| Dog.find(dog) }
       end
     end
   rescue Ultrasphinx::UsageError

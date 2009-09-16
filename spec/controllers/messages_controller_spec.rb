@@ -9,7 +9,9 @@ describe MessagesController do
 
     @person = login_as(:quentin)
     @other_person = people(:aaron)
-    @message = @person.received_messages.first
+    @dog = dogs(:dana)
+    @other_dog = dogs(:max)
+    @message = @dog.received_messages.first
   end
 
   describe "pages" do
@@ -34,7 +36,7 @@ describe MessagesController do
     end
     
     it "should have a working new page" do
-      get :new, :person_id => @person
+      get :new, :dog_id => @dog, :recipient_id => @other_dog
       response.should be_success
       response.should render_template("new")
     end
@@ -50,15 +52,15 @@ describe MessagesController do
     end
 
     it "should reply correctly when logged in as the sender" do
-      login_as @message.sender
-      get :reply, :id => @message
+      login_as @message.sender.owner
+      get :reply, :id => @message, :dog_id => @message.sender
       assigns(:recipient).should == @message.recipient
     end
     
     it "should handle invalid reply creation" do
       login_as(:kelly)
       post :create, :message => { :parent_id => @message.id },
-                    :person_id => @person
+                    :dog_id => dogs(:buba), :recipient_id => @other_dog
       response.should redirect_to(home_url)
     end
     
@@ -66,7 +68,7 @@ describe MessagesController do
       lambda do
         post :create, :message => { :subject => "The subject",
                                     :content => "Hey there!" },
-                      :person_id => @other_person
+                      :dog_id => @dog, :recipient_id => @other_dog
       end.should change(Message, :count).by(1)
     end
     
@@ -74,7 +76,7 @@ describe MessagesController do
       lambda do
         post :create, :message => { :subject => "The subject",
                                     :content => "Hey there!" },
-                      :person_id => @other_person
+                      :dog_id => @dog, :recipient_id => @other_dog
       end.should change(@emails, :length).by(1)
     end
     
@@ -87,14 +89,14 @@ describe MessagesController do
     end
     
     it "should trash messages" do
-      delete :destroy, :id => @message
+      delete :destroy, :id => @message, :dog_id => @dog
       assigns(:message).should be_trashed(@message.recipient)
       assigns(:message).should_not be_trashed(@message.sender)
     end
     
     it "should untrash messages" do
-      delete :destroy, :id => @message
-      put :undestroy, :id => @message
+      delete :destroy, :id => @message, :dog_id => @dog
+      put :undestroy, :id => @message, :dog_id => @dog
       assigns(:message).should_not be_trashed(@message.recipient)
     end
     
@@ -109,26 +111,26 @@ describe MessagesController do
   private
 
     def working_page(page, message_type)
-      get page      
+      get page, :dog_id => @dog    
       response.should be_success
       response.should render_template("index")
-      assigns(:messages).should == @person.send(message_type)
+      assigns(:messages).should == @dog.send(message_type)
     end
   
     def handle_replies(message, recipient, sender)
-      login_as(recipient)
+      login_as(recipient.owner)
       lambda do
         post :create, :message => { :subject => "The subject",
                                     :content => "This is a reply",
                                     :parent_id  => message.id },
-                      :person_id => sender
+                      :dog_id => recipient, :recipient_id => sender
         assigns(:message).should be_reply
       end.should change(Message, :count).by(1)
     end
   
-    def proper_reply_behavior(person)
-      login_as person
-      get :reply, :id => @message
+    def proper_reply_behavior(dog)
+      login_as dog.owner
+      get :reply, :id => @message, :dog_id => dog
       response.should be_success
       # Check that the hidden parent_id tag is there, with the right value.
       response.should have_tag("input[id=?][name=?][type=?][value=?]",
@@ -138,6 +140,6 @@ describe MessagesController do
                                @message.id)
       response.should render_template("new")
       assigns(:message).parent.should == @message
-      assigns(:recipient).should == @message.other_person(person)
+      assigns(:recipient).should == @message.other_dog(dog)
     end
 end

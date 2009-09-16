@@ -2,7 +2,7 @@
   <div class="profile-image">
     <%= image_link message.sender %>
     
-    <%- if not message.read? and not current_person?(message.sender) -%>
+    <%- if not message.read? and not current_person?(message.sender.owner) -%>
       <%= link_to image_tag("icons/email_add.png", :class => "icon"),
                   @message %>
     <%- elsif message.replied_to? -%>
@@ -10,7 +10,7 @@
                   @message %>
     <%- end -%>    
   </div>
-  <p><span class="field">From:</span> <%= person_link message.sender %></p>
+  <p><span class="field">From:</span> <%= dog_link message.sender %></p>
   <p class="meta published">
     <%= time_ago_in_words message.created_at %> ago
   </p>

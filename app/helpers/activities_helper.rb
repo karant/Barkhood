@@ -2,16 +2,16 @@ module ActivitiesHelper
 
   # Given an activity, return a message for the feed for the activity's class.
   def feed_message(activity, recent = false)
-    person = activity.person
+    dog = activity.dog
     case activity_type(activity)
     when "BlogPost"
       post = activity.item
       blog = post.blog
-      view_blog = blog_link("#{h person.name}'s blog", blog)
+      view_blog = blog_link("#{h dog.name}'s blog", blog)
       if recent
         %(new blog post  #{post_link(blog, post)})
       else
-        %(#{person_link_with_image(person)} posted
+        %(#{dog_link_with_image(dog)} posted
           #{post_link(blog, post)} &mdash; #{view_blog})
       end
     when "Comment"
@@ -22,18 +22,18 @@ module ActivitiesHelper
         post = activity.item.commentable
         blog = post.blog
         if recent
-          %(made a comment to #{someones(blog.person, person)} blog post
+          %(made a comment to #{someones(blog.dog, dog)} blog post
             #{post_link(blog, post)})
         else
-          %(#{person_link_with_image(person)} made a comment to
-            #{someones(blog.person, person)} blog post
+          %(#{dog_link_with_image(dog)} made a comment to
+            #{someones(blog.dog, dog)} blog post
             #{post_link(blog, post)})
         end
-      when "Person"
+      when "Dog"
         if recent
           %(commented on #{wall(activity)})
         else
-          %(#{person_link_with_image(activity.item.commenter)}
+          %(#{dog_link_with_image(activity.item.commenter)}
             commented on #{wall(activity)})
         end
       end
@@ -41,23 +41,23 @@ module ActivitiesHelper
       # TODO: make recent/long versions for this
       event = activity.item.commentable
       commenter = activity.item.commenter
-      %(#{person_link_with_image(commenter)} commented on 
-        #{someones(event.person, commenter)} event: 
+      %(#{dog_link_with_image(commenter)} commented on 
+        #{someones(event.dog, commenter)} event: 
         #{event_link(event.title, event)}.)
     when "Connection"
-      if activity.item.contact.admin?
+      if activity.item.contact.owner.admin?
         if recent
           %(joined the system)
         else
-          %(#{person_link_with_image(activity.item.person)}
+          %(#{dog_link_with_image(activity.item.dog)}
             has joined the system)
         end
       else
         if recent
-          %(connected with #{person_link_with_image(activity.item.contact)})
+          %(connected with #{dog_link_with_image(activity.item.contact)})
         else
-          %(#{person_link_with_image(activity.item.person)} and
-            #{person_link_with_image(activity.item.contact)} have connected)
+          %(#{dog_link_with_image(activity.item.dog)} and
+            #{dog_link_with_image(activity.item.contact)} have connected)
         end
       end
     when "ForumPost"
@@ -65,27 +65,27 @@ module ActivitiesHelper
       if recent
         %(new post to forum topic #{topic_link(post.topic)})
       else
-        %(#{person_link_with_image(person)} made a post to forum topic
+        %(#{dog_link_with_image(dog)} made a post to forum topic
           #{topic_link(post.topic)})
       end
     when "Topic"
       if recent
         %(new discussion topic #{topic_link(activity.item)})
       else
-        %(#{person_link_with_image(person)} created the new discussion topic
+        %(#{dog_link_with_image(dog)} created the new discussion topic
           #{topic_link(activity.item)})
       end
-    when "Person"
+    when "Dog"
       if recent
         %(description changed)
       else
-        %(#{person_link_with_image(person)}'s description changed)
+        %(#{dog_link_with_image(dog)}'s description changed)
       end
     when "Gallery"
       if recent
         %(new gallery #{gallery_link(activity.item)})
       else
-        %(#{person_link_with_image(person)} added a new gallery
+        %(#{dog_link_with_image(dog)} added a new gallery
           #{gallery_link(activity.item)})
       end
     when "Photo"
@@ -93,18 +93,18 @@ module ActivitiesHelper
         %(added new #{photo_link(activity.item)}
           #{to_gallery_link(activity.item.gallery)})
       else
-        %(#{person_link_with_image(person)} added a new
+        %(#{dog_link_with_image(dog)} added a new
           #{photo_link(activity.item)}
           #{to_gallery_link(activity.item.gallery)})
       end
     when "Event"
       event = activity.item
-      %(#{person_link_with_image(person)} has created a new event:
+      %(#{dog_link_with_image(dog)} has created a new event:
         #{event_link(event.title, event)}.)
     when "EventAttendee"
       event = activity.item.event
-      %(#{person_link_with_image(person)} is attending
-        #{someones(event.person, person)} event: 
+      %(#{dog_link_with_image(dog)} is attending
+        #{someones(event.dog, dog)} event: 
         #{event_link(event.title, event)}.) 
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
@@ -112,12 +112,12 @@ module ActivitiesHelper
   end
   
   def minifeed_message(activity)
-    person = activity.person
+    dog = activity.dog
     case activity_type(activity)
     when "BlogPost"
       post = activity.item
       blog = post.blog
-      %(#{person_link(person)} made a
+      %(#{dog_link(dog)} made a
         #{post_link("new blog post", blog, post)})
     when "Comment"
       parent = activity.item.commentable
@@ -126,47 +126,47 @@ module ActivitiesHelper
       when "BlogPost"
         post = activity.item.commentable
         blog = post.blog
-        %(#{person_link(person)} made a comment on
-          #{someones(blog.person, person)} 
+        %(#{dog_link(dog)} made a comment on
+          #{someones(blog.dog, dog)} 
           #{post_link("blog post", post.blog, post)})
-      when "Person"
-        %(#{person_link(activity.item.commenter)} commented on 
+      when "Dog"
+        %(#{dog_link(activity.item.commenter)} commented on 
           #{wall(activity)}.)
       when "Event"
         event = activity.item.commentable
-        %(#{person_link(activity.item.commenter)} commented on 
-          #{someones(event.person, activity.item.commenter)} #{event_link("event", event)}.)
+        %(#{dog_link(activity.item.commenter)} commented on 
+          #{someones(event.dog, activity.item.commenter)} #{event_link("event", event)}.)
       end
     when "Connection"
-      if activity.item.contact.admin?
-        %(#{person_link(person)} has joined the system)
+      if activity.item.contact.owner.admin?
+        %(#{dog_link(dog)} has joined the system)
       else
-        %(#{person_link(person)} and
-          #{person_link(activity.item.contact)} have connected)
+        %(#{dog_link(dog)} and
+          #{dog_link(activity.item.contact)} have connected)
       end
     when "ForumPost"
       topic = activity.item.topic
-      %(#{person_link(person)} made a
+      %(#{dog_link(dog)} made a
         #{topic_link("forum post", topic)})
     when "Topic"
-      %(#{person_link(person)} created a 
+      %(#{dog_link(dog)} created a 
         #{topic_link("new discussion topic", activity.item)})
-    when "Person"
-      %(#{person_link(person)}'s description changed)
+    when "Dog"
+      %(#{dog_link(dog)}'s description changed)
     when "Gallery"
-      %(#{person_link(person)} added a new gallery
+      %(#{dog_link(dog)} added a new gallery
         #{gallery_link(activity.item)})
     when "Photo"
-      %(#{person_link(person)} added new
+      %(#{dog_link(dog)} added new
         #{photo_link(activity.item)} #{to_gallery_link(activity.item.gallery)})
-      %(#{person_link(person)}'s description has changed.)
+      %(#{dog_link(dog)}'s description has changed.)
     when "Event"
-      %(#{person_link(person)}'s has created a new
+      %(#{dog_link(dog)}'s has created a new
         #{event_link("event", activity.item)}.)
     when "EventAttendee"
       event = activity.item.event
-      %(#{person_link(person)} is attending
-        #{someones(event.person, person)} #{event_link("event", event)}.)
+      %(#{dog_link(dog)} is attending
+        #{someones(event.dog, dog)} #{event_link("event", event)}.)
     else
       raise "Invalid activity type #{activity_type(activity).inspect}"
     end
@@ -184,11 +184,11 @@ module ActivitiesHelper
                 "comment.png"
               when "Event"
                 "comment.png"
-              when "Person"
+              when "Dog"
                 "sound.png"
               end
             when "Connection"
-              if activity.item.contact.admin?
+              if activity.item.contact.owner.admin?
                 "vcard.png"
               else
                 "connect.png"
@@ -197,7 +197,7 @@ module ActivitiesHelper
               "asterisk_yellow.png"
             when "Topic"
               "note.png"
-            when "Person"
+            when "Dog"
                 "user_edit.png"
             when "Gallery"
               "photos.png"
@@ -215,8 +215,8 @@ module ActivitiesHelper
     image_tag("icons/#{img}", :class => "icon")
   end
   
-  def someones(person, commenter, link = true)
-    link ? "#{person_link_with_image(person)}'s" : "#{h person.name}'s"
+  def someones(dog, commenter, link = true)
+    link ? "#{dog_link_with_image(dog)}'s" : "#{h dog.name}'s"
   end
   
   def blog_link(text, blog)
@@ -271,10 +271,10 @@ module ActivitiesHelper
 
   # Return a link to the wall.
   def wall(activity)
-    commenter = activity.person
-    person = activity.item.commentable
-    link_to("#{someones(person, commenter, false)} wall",
-            person_path(person, :anchor => "tWall"))
+    commenter = activity.dog
+    dog = activity.item.commentable
+    link_to("#{someones(dog, commenter, false)} wall",
+            dog_path(dog, :anchor => "tWall"))
   end
   
   # Only show member photo for certain types of activity
@@ -288,7 +288,7 @@ module ActivitiesHelper
       false
     end
     if shouldShow
-      image_link(activity.person, :image => :thumbnail)
+      image_link(activity.dog, :image => :thumbnail)
     end
   end
   

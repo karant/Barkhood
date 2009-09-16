@@ -75,7 +75,7 @@ describe Person do
     end
     
     it "should have dogs" do
-      @person.dogs.should == [dogs(:deactivated), dogs(:dana), dogs(:nola)]
+      @person.dogs.should == [dogs(:dana), dogs(:nola), dogs(:deactivated)]
     end
 
     describe "common contacts" do
@@ -105,7 +105,13 @@ describe Person do
         common_contacts = @person.common_contacts_with(@parker)
         common_contacts.should be_empty
       end   
-    end    
+    end  
+    
+    describe "message associations" do      
+      it "should have unread messages" do
+        @person.has_unread_messages?.should be_true
+      end
+    end
   end
 
   describe "authentication" do

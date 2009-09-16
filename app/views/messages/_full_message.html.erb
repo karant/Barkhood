@@ -11,7 +11,7 @@
     <%= link_to image_tag("icons/email_edit.png", :class => 'actioner'), 
                 reply_message_path(@message),
                 :title => "Reply to this message" %>
-    <% unless @message.trashed?(current_person) -%>
+    <% unless @message.trashed?(@dog) -%>
       <%= link_to image_tag("icons/email_delete.png", :class => 'actioner'), 
                   @message,
                   :method => :delete, 
