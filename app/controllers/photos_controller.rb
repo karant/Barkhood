@@ -7,7 +7,7 @@ class PhotosController < ApplicationController
   before_filter :correct_gallery_requried, :only => [:new, :create]
   
   def index
-    @dog = current_person.dogs.find(params[:dog_id])
+    @dog = Dog.find(params[:dog_id])
     redirect_to dog_galleries_path(@dog)
   end
   
@@ -38,7 +38,7 @@ class PhotosController < ApplicationController
       redirect_to gallery_path(Gallery.find(params[:gallery_id])) and return
     end
 
-    @dog = current_person.dogs.find(Gallery.find(params[:gallery_id]).dog_id)
+    @dog = Gallery.find(params[:gallery_id]).dog
     photo_data = params[:photo].merge(:dog => @dog)
     @photo = @gallery.photos.build(photo_data)
 
@@ -66,7 +66,7 @@ class PhotosController < ApplicationController
   end
 
   def destroy
-    @dog = current_person.dogs.find(params[:dog_id])
+    @dog = @photo.gallery.dog
     @gallery = @photo.gallery
     redirect_to dog_galleries_path(@dog) and return if @photo.nil?
     @photo.destroy
@@ -77,8 +77,8 @@ class PhotosController < ApplicationController
   end
   
   def set_primary
-    @dog = current_person.dogs.find(params[:dog_id])
     @photo = Photo.find(params[:id])
+    @dog = @photo.gallery.dog
     if @photo.nil? or @photo.primary?
       redirect_to dog_galleries_path(@dog) and return
     end
@@ -99,8 +99,8 @@ class PhotosController < ApplicationController
   end
   
   def set_avatar
-    @dog = current_person.dogs.find(params[:dog_id])
     @photo = Photo.find(params[:id])
+    @dog = @photo.gallery.dog
     if @photo.nil? or @photo.avatar?
       redirect_to @dog and return
     end

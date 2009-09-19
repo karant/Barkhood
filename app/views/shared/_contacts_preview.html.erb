@@ -1,5 +1,5 @@
 <%- unless dog.some_contacts.empty? -%>
-  <h2>Contacts</h2>
+  <h2><%=h dog.name %>'s Contacts</h2>
   <ul class="grid contacts small">
     <%- dog.some_contacts.each do |contact| -%>
     <%= render :partial => 'shared/contact', :locals => {:contact => contact} %>

@@ -16,7 +16,7 @@ describe ConnectionsController do
   end
   
   it "should create a new connection request" do
-    Connection.should_receive(:request).with(@dog, @contact).
+    Connection.should_receive(:request).with(@contact, @dog).
       and_return(true)
     post :create, :dog_id => @dog, :contact_id => @contact
     response.should redirect_to(home_url)

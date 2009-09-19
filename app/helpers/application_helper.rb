@@ -12,16 +12,15 @@ module ApplicationHelper
   
   def menu
     home     = menu_element("Dashboard",   home_path)
-    people   = menu_element("People", people_path)
+    dogs   = menu_element("Dogs", dogs_path)
     if Forum.count == 1
       forum = menu_element("Forum", forum_path(Forum.find(:first)))
     else
       forum = menu_element("Forums", forums_path)
     end
-    resources = menu_element("Resources", "http://docs.insoshi.com/")
 
     if logged_in? and not admin_view?
-      profile  = menu_element("Profile",  person_path(current_person))
+      profile  = menu_element("My Profile",  person_path(current_person))
       messages = menu_element("Messages", messages_path)
       #blog     = menu_element("Blog",     blog_path(current_person.blog))
       #photos   = menu_element("Photos",   photos_path)
@@ -29,19 +28,21 @@ module ApplicationHelper
       #                        person_connections_path(current_person))
       events   = menu_element("Events", events_path)
       #links = [home, profile, contacts, messages, blog, people, forum]
-      links = [home, profile, messages, people, forum]
+      links = [home, profile, messages, dogs, forum]
       # TODO: put this in once events are ready.
       # links.push(events)
       
     elsif logged_in? and admin_view?
       home =    menu_element("Home", home_path)
       people =  menu_element("People", admin_people_path)
+      dogs = menu_element("Dogs", dogs_path)
+      breeds = menu_element("Breeds", breeds_path)
       forums =  menu_element(inflect("Forum", Forum.count),
                              admin_forums_path)
       preferences = menu_element("Prefs", admin_preferences_path)
-      links = [home, people, forums, preferences]
+      links = [home, people, dogs, breeds, forums, preferences]
     else
-      links = [home, people]
+      links = [home, dogs]
     end
     if global_prefs.about.blank?
       links

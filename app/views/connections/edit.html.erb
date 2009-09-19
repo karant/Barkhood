@@ -1,7 +1,7 @@
 <h2>Contact request</h2>
 
 <p><%= image_link @contact, :image => :thumbnail %></p>
-<p>You have a contact request from <%= @contact.name %></p>
+<p><%=h @dog.name %> has a contact request from <%=h @contact.name %></p>
 
 <% form_for(@connection) do |f| %>
   <p>

@@ -15,6 +15,8 @@ class Person < ActiveRecord::Base
   has_many :dogs, :foreign_key => 'owner_id', :dependent => :destroy
   has_many :contacts, :through => :dogs, :source => :connections
   has_many :email_verifications
+  has_many :_sent_messages, :through => :dogs
+  has_many :_received_messages, :through => :dogs
  
   validates_presence_of     :email, :name, :address
   validates_presence_of     :password,              :if => :password_required?
@@ -191,6 +193,35 @@ class Person < ActiveRecord::Base
       not deactivated?
     end
   end
+  
+  ## Message methods
+
+  def received_messages(page = 1)
+    _received_messages.paginate(:page => page, :per_page => Dog::MESSAGES_PER_PAGE)
+  end
+
+  def sent_messages(page = 1)
+    _sent_messages.paginate(:page => page, :per_page => Dog::MESSAGES_PER_PAGE)
+  end
+
+  def trashed_messages(page = 1)
+    conditions = [%((sender_id IN (:dog_ids) AND sender_deleted_at > :t) OR
+                    (recipient_id IN (:dog_ids) AND recipient_deleted_at > :t)),
+                  { :dog_ids => dog_ids, :t => Dog::TRASH_TIME_AGO }]
+    order = 'created_at DESC'
+    trashed = Message.paginate(:all, :conditions => conditions,
+                                     :order => order,
+                                     :page => page,
+                                     :per_page => Dog::MESSAGES_PER_PAGE)
+  end
+
+  def recent_messages
+    Message.find(:all,
+                 :conditions => [%(recipient_id IN (?) AND
+                                   recipient_deleted_at IS NULL), dog_ids],
+                 :order => "created_at DESC",
+                 :limit => Dog::NUM_RECENT_MESSAGES)
+  end  
   
   def has_unread_messages?
     sql = %(recipient_id IN (:dog_ids)

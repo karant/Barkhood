@@ -15,36 +15,36 @@ describe CommentsController do
     it "should have working pages" do
       with_options :blog_id => @blog, :post_id => @post do |page|
         page.get    :new
-        page.post   :create, :commenter_id => @commenter, :comment => { }
+        page.post   :create, :comment => { :commenter_id => @commenter }
         page.delete :destroy, :id => comments(:blog_comment)
       end
     end
     
     it "should create a blog comment" do
       lambda do
-        post :create, :blog_id => @blog, :post_id => @post, :commenter_id => @commenter,
-                      :comment => { :body => "The body" }
+        post :create, :blog_id => @blog, :post_id => @post,
+                      :comment => { :body => "The body", :commenter_id => @commenter }
         response.should redirect_to(blog_post_url(@blog, @post))
       end.should change(Comment, :count).by(1)
     end
     
     it "should create the right blog comment associations" do
       lambda do
-        post :create, :blog_id => @blog, :post_id => @post, :commenter_id => @commenter,
-                      :post => { :body => "The body" }
+        post :create, :blog_id => @blog, :post_id => @post,
+                      :post => { :body => "The body", :commenter_id => @commenter }
         assigns(:comment).commenter.should == @commenter
         assigns(:comment).post.should == @post
       end 
     end
     
     it "should render the new template on creation failure" do
-      post :create, :blog_id => @blog, :post_id => @post, :commenter_id => @commenter, :comment => {}
+      post :create, :blog_id => @blog, :post_id => @post, :comment => { :commenter_id => @commenter }
       response.should render_template("blog_post_new")
     end
     
     it "should associate a commenter to the comment" do
-      post :create, :blog_id => @blog, :post_id => @post, :commenter_id => @commenter,
-                    :comment => { :body => "The body" }
+      post :create, :blog_id => @blog, :post_id => @post,
+                    :comment => { :body => "The body", :commenter_id => @commenter }
       assigns(:comment).commenter.should == @commenter
     end
     
@@ -77,15 +77,15 @@ describe CommentsController do
     it "should have working pages" do
       with_options :dog_id => @dog do |page|
         page.get    :new
-        page.post   :create, :commenter_id => @commenter, :comment => { }
+        page.post   :create, :comment => { :commenter_id => @commenter }
         page.delete :destroy, :id => comments(:wall_comment)
       end
     end
   
     it "should allow create" do
       lambda do
-        post :create, :dog_id => @dog, :commenter_id => @commenter,
-                      :comment => { :body => "The body" }
+        post :create, :dog_id => @dog,
+                      :comment => { :body => "The body", :commenter_id => @commenter }
         #should go directly to the dog's wall              
         response.should redirect_to(dog_url(@dog)+'#tWall')
       end.should change(Comment, :count).by(1)
@@ -93,14 +93,14 @@ describe CommentsController do
       
     it "should associate a dog to a comment" do
       with_options :dog_id => @dog do |page|
-        page.post :create, :commenter_id => @commenter, :comment => { :body => "The body" }
+        page.post :create, :comment => { :body => "The body", :commenter_id => @commenter }
         assigns(:comment).commenter.should == @commenter
         assigns(:comment).commentable.should == @dog
       end
     end
     
     it "should render the new template on creation failure" do
-      post :create, :dog_id => @dog, :commenter_id => @commenter, :comment => { :body => "" }
+      post :create, :dog_id => @dog, :comment => { :body => "", :commenter_id => @commenter }
       response.should render_template("wall_new")
     end
     

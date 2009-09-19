@@ -11,10 +11,10 @@
   
       <% form_for :topic, :url => forum_topics_path(@forum) do |f| %>
         <div class="form_row">
+          <%= f.label :dog, "Author" %>
+          <%= f.select :dog_id, current_person.dogs.map{|dog| [dog.name, dog.id]} %>
           <%= f.label :name, "Subject" %>
           <%= f.text_field :name %>
-		  <%= f.label :dog, "Author" %>
-          <%= f.select :dog_id, current_person.dogs.map{|dog| [dog.name, dog.id]} %>
           <%= f.submit "Start", :class => "button" %>
         </div>
       <% end %>

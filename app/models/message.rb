@@ -40,15 +40,15 @@ class Message < Communication
   end
 
   # Put the message in the trash for the given dog.
-  def trash(dog, time=Time.now)
-    case dog
-    when sender
+  def trash(person, time=Time.now)
+    case person
+    when sender.owner
       self.sender_deleted_at = time
-    when recipient
+    when recipient.owner
       self.recipient_deleted_at = time
     else
       # Given our controller before filters, this should never happen...
-      raise ArgumentError,  "Unauthorized dog"
+      raise ArgumentError,  "Unauthorized person"
     end
     save!
   end
@@ -60,11 +60,11 @@ class Message < Communication
   end
   
   # Return true if the message has been trashed.
-  def trashed?(dog)
-    case dog
-    when sender
+  def trashed?(user)
+    case user
+    when sender.owner
       !sender_deleted_at.nil? and sender_deleted_at > Dog::TRASH_TIME_AGO
-    when recipient
+    when recipient.owner
       !recipient_deleted_at.nil? and 
        recipient_deleted_at > Dog::TRASH_TIME_AGO
     end

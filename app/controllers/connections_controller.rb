@@ -18,6 +18,7 @@ class ConnectionsController < ApplicationController
   
   def edit
     @contact = @connection.contact
+    @dog = @connection.dog
   end
   
   def create
@@ -25,7 +26,7 @@ class ConnectionsController < ApplicationController
     @contact = Dog.find(params[:contact_id])
 
     respond_to do |format|
-      if Connection.request(@dog, @contact)
+      if Connection.request(@contact, @dog)
         flash[:notice] = 'Connection request sent!'
         format.html { redirect_to(home_url) }
       else
@@ -56,12 +57,11 @@ class ConnectionsController < ApplicationController
   end
 
   def destroy
-    @dog = Dog.find(params[:dog_id])
     @connection.breakup
     
     respond_to do |format|
       flash[:success] = "Ended connection with #{@connection.contact.name}"
-      format.html { redirect_to( dog_connections_url(@dog)) }
+      format.html { redirect_to( dog_connections_url(@connection.dog)) }
     end
   end
 

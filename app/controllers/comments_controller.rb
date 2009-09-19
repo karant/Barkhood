@@ -27,7 +27,7 @@ class CommentsController < ApplicationController
   # Used for both wall and blog comments.
   def create
     @comment = parent.comments.build(params[:comment])
-    @comment.commenter = current_person.dogs.find(params[:commenter_id])
+    @comment.commenter = current_person.dogs.find(params[:comment][:commenter_id])
     
     respond_to do |format|
       if @comment.save

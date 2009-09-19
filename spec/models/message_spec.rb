@@ -34,29 +34,29 @@ describe Message do
   end
 
   it "should be able to trash messages as sender" do
-    @message.trash(@message.sender)
-    @message.should be_trashed(@message.sender)
-    @message.should_not be_trashed(@message.recipient)
+    @message.trash(@message.sender.owner)
+    @message.should be_trashed(@message.sender.owner)
+    @message.should_not be_trashed(@message.recipient.owner)
   end
   
   it "should be able to trash message as recipient" do
-    @message.trash(@message.recipient)
-    @message.should be_trashed(@message.recipient) 
-    @message.should_not be_trashed(@message.sender)
+    @message.trash(@message.recipient.owner)
+    @message.should be_trashed(@message.recipient.owner) 
+    @message.should_not be_trashed(@message.sender.owner)
   end
   
   it "should description not be able to trash as another dog" do
-    parker = dogs(:parker)
-    parker.should_not == @message.sender
-    parker.should_not == @message.recipient
-    lambda { @message.trash(parker) }.should raise_error(ArgumentError)
+    buba = dogs(:buba)
+    buba.should_not == @message.sender
+    buba.should_not == @message.recipient
+    lambda { @message.trash(buba.owner) }.should raise_error(ArgumentError)
   end
   
   it "should untrash messages" do
-    @message.trash(@message.sender)
-    @message.should be_trashed(@message.sender)
-    @message.untrash(@message.sender)
-    @message.should_not be_trashed(@message.sender)
+    @message.trash(@message.sender.owner)
+    @message.should be_trashed(@message.sender.owner)
+    @message.untrash(@message.sender.owner)
+    @message.should_not be_trashed(@message.sender.owner)
   end
   
   it "should handle replies" do

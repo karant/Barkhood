@@ -2,7 +2,7 @@ module SearchesHelper
   
   # Return the model to be searched based on params.
   def search_model
-    return "Person"    if params[:controller] =~ /home/
+    return "Dog"    if params[:controller] =~ /home/
     return "ForumPost" if params[:controller] =~ /forums/
     params[:model] || params[:controller].classify
   end
@@ -13,7 +13,7 @@ module SearchesHelper
     elsif params[:controller] == "messages" or params[:model] == "Message"
       "Messages"
     else
-      "People"
+      "Dogs"
     end
   end
   
@@ -26,9 +26,9 @@ module SearchesHelper
     when "ForumPost"
       dir  = "topics" 
       part = "search_result"
-    when "AllPerson"
-      dir  = 'people'
-      part = 'person'
+    when "AllDog"
+      dir  = 'dogs'
+      part = 'dog'
     else
       dir  = klass.tableize  # E.g., 'Person' becomes 'people'
       part = dir.singularize # E.g., 'people' becomes 'person'

@@ -1,5 +1,5 @@
 <%- unless dog.requested_contacts.empty? -%>
-  <h2>Contact Requests</h2>
+  <h2><%=h dog.name %>'s Contact Requests</h2>
   <ul class="list requests small">
     <%- dog.requested_contacts.each do |contact| -%>
       <%- conn = Connection.conn(dog, contact) -%>

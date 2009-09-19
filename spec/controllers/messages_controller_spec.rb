@@ -36,7 +36,7 @@ describe MessagesController do
     end
     
     it "should have a working new page" do
-      get :new, :dog_id => @dog, :recipient_id => @other_dog
+      get :new, :dog_id => @dog
       response.should be_success
       response.should render_template("new")
     end
@@ -59,24 +59,26 @@ describe MessagesController do
     
     it "should handle invalid reply creation" do
       login_as(:kelly)
-      post :create, :message => { :parent_id => @message.id },
-                    :dog_id => dogs(:buba), :recipient_id => @other_dog
+      post :create, :message => { :parent_id => @message.id, :sender_id => dogs(:buba) },
+                    :dog_id => @other_dog
       response.should redirect_to(home_url)
     end
     
     it "should create a message" do
       lambda do
         post :create, :message => { :subject => "The subject",
-                                    :content => "Hey there!" },
-                      :dog_id => @dog, :recipient_id => @other_dog
+                                    :content => "Hey there!",
+                                    :sender_id => @dog },
+                      :dog_id => @other_dog
       end.should change(Message, :count).by(1)
     end
     
     it "should send a message receipt email" do
       lambda do
         post :create, :message => { :subject => "The subject",
-                                    :content => "Hey there!" },
-                      :dog_id => @dog, :recipient_id => @other_dog
+                                    :content => "Hey there!",
+                                    :sender_id => @dog },
+                      :dog_id => @other_dog
       end.should change(@emails, :length).by(1)
     end
     
@@ -89,15 +91,15 @@ describe MessagesController do
     end
     
     it "should trash messages" do
-      delete :destroy, :id => @message, :dog_id => @dog
-      assigns(:message).should be_trashed(@message.recipient)
-      assigns(:message).should_not be_trashed(@message.sender)
+      delete :destroy, :id => @message
+      assigns(:message).should be_trashed(@message.recipient.owner)
+      assigns(:message).should_not be_trashed(@message.sender.owner)
     end
     
     it "should untrash messages" do
-      delete :destroy, :id => @message, :dog_id => @dog
-      put :undestroy, :id => @message, :dog_id => @dog
-      assigns(:message).should_not be_trashed(@message.recipient)
+      delete :destroy, :id => @message
+      put :undestroy, :id => @message
+      assigns(:message).should_not be_trashed(@message.recipient.owner)
     end
     
     it "should require login" do
@@ -122,8 +124,9 @@ describe MessagesController do
       lambda do
         post :create, :message => { :subject => "The subject",
                                     :content => "This is a reply",
-                                    :parent_id  => message.id },
-                      :dog_id => recipient, :recipient_id => sender
+                                    :parent_id  => message.id,
+                                    :sender_id => recipient },
+                      :dog_id => sender
         assigns(:message).should be_reply
       end.should change(Message, :count).by(1)
     end

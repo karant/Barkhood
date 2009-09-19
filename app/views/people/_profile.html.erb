@@ -1,4 +1,7 @@
-<h2>Profile</h2>
+<h2>Owner Profile</h2>
+<p>
+	Name: <%=h @person.name %>
+</p>
 <%- if current_person?(@person) || current_person.admin? -%>
   <div class="button_container">
 <%- end -%>
@@ -19,7 +22,7 @@
 <%- if admin? and not @person.active? -%>
   <p class="error">This person is not active</p>
 <%- end -%>
-<h3>Dogs</h3>
+<h2>Dogs</h2>
 <ul class="list people">
 	<% current_person.dogs.each do |dog| %>
 		<%= render :partial => 'dogs/dog', :locals => { :dog => dog } %>

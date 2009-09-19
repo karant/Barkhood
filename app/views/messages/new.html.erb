@@ -1,4 +1,4 @@
-<h2>New message</h2>
+<h2>New message to <%=h @recipient.name %></h2>
 
 <%- column_div :type => :primary do -%>
 
@@ -12,9 +12,11 @@
   <% form_for(:message,
               :url => dog_messages_path(@recipient)) do |f| %>
     <div class="form_row full">
-      <label for="recipient">To</label>
-      <%= text_field_tag :recipient, h(@recipient.name) %>
+		<%= f.label :from %>
+		<%= f.select :sender_id, current_person.dogs.map{|d| [d.name, d.id]} %>
       <!-- TODO: be able to change recipients with this
+	  <label for="recipient">To</label>
+      <%= text_field_tag :recipient, h(@recipient.name) %>
       <a href="#" class="add-recipient">
         <%= image_tag "icons/add.gif", :alt => "Add a recipient" %>
       </a> -->

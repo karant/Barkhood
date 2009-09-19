@@ -10,7 +10,7 @@ describe "/people/show.html.erb" do
   end
 
   it "should have the right title" do
-    response.should have_tag("h2", /Owner's Profile/)
+    response.should have_tag("h2", /Profile/)
   end
   
 #  it "should have a Markdown-ed description if BlueCloth is present" do

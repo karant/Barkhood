@@ -5,8 +5,8 @@ class MessagesController < ApplicationController
 
   # GET /messages
   def index
-    @dog = current_person.dogs.find(params[:dog_id])
-    @messages = @dog.received_messages(params[:page])
+    @person = current_person
+    @messages = @person.received_messages(params[:page])
     respond_to do |format|
       format.html { render :template => "messages/index" }
     end
@@ -14,8 +14,8 @@ class MessagesController < ApplicationController
 
   # GET /messages/sent
   def sent
-    @dog = current_person.dogs.find(params[:dog_id])
-    @messages = @dog.sent_messages(params[:page])
+    @person = current_person
+    @messages = @person.sent_messages(params[:page])
     respond_to do |format|
       format.html { render :template => "messages/index" }
     end
@@ -23,8 +23,8 @@ class MessagesController < ApplicationController
   
   # GET /messages/trash
   def trash
-    @dog = current_person.dogs.find(params[:dog_id])
-    @messages = @dog.trashed_messages(params[:page])
+    @person = current_person
+    @messages = @person.trashed_messages(params[:page])
     respond_to do |format|
       format.html { render :template => "messages/index" }
     end    
@@ -39,7 +39,7 @@ class MessagesController < ApplicationController
 
   def new    
     @message = Message.new
-    @recipient = Dog.find(params[:recipient_id])
+    @recipient = Dog.find(params[:dog_id])
 
     respond_to do |format|
       format.html
@@ -47,8 +47,8 @@ class MessagesController < ApplicationController
   end
 
   def reply
-    @dog = current_person.dogs.find(params[:dog_id])
     original_message = Message.find(params[:id])
+    @dog = original_message.sender.owner == current_person ? original_message.sender : original_message.recipient
     @recipient = original_message.other_dog(@dog)
     @message = Message.unsafe_build(:parent_id    => original_message.id,
                                     :subject      => original_message.subject,
@@ -62,9 +62,9 @@ class MessagesController < ApplicationController
   end
 
   def create
-    @dog = current_person.dogs.find(params[:dog_id])
+    @dog = current_person.dogs.find(params[:message][:sender_id])
     @message = Message.new(params[:message])
-    @recipient = Dog.find(params[:recipient_id])
+    @recipient = Dog.find(params[:dog_id])
     @message.sender    = @dog
     @message.recipient = @recipient
     if reply?
@@ -84,9 +84,8 @@ class MessagesController < ApplicationController
   end
 
   def destroy
-    @dog = current_person.dogs.find(params[:dog_id])
     @message = Message.find(params[:id])
-    if @message.trash(@dog)
+    if @message.trash(current_person)
       flash[:success] = "Message trashed"
     else
       # This should never happen...
@@ -99,9 +98,8 @@ class MessagesController < ApplicationController
   end
   
   def undestroy
-    @dog = current_person.dogs.find(params[:dog_id])
     @message = Message.find(params[:id])
-    if @message.untrash(@dog)
+    if @message.untrash(current_person)
       flash[:success] = "Message restored to inbox"
     else
       # This should never happen...
