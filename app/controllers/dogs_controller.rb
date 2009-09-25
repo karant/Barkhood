@@ -32,6 +32,10 @@ class DogsController < ApplicationController
       @blog = @dog.blog
       @posts = @dog.blog.posts.paginate(:page => params[:page])
       @galleries = @dog.galleries.paginate(:page => params[:page])
+      @groups = current_person == @dog.owner ? @dog.groups : @dog.groups_not_hidden
+      @some_groups = @groups[0...num_contacts]
+      @own_groups = current_person == @dog.owner ? @dog.own_groups : @dog.own_not_hidden_groups
+      @some_own_groups = @own_groups[0...num_contacts]
     end
     respond_to do |format|
       format.html

@@ -1,0 +1,12 @@
+<%- if title.length > 0 -%>
+  <h3><span class="fn n"><%= h @group.name %></span>'s <%= title %></h3>
+<%- end -%>
+<%- unless members.empty? -%>
+  <ul class="grid contacts medium">
+    <%- members.each do |contact| -%>
+      <%= render :partial => 'shared/contact', :locals => {:contact => contact} %>
+    <%- end -%>
+  </ul>
+<%- else -%>
+  <h4>No members (yet)</h4>
+<%- end -%>

@@ -1,0 +1,19 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+public:
+  name: Public
+  description: Public group!
+  mode: 0
+  dog: dana
+
+private:
+  name: Private
+  description: Private group!
+  mode: 1
+  dog: dana
+  
+hiddne:
+  name: Hidden
+  description: Hidden group!
+  mode: 2
+  dog: max

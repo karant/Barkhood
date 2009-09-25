@@ -17,3 +17,9 @@ event_comment:
   body: MyText
   commentable: public
   commentable_type: Event
+  
+group_comment:
+  commenter: dana
+  body: MyText
+  commentable: public
+  commentable_type: Group

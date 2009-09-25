@@ -1,4 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :groups
+
+  map.resources :memberships
+
   map.resources :breeds
 
   map.resources :dogs, :member => { :common_contacts => :get }

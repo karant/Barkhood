@@ -1,0 +1,66 @@
+<div class="profile vcard">
+  <h2><span class="fn n"><%= h @group.name %></span>'s Profile</h2>
+  Mode: <%= get_groups_modes[@group.mode][0] %>
+  <%- if group_owner?(current_person,@group) -%>
+    <div class="button_container">
+      <%- if @group.description.blank? -%>
+        <div class="error">
+          The group description is blank.
+          <%= link_to "Click here to add a description",
+                      edit_group_path(@group) %>
+        </div>
+        <%= link_to "Edit members", members_group_path(@group) %> |
+      <%- else -%>
+          <%= link_to "Edit profile", edit_group_path(@group) %> |
+          <%= link_to "Edit members", members_group_path(@group) %> |
+      <%- end -%>
+	  <% if @group.hidden? %>
+	          <%= link_to "Invite contacts", invite_group_path(@group) %> |
+	  <% end %>
+	  <%= link_to "Delete group", group_path(@group), :confirm => 'Are you sure?', :method => :delete %>
+    </div>
+  <%- elsif current_person.admin? %>
+  	  	<%= link_to "Delete group",
+              admin_group_path(@group),:confirm => 'Are you sure?', :method => :delete %>
+  <%- end -%>
+  <div class="toolbox">
+    <%= image_tag @group.main_photo, :class => "profile-image photo",
+                                      :alt => h(@group.name) %>
+    <ul class="tools">
+	  	<%- if logged_in? && !current_person.dogs.empty? -%>
+		  	<li>Memberships:
+				<ul>
+					<% current_person.dogs.each do |dog| %>
+						<li><%=h dog.name %> -
+						   <% if @group.owner == dog %>
+						   	   Group owner
+						   <% else %> 
+						       <%- unless Membership.exist?(dog,@group) -%>
+						            <%= link_to "Join",
+						                      group_memberships_path(@group, :dog_id => dog), :method => :post %>
+						        <%- else -%>
+						            <%- if @group.has_invited?(dog) -%>
+						              You have been invited <%= link_to "(respond)",
+						                edit_membership_path(Membership.find_by_group_id(@group,
+						                  :conditions => ["dog_id = ?", dog.id])) %>
+						            <%- end -%>
+						        <%- end -%>
+						        <%- if Membership.connected?(dog,@group) -%>
+						          Member (<%= link_to "Leave group",
+						                      membership_path(Membership.mem(dog, @group)),
+						                      :method => :delete,
+						                      :confirm =>
+						                      "Are you sure you want #{h dog.name } to leave #{h @group.name}?" %>)
+						        <%- end -%>
+						        <%- if Membership.pending?(dog, @group) -%>
+						            Request pending
+						        <%- end -%>		
+							<% end %>				
+					<% end %>
+				</ul>	
+			</li>	
+		<%- end %>
+    </ul>
+  </div>
+  <%= display @group.description %>
+</div>

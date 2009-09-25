@@ -1,0 +1,12 @@
+<%- if @group.recent_activity.empty? -%>
+  <h2>No recent activity</h2>
+<%- else -%>
+  <h2><%= @group.name %>'s Recent Activity</h2>
+  
+  <ul class="list activity">
+     <%= render :partial => 'shared/activity',
+                :collection => @group.recent_activity,
+                :locals => { :destroy => current_person?(@group.owner.owner),
+                             :recent => true } %>
+  </ul>
+<%- end -%>

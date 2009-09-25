@@ -1,0 +1,49 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+public_dana:
+  group: public
+  dog: dana
+  status: 0
+  accepted_at: 2.weeks.ago.to_s(:db)
+
+public_nola:
+  group: public
+  dog: nola
+  status: 0
+  accepted_at: 1.week.ago.to_s(:db)
+  
+public_buba:
+  group: public
+  dog: buba
+  status: 1
+  accepted_at:
+  
+private_dana:
+  group: private
+  dog: dana
+  status: 0
+  accepted_at: 2.weeks.ago.to_s(:db)
+
+private_nola:
+  group: private
+  dog: nola
+  status: 0
+  accepted_at: 3.weeks.ago.to_s(:db)
+  
+private_buba:
+  group: private
+  dog: buba
+  status: 2
+  accepted_at:
+  
+hidden_max:
+  group: hidden
+  dog: max
+  status: 0
+  accepted_at: 3.weeks.ago.to_s(:db)
+
+hidden_dana:
+  group: hidden
+  dog: dana
+  status: 1
+  accepted_at:

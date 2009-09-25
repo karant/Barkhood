@@ -1,0 +1,67 @@
+<%- column_div :type => :primary do -%>
+  <h2>Members for <%= h @group.name %></h2>
+  
+  <% if @group.owner?(current_person) and not @pending.empty? -%>
+    <h3>Pending request</h3>
+    <ul class="grid contacts medium">
+      <%- @pending.each do |contact| -%>
+        <li class="vcard contact">
+          <%= image_link contact, :image_options => { :class => "photo" },
+                                  :link_options => { :class => "url" },
+                                  :vcard => true,
+                                  :image => :bounded_icon %>
+          <% if @group.owner?(current_person) %>
+            <div class="accept_or_cancel_membership">
+                <%= link_to image_tag("icons/remove.gif"),
+                  unsuscribe_membership_path(contact.memberships.find(:first, :conditions => ['group_id = ?',@group])),
+                  :method => "delete", :title => 'Cancel membership',
+                :confirm => "Are you sure you want to unsuscribe this dog?" %>
+                <%= link_to image_tag("icons/add.gif"),
+                  suscribe_membership_path(contact.memberships.find(:first, :conditions => ['group_id = ?',@group])),
+                  :method => "post", :title => 'Accept membership' %>
+            </div>
+          <% end %>
+        </li>
+      <%- end -%>
+ 
+    </ul>
+  <% end -%>
+ 
+  <h3>Members</h3>
+ 
+  <% unless @members.empty? -%>
+    <ul class="grid contacts medium">
+      <%- @members.each do |contact| -%>
+        <li class="vcard contact">
+          <%= image_link contact, :image_options => { :class => "photo" },
+                                  :link_options => { :class => "url" },
+                                  :vcard => true,
+                                  :image => :bounded_icon %>
+          <% if @group.owner?(current_person) %>
+            <div class="cancel_membership">
+                <%= link_to image_tag("icons/remove.gif"),
+                  unsuscribe_membership_path(contact.memberships.find(:first, :conditions => ['group_id = ?',@group])),
+                  :method => "delete",
+                  :title => 'Delete membership',
+                  :confirm => "Are you sure you want to unsuscribe this dog?" %>
+            </div>
+          <% end %>
+        </li>
+      <%- end -%>
+ 
+    </ul>
+    <%= will_paginate(@members) %>
+  <% else %>
+    <h3>No members (yet)</h3>
+  <% end -%>
+ 
+  <h2>Administrator</h2>
+  <ul class="grid contacts medium">
+      <%= render :partial => 'shared/contact', :locals => {:contact => @group.owner} %>
+  </ul>
+ 
+<%- end -%>
+ 
+<%- column_div :type => :secondary do -%>
+  <%= render :partial => 'shared/minifeed' %>
+<%- end -%>
