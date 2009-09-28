@@ -1,5 +1,6 @@
 class GalleriesController < ApplicationController
   before_filter :login_required
+  before_filter :get_instance_vars
   before_filter :correct_user_required, :only => [ :edit, :update, :destroy ]
   
   def show
@@ -10,17 +11,17 @@ class GalleriesController < ApplicationController
   
   def index
     @body = "galleries"
-    @dog = Dog.find(params[:dog_id])
-    @galleries = @dog.galleries.paginate :page => params[:page]
+    @parent = parent
+    @galleries = @parent.galleries.paginate :page => params[:page]
   end
   
   def new
-    @gallery = Gallery.new
+    @gallery = parent.galleries.new
   end
   
   def create
     @dog = current_person.dogs.find(params[:gallery][:dog_id])
-    @gallery = @dog.galleries.build(params[:gallery])
+    @gallery = parent.galleries.build(params[:gallery])
     respond_to do |format|
       if @gallery.save
         flash[:success] = "Gallery successfully created"
@@ -48,17 +49,16 @@ class GalleriesController < ApplicationController
   end
   
   def destroy
-    @dog = current_person.dogs.find(params[:dog_id])
-    if @dog.galleries.count == 1
+    if parent.galleries.count == 1
       flash[:error] = "You can't delete the final gallery"
-    elsif @dog.galleries.find(params[:id]).destroy
+    elsif parent.galleries.find(params[:id]).destroy
       flash[:success] = "Gallery successfully deleted"
     else
       flash[:error] = "Gallery could not be deleted"
     end
 
     respond_to do |format|
-      format.html { redirect_to dog_galleries_path(@dog) }
+      format.html { redirect_to parent_galleries_path }
     end
 
   end
@@ -70,9 +70,41 @@ class GalleriesController < ApplicationController
       if @gallery.nil?
         flash[:error] = "No gallery found"
         redirect_to dog_galleries_path(current_user.dogs.first)
-      elsif @gallery.dog.owner != current_person
+      elsif @gallery.person != current_person
         flash[:error] = "You are not the owner of this gallery"
-        redirect_to dog_galleries_path(@gallery.dog)
+        redirect_to parent_galleries_path
       end
+  end
+  
+  def get_instance_vars
+    if dog?
+      @dog = Dog.find(params[:dog_id])
+    elsif group?
+      @group = Group.find(params[:group_id])
     end
+  end
+  
+  def parent_galleries_path
+    if dog?
+      dog_galleries_path(parent)
+    elsif group?
+      group_galleries_path(parent)
+    end
+  end
+  
+  def parent
+    if dog?
+      @dog
+    elsif group?
+      @group
+    end
+  end
+  
+  def dog?
+    !params[:dog_id].nil?
+  end
+  
+  def group?
+    !params[:group_id].nil?
+  end
 end

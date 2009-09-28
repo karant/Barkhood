@@ -33,11 +33,11 @@ describe Membership do
       # Both notifications are on by default.
       lambda do
         Membership.request(@dog, @group)
-      end.should change(@emails, :length).by(1)
+      end.should change(@emails, :length).by(2)
     end
     
     it "should not send an email when person's notifications are off" do
-      @dog.owner.toggle!(:connection_notifications)
+      @group.owner.owner.toggle!(:connection_notifications)
       @dog.owner.connection_notifications.should == false
       lambda do
         Membership.request(@dog, @group)
@@ -78,6 +78,12 @@ describe Membership do
       Membership.invited?(@dog, @group).should == false      
     end
     
+    it "shoud determine if any of person's dogs have pending invitations to join a group" do
+      other_dog = dogs(:buba)
+      Membership.invited_person?(other_dog.owner, @group).should == true
+      Membership.invited_person?(@dog.owner, @group).should == false
+    end
+    
     it "should accept a request" do
       Membership.request(@dog, @private_group)
       Membership.accept(@dog,  @private_group)
@@ -116,7 +122,9 @@ describe Membership do
   
   
   it "should create a feed activity for a new membership" do
-    membership = Membership.request(@dog, @group)
+    Membership.request(@dog, @group)
+    membership = Membership.mem(@dog, @group)
+    membership.accept
     activity = Activity.find_by_item_id(membership)
     activity.should_not be_nil
     activity.dog.should_not be_nil

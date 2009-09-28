@@ -25,36 +25,46 @@ describe Group do
   
   describe "length validations" do
     it "should enforce a maximum name length" do
-      @group.should have_maximum(:name, MAX_NAME)
+      @group.should have_maximum(:name, Group::MAX_NAME)
     end
     
     it "should enforce a maximum description length" do
-      @group.should have_maximum(:description, MAX_DESCRIPTION)
+      @group.should have_maximum(:description, Group::MAX_DESCRIPTION)
     end
   end
 
   describe "activity associations" do
 
-    it "should log an activity if description changed" do
-      @group.update_attributes(:description => "New Description")
-      activity = Activity.find_by_item_id(@group)
-      Activity.global_feed.should contain(activity)
-    end
+#    it "should log an activity if description changed" do
+#      @group.update_attributes(:description => "New Description")
+#      activity = Activity.find_by_item_id(@group)
+#      Activity.global_feed.should contain(activity)
+#    end
+#
+#    it "should not log an activity if description didn't change" do
+#      @group.save!
+#      activity = Activity.find_by_item_id(@group)
+#      Activity.global_feed.should_not contain(activity)
+#    end
 
-    it "should not log an activity if description didn't change" do
-      @group.save!
-      activity = Activity.find_by_item_id(@group)
-      Activity.global_feed.should_not contain(activity)
-    end
+# TODO : need activity to be polymorphic for this to work
+#    it "should disappear if the group is destroyed" do
+#      group = create_group(:save => true)
+#      group.update_attributes(:name => "New name")
+#
+#      Activity.find_all_by_dog_id(group.owner).should_not be_empty
+#      group.destroy
+#      Activity.find_all_by_dog_id(group.owner).should be_empty
+#      Feed.find_all_by_dog_id(group.owner).should be_empty
+#    end
 
-    it "should disappear if the group is destroyed" do
-      group = create_group(:save => true)
-      group.update_attributes(:name => "New name")
-
-      Activity.find_all_by_group_id(group).should_not be_empty
-      group.destroy
-      Activity.find_all_by_group_id(group).should be_empty
-      Feed.find_all_by_group_id(group).should be_empty
+    it "should log an activity when the group is created" do
+      lambda do
+        group = create_group(:save => true)
+      end.should change(Activity, :count).by(1)
+      lambda do
+        group = create_group(:save => true)
+      end.should change(Feed, :count).by(1)
     end
   end
 
@@ -92,8 +102,12 @@ describe Group do
     end
     
     it "should identify people with invited dogs" do
-      @group.has_invited?(people(:kelly)).should == true
-      @group.has_invited?(people(:quentin)).should == false
+      @group.has_invited?(dogs(:buba)).should == true
+      @group.has_invited?(dogs(:dana)).should == false
+    end
+    
+    it "should return owner's owner as person" do
+      @group.person.should == @group.owner.owner
     end
   end
 
@@ -115,16 +129,16 @@ describe Group do
         
         it "should exclude dogs with inactive owners" do
           member = dogs(:nola)
-          @group.contacts.should contain(member)
+          @group.dogs.should contain(member)
           member.owner.toggle!(:deactivated)
-          @group.reload.contacts.should_not contain(member)          
+          @group.reload.dogs.should_not contain(member)          
         end
         
         it "should exclude deactivated dogs" do
           member = dogs(:nola)
-          @group.contacts.should contain(member)
+          @group.dogs.should contain(member)
           member.toggle!(:deactivated)
-          @group.reload.contacts.should_not contain(member)  
+          @group.reload.dogs.should_not contain(member)  
         end
       end
       
@@ -135,16 +149,16 @@ describe Group do
         
         it "should exclude dogs with inactive owners" do
           member = dogs(:buba)
-          @group.contacts.should contain(member)
+          @private_group.pending_requests.should contain(member)
           member.owner.toggle!(:deactivated)
-          @group.reload.contacts.should_not contain(member)          
+          @private_group.reload.pending_requests.should_not contain(member)          
         end
         
         it "should exclude deactivated dogs" do
           member = dogs(:buba)
-          @group.contacts.should contain(member)
+          @private_group.pending_requests.should contain(member)
           member.toggle!(:deactivated)
-          @group.reload.contacts.should_not contain(member)  
+          @private_group.reload.pending_requests.should_not contain(member)  
         end        
       end
 
@@ -155,16 +169,16 @@ describe Group do
         
         it "should exclude dogs with inactive owners" do
           member = dogs(:dana)
-          @group.contacts.should contain(member)
+          @hidden_group.pending_invitations.should contain(member)
           member.owner.toggle!(:deactivated)
-          @group.reload.contacts.should_not contain(member)          
+          @hidden_group.reload.pending_invitations.should_not contain(member)          
         end
         
         it "should exclude deactivated dogs" do
           member = dogs(:dana)
-          @group.contacts.should contain(member)
+          @hidden_group.pending_invitations.should contain(member)
           member.toggle!(:deactivated)
-          @group.reload.contacts.should_not contain(member)  
+          @hidden_group.reload.pending_invitations.should_not contain(member)  
         end         
       end
     end

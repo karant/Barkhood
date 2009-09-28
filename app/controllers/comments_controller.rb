@@ -54,6 +54,8 @@ class CommentsController < ApplicationController
     def get_instance_vars
       if wall?
         @dog = Dog.find(params[:dog_id])
+      elsif group_wall?
+        @group = Group.find(params[:group_id])
       elsif blog?
         @blog = Blog.find(params[:blog_id])
         @post = Post.find(params[:post_id])
@@ -65,8 +67,15 @@ class CommentsController < ApplicationController
     def dog
       if wall?
         @dog
+      elsif group_wall?
+        @group.owner
       elsif blog?
-        @blog.dog 
+        case @blog.owner.class.to_s
+          when 'Dog'
+            @blog.owner
+          when 'Group'
+            @blog.owner.owner
+        end
       elsif event?
         @event.dog
       end
@@ -79,6 +88,11 @@ class CommentsController < ApplicationController
           flash[:notice] = "You must be contacts to complete that action"
           redirect_to @dog
         end
+      elsif group_wall?
+        unless is_member_of?(group)
+          flash[:notice] = "You must be a member of the group to complete that action"
+          redirect_to @group          
+        end
       end
     end
     
@@ -86,6 +100,8 @@ class CommentsController < ApplicationController
       @comment = Comment.find(params[:id])
       if wall?
         current_person?(dog.owner) or current_person?(@comment.commenter)
+      elsif group_wall?
+        current_person(group.owner.owner) or current_person?(@comment.commenter)
       elsif blog?
         current_person?(dog.owner)
       end
@@ -101,6 +117,8 @@ class CommentsController < ApplicationController
     def resource_comments
       if wall?
         @dog.comments
+      elsif group_wall?
+        @group.comments
       elsif blog?
         @post.comments.paginate(:page => params[:page])
       elsif
@@ -112,6 +130,8 @@ class CommentsController < ApplicationController
     def parent
       if wall?
         @dog
+      elsif group_wall?
+        @group
       elsif blog?
         @post
       elsif event?
@@ -129,6 +149,8 @@ class CommentsController < ApplicationController
     def resource
       if wall?
         "wall"
+      elsif group_wall?
+        "group_wall"
       elsif blog?
         "blog_post"
       elsif event?
@@ -140,6 +162,8 @@ class CommentsController < ApplicationController
     def comments_url
       if wall?
         (dog_url @dog)+'#tWall'  # go directly to comments tab
+      elsif group_wall?
+        (group_url @group)+'#tWall'
       elsif blog?
         blog_post_url(@blog, @post)
       elsif event?
@@ -150,6 +174,10 @@ class CommentsController < ApplicationController
     # True if resource lives on a wall.
     def wall?
       !params[:dog_id].nil?
+    end
+    
+    def group_wall?
+      !params[:group_id].nil?
     end
 
     # True if resource lives in a blog.

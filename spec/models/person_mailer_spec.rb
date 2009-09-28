@@ -75,10 +75,177 @@ describe PersonMailer do
      
      it "should have a link to the recipient's preferences" do
        prefs_url = "http://#{@server}"
-       prefs_url += "/dogs/#{@contact.to_param}/edit"
+       prefs_url += "/people/#{@contact.owner.to_param}/edit"
        @email.body.should =~ /#{prefs_url}/
      end
    end
+   
+   describe "membership public group" do
+     before(:each) do
+       @group = groups(:public)
+       @dog  = dogs(:max)
+       Membership.request(@dog, @group)
+       @membership = Membership.mem(@dog, @group)
+       @email = PersonMailer.create_membership_public_group(@membership)
+     end  
+     
+     it "should have the right recipient" do
+       @email.to.first.should == @group.owner.owner.email
+     end
+     
+     it "should have the right requester" do
+       @email.body.should =~ /#{@dog.name}/
+     end
+     
+     it "should have a URL to the group" do
+       url = "http://#{@server}/groups/#{@group.to_param}/members"
+       @email.body.should =~ /#{url}/
+     end
+   
+     it "should have the right domain in the body" do
+        @email.body.should =~ /#{@server}/
+     end
+     
+     it "should have a link to the recipient's preferences" do
+       prefs_url = "http://#{@server}"
+       prefs_url += "/people/#{@group.owner.owner.to_param}/edit"
+       @email.body.should =~ /#{prefs_url}/
+     end     
+   end
+   
+   describe "membership request" do
+     before(:each) do
+       @group = groups(:private)
+       @dog  = dogs(:max)
+       Membership.request(@dog, @group)
+       @membership = Membership.mem(@dog, @group)
+       @email = PersonMailer.create_membership_request(@membership)
+     end  
+     
+     it "should have the right recipient" do
+       @email.to.first.should == @group.owner.owner.email
+     end
+     
+     it "should have the right requester" do
+       @email.body.should =~ /#{@dog.name}/
+     end
+     
+     it "should have a URL to the group" do
+       url = "http://#{@server}/groups/#{@group.to_param}/members"
+       @email.body.should =~ /#{url}/
+     end
+   
+     it "should have the right domain in the body" do
+        @email.body.should =~ /#{@server}/
+     end
+     
+     it "should have a link to the recipient's preferences" do
+       prefs_url = "http://#{@server}"
+       prefs_url += "/people/#{@group.owner.owner.to_param}/edit"
+       @email.body.should =~ /#{prefs_url}/
+     end     
+   end  
+   
+   describe "membership accepted" do
+     before(:each) do
+       @group = groups(:private)
+       @dog  = dogs(:max)
+       Membership.request(@dog, @group)
+       @membership = Membership.mem(@dog, @group)
+       @membership.accept
+       @email = PersonMailer.create_membership_accepted(@membership)
+     end  
+     
+     it "should have the right recipient" do
+       @email.to.first.should == @dog.owner.email
+     end
+     
+     it "should have the right requester" do
+       @email.body.should =~ /#{@dog.name}/
+     end
+     
+     it "should have a URL to the group" do
+       url = "http://#{@server}/groups/#{@group.to_param}"
+       @email.body.should =~ /#{url}/
+     end
+   
+     it "should have the right domain in the body" do
+        @email.body.should =~ /#{@server}/
+     end
+     
+     it "should have a link to the recipient's preferences" do
+       prefs_url = "http://#{@server}"
+       prefs_url += "/people/#{@dog.owner.to_param}/edit"
+       @email.body.should =~ /#{prefs_url}/
+     end     
+   end 
+   
+   describe "invitation notification" do
+     before(:each) do
+       @group = groups(:private)
+       @dog  = dogs(:max)
+       Membership.invite(@dog, @group)
+       @membership = Membership.mem(@dog, @group)
+       @email = PersonMailer.create_invitation_notification(@membership)
+     end  
+     
+     it "should have the right recipient" do
+       @email.to.first.should == @dog.owner.email
+     end
+     
+     it "should have the right requester" do
+       @email.body.should =~ /#{@dog.name}/
+     end
+     
+     it "should have a URL to the membership" do
+       url = "http://#{@server}/memberships/#{@membership.id}/edit"
+       @email.body.should =~ /#{url}/
+     end
+   
+     it "should have the right domain in the body" do
+        @email.body.should =~ /#{@server}/
+     end
+     
+     it "should have a link to the recipient's preferences" do
+       prefs_url = "http://#{@server}"
+       prefs_url += "/people/#{@dog.owner.to_param}/edit"
+       @email.body.should =~ /#{prefs_url}/
+     end     
+   end    
+   
+   describe "invitation accepted" do
+     before(:each) do
+       @group = groups(:private)
+       @dog  = dogs(:max)
+       Membership.invite(@dog, @group)
+       @membership = Membership.mem(@dog, @group)
+       @membership.accept
+       @email = PersonMailer.create_invitation_accepted(@membership)
+     end  
+     
+     it "should have the right recipient" do
+       @email.to.first.should == @group.owner.owner.email
+     end
+     
+     it "should have the right requester" do
+       @email.body.should =~ /#{@dog.name}/
+     end
+     
+     it "should have a URL to the group" do
+       url = "http://#{@server}/groups/#{@group.to_param}/members"
+       @email.body.should =~ /#{url}/
+     end
+   
+     it "should have the right domain in the body" do
+        @email.body.should =~ /#{@server}/
+     end
+     
+     it "should have a link to the recipient's preferences" do
+       prefs_url = "http://#{@server}"
+       prefs_url += "/people/#{@group.owner.owner.to_param}/edit"
+       @email.body.should =~ /#{prefs_url}/
+     end     
+   end    
    
    describe "blog comment notification" do
      
@@ -105,8 +272,8 @@ describe PersonMailer do
      end
      
      it "should have a link to the recipient's preferences" do
-       prefs_url = "http://#{@server}/dogs/"
-       prefs_url += "#{@recipient.to_param}/edit"
+       prefs_url = "http://#{@server}/people/"
+       prefs_url += "#{@recipient.owner.to_param}/edit"
        @email.body.should =~ /#{prefs_url}/
      end
    end
@@ -135,7 +302,7 @@ describe PersonMailer do
      end
      
      it "should have a link to the recipient's preferences" do
-       prefs_url = "http://#{@server}/dogs/#{@recipient.to_param}/edit"
+       prefs_url = "http://#{@server}/people/#{@recipient.owner.to_param}/edit"
        @email.body.should =~ /#{prefs_url}/
      end
    end

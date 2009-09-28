@@ -13,6 +13,14 @@ class GroupsController < ApplicationController
  
   def show
     @group = Group.find(params[:id])
+    @parent = @group
+    num_contacts = Dog::MAX_DEFAULT_CONTACTS
+    @members = @group.dogs
+    @some_members = @members[0...num_contacts]
+    @pending_requests = @group.pending_requests
+    @blog = @group.blog
+    @posts = @group.blog.posts.paginate(:page => params[:page])
+    @galleries = @group.galleries.paginate(:page => params[:page])    
     group_redirect_if_not_public
   end
  
@@ -89,7 +97,7 @@ class GroupsController < ApplicationController
     @group = Group.find(params[:id])
     @members = @group.dogs.paginate(:page => params[:page],
                                           :per_page => RASTER_PER_PAGE)
-    @pending = @group.pending_request.paginate(:page => params[:page],
+    @pending = @group.pending_requests.paginate(:page => params[:page],
                                           :per_page => RASTER_PER_PAGE)
     group_redirect_if_not_public
   end

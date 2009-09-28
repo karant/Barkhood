@@ -10,11 +10,6 @@
     <div class="clear"></div>
   <% end %>
  
-  <% tabs.create('tActivity', 'Recent Activity') do %>
-    <%= render :partial => 'recent_activity' %>
-    <div class="clear"></div>
-  <% end %>
- 
   <% tabs.create('tMembers', 'Members') do %>
     <%= render :partial => 'profile_members' %>
     <div class="clear"></div>
@@ -26,7 +21,7 @@
   <% end %>
   
   <% tabs.create('tGalleries', 'Galleries') do %>
-    <%= render :partial => 'shared/galleries' %>
+    <%= render :partial => 'shared/galleries', :locals => { :galleries => @galleries, :parent => @group } %>
     <div class="clear"></div>
   <% end %>
  

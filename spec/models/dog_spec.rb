@@ -81,6 +81,10 @@ describe Dog do
       param = "#{@dog.id}-michael-and-hartl"
       @dog.to_param.should == param
     end
+    
+    it "should return person as owner" do
+      @dog.person.should == @dog.owner
+    end
   end
 
   describe "contact associations" do
@@ -224,6 +228,57 @@ describe Dog do
     
     it "should have unread messages" do
       @dog.has_unread_messages?.should be_true
+    end
+  end
+  
+  describe "own group associations" do
+    it "should have own groups" do
+      @dog.own_groups.should_not be_nil
+      @dog.own_groups.should contain(groups(:public))
+      dogs(:max).own_groups.should contain(groups(:hidden))
+    end
+    
+    it "should have own not hidden groups" do
+      @dog.own_not_hidden_groups.should_not be_nil
+      @dog.own_not_hidden_groups.should contain(groups(:public))
+      dogs(:max).own_not_hidden_groups.should_not be_nil
+      dogs(:max).own_not_hidden_groups.should_not contain(groups(:hidden))
+    end
+    
+    it "should have own hidden groups" do
+      @dog.own_hidden_groups.should_not be_nil
+      @dog.own_hidden_groups.should be_empty
+      dogs(:max).own_hidden_groups.should contain(groups(:hidden))
+    end
+    
+    it "should disappear if the dog is destroyed" do
+      Group.find_all_by_dog_id(@dog).should_not be_empty
+      @dog.destroy
+      Group.find_all_by_dog_id(@dog).should be_empty
+    end    
+  end
+  
+  describe "group associations" do
+    it "should have membership" do
+      @dog.memberships.should_not be_empty
+    end
+    
+    it "should have groups" do
+      @dog.groups.should_not be_empty
+    end
+    
+    it "should have not hidden groups" do
+      @dog.groups_not_hidden.should_not be_empty
+    end
+    
+    describe "instance methods" do
+      it "should have requested memberships" do
+        dogs(:dana).requested_memberships.should contain(memberships(:private_buba))
+      end
+      
+      it "should have invitations" do
+        dogs(:buba).invitations.should contain(memberships(:public_buba))
+      end
     end
   end
   

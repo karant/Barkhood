@@ -46,8 +46,10 @@ class Comment < ActiveRecord::Base
     @commented_dog ||= case commentable.class.to_s
                          when "Dog"
                            commentable
+                         when "Group"
+                           commentable
                          when "BlogPost"
-                           commentable.blog.dog
+                           commentable.blog.owner
                          when "Event"
                            commentable.dog
                          end

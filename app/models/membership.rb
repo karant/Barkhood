@@ -124,6 +124,15 @@ class Membership < ActiveRecord::Base
       exist?(dog, group) and mem(dog,group).status == INVITED
     end
     
+    def invited_person?(person, group)
+      result = false
+      person.dogs.each do |dog|
+        result = invited?(dog, group)
+        break if result
+      end
+      return result
+    end
+    
   end
   
   private
@@ -137,10 +146,8 @@ class Membership < ActiveRecord::Base
     end
   
     def log_activity(membership)
-      activity = Activity.create!(:item => membership, :owner => membership.dog)
-      add_activities(:activity => activity, :owner => membership.dog)
-      activity = Activity.create!(:item => membership, :owner => membership.group)
-      add_activities(:activity => activity, :owner => membership.group)
+      activity = Activity.create!(:item => membership, :dog => membership.dog)
+      add_activities(:activity => activity, :dog => membership.dog)
     end
   end  
 end

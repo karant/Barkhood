@@ -15,9 +15,17 @@
   	<% @dogs.each do |dog | %>
 	    <%= render :partial => 'requested_contacts', :locals => { :dog => dog } %>
 	    <%= render :partial => 'messages_preview', :locals => { :dog => dog } %>
+		<%= render :partial => 'invitations', :locals => { :dog => dog } %>
 	    <%= render :partial => 'shared/contacts_preview',
 	               :locals => { :dog => dog } %>
+		<%= render :partial => 'shared/groups',
+	               :locals => { :dog => dog, :groups => dog.own_groups,
+	               :title => "Admin Groups", :link => "admin"} %>
+    	<%= render :partial => 'shared/groups',
+	               :locals => { :dog => dog, :groups => dog.groups,
+	               :title => "Groups", :link => "groups"} %>				   
 	<% end %>
+	<%= render :partial => 'requested_memberships' %>
   <%- else -%>
     <%- unless global_prefs.app_name.blank? -%>
       <h2>About <%= global_prefs.app_name %></h2>

@@ -28,7 +28,14 @@ describe Gallery do
   end
   
   it "should have an activity" do
-    @gallery = Gallery.unsafe_create(:dog => dogs(:parker))
+    @gallery = Gallery.unsafe_create(:owner => dogs(:parker))
     Activity.find_by_item_id(@gallery).should_not be_nil
+  end
+  
+  describe "utility methods" do
+    it "should determine person/owner" do
+      @gallery.person.should == people(:quentin)
+      galleries(:group_gallery).person.should == people(:quentin)
+    end
   end
 end

@@ -36,7 +36,7 @@ class Dog < ActiveRecord::Base
   belongs_to  :owner, :class_name => 'Person', :foreign_key => 'owner_id'
   belongs_to  :breed
   
-  has_one :blog
+  has_one :blog, :as => :owner
   has_many :email_verifications
   has_many :comments, :as => :commentable, :order => 'created_at DESC',
                       :limit => NUM_WALL_COMMENTS
@@ -45,7 +45,7 @@ class Dog < ActiveRecord::Base
                       :include => [:owner],
                       :conditions => ACCEPTED_AND_ACTIVE,
                       :order => 'dogs.created_at DESC'
-  has_many :photos, :dependent => :destroy, :order => 'created_at'
+  has_many :photos, :as => :owner, :dependent => :destroy, :order => 'created_at'
   has_many :requested_contacts, :through => :connections,
                                 :include => [:owner],
                                 :source => :contact,
@@ -64,10 +64,22 @@ class Dog < ActiveRecord::Base
                                             :include => :dog
 
   has_many :page_views, :order => 'created_at DESC'
-  has_many :galleries
+  has_many :galleries, :as => :owner
   has_many :events
   has_many :event_attendees
   has_many :attendee_events, :through => :event_attendees, :source => :event
+
+  has_many :own_groups, :class_name => "Group", :foreign_key => "dog_id",
+    :order => "name ASC"
+  has_many :own_not_hidden_groups, :class_name => "Group",
+    :foreign_key => "dog_id", :conditions => [%(mode != ?), Group::HIDDEN], :order => "name ASC"
+  has_many :own_hidden_groups, :class_name => "Group",
+    :foreign_key => "dog_id", :conditions => [%(mode = ?), Group::HIDDEN], :order => "name ASC"
+  has_many :memberships
+  has_many :groups, :through => :memberships, :source => :group,
+    :conditions => [%(status = ?), Membership::ACCEPTED], :order => "name ASC"
+  has_many :groups_not_hidden, :through => :memberships, :source => :group,
+    :conditions => [%(status = ? AND mode != ?), Membership::ACCEPTED, Group::HIDDEN], :order => "name ASC"
 
   validates_presence_of     :name
   validates_length_of       :name,  :maximum => MAX_NAME
@@ -79,7 +91,9 @@ class Dog < ActiveRecord::Base
 
   before_update :set_old_description
   after_update :log_activity_description_changed
-  before_destroy :destroy_activities, :destroy_feeds
+  before_destroy :destroy_activities, :destroy_feeds, :destroy_groups
+
+  alias person owner
 
   class << self
 
@@ -146,6 +160,16 @@ class Dog < ActiveRecord::Base
   def some_contacts
     contacts[(0...MAX_DEFAULT_CONTACTS)]
   end
+  
+  def requested_memberships
+    Membership.find(:all,
+          :conditions => ['status = 2 AND group_id in (?)', self.own_group_ids])
+  end
+  
+  def invitations
+    Membership.find_all_by_dog_id(self,
+          :conditions => [%(status = ?), Membership::INVITED], :order => 'created_at DESC')
+  end  
 
   # Contact links for the contact image raster.
   def requested_contact_links
@@ -284,6 +308,10 @@ class Dog < ActiveRecord::Base
     def destroy_feeds
       Feed.find_all_by_dog_id(self).each {|f| f.destroy}
     end
+    
+    def destroy_groups
+      Group.find_all_by_dog_id(self).each {|g| g.destroy}
+    end    
 
     ## Other private method(s)
     

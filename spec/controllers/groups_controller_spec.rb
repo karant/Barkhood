@@ -45,19 +45,16 @@ describe GroupsController do
       response.should render_template("edit")
     end
     
-    it "should redirect to home for deactivated groups" do
-      @group.toggle!(:deactivated)
-      get :show, :id => @group
-      response.should redirect_to(home_url)
-      flash[:error].should =~ /not active/
+    it "should have a working members page" do
+      get :members, :id => @group
+      response.should be_success
+      response.should render_template("members")
     end
     
-    it "should redirect to home for email unverified users" do
-      enable_email_notifications
-      @person.email_verified = false; @person.save!
-      @person.should_not be_active
-      get :new
-      response.should redirect_to(logout_url)
+    it "should have a working photos page" do
+      get :photos, :id => @group
+      response.should be_success
+      response.should render_template("photos")
     end
   end
   
@@ -66,7 +63,7 @@ describe GroupsController do
       lambda do
         create_group
         response.should be_redirect
-      end.should change(Dog, :count).by(1)
+      end.should change(Group, :count).by(1)
     end
   end
   
@@ -97,20 +94,12 @@ describe GroupsController do
       response.should redirect_to(group_url(assigns(:group)))
     end
     
-    it "should allow mass assignment to breed" do
-      put :update, :id => @group, :group => { :breed_id => breeds(:bullgroup).id },
+    it "should allow mass assignment to mode" do
+      put :update, :id => @group, :group => { :mode => Group::PRIVATE },
                    :type => "info_edit"
-      assigns(:group).breed.should == breeds(:bullgroup)
+      assigns(:group).mode.should == Group::PRIVATE
       response.should redirect_to(group_url(assigns(:group)))
-    end       
-    
-    it "should allow mass assignment to date of birth" do
-      dob = 2.years.ago
-      put :update, :id => @group, :group => { :dob => dob },
-                   :type => "info_edit"
-      assigns(:group).dob.should == dob
-      response.should redirect_to(group_url(assigns(:group)))
-    end 
+    end
     
     it "should render edit page on invalid update" do
       put :update, :id => @group, :group => { :name => nil },
@@ -147,38 +136,67 @@ describe GroupsController do
       response.should_not have_tag("a[href=?]", edit_group_path(@group))
     end
     
-    it "should not display a deactivated group" do
-      @group.toggle!(:deactivated)
+    it "should display edit members link if current person is owner" do
+      login_as(:quentin)
       get :show, :id => @group
-      response.should redirect_to(home_url)
+      response.should have_tag("a[href=?]", members_group_path(@group))
     end
     
-    it "should display deactivated group for owner" do
-      login_as(:quentin)
-      @group.toggle!(:deactivated)
+    it "should not display edit members link of current person is not owner" do
+      login_as(:aaron)
       get :show, :id => @group
-      response.should be_success
+      response.should_not have_tag("a[href=?]", members_group_path(@group))
     end
     
-    it "should display break up link if connected" do
+    it "should display invite members link for owner of hidden group" do
       login_as(:quentin)
-      @contact = groups(:max)
-      conn = Connection.connect(@group, @contact)
-      get :show, :id => @contact.reload
-      response.should have_tag("a[href=?]", connection_path(conn))
+      @group.update_attribute(:mode, Group::HIDDEN)
+      get :show, :id => @group
+      response.should have_tag("a[href=?]", invite_group_path(@group))
     end
     
-    it "should not display break up link if not connected" do
+    it "should not display invite members link for non-hidden group" do
       login_as(:quentin)
-      @contact = groups(:max)
-      get :show, :id => @contact.reload
-      response.should_not have_tag("a", :text => "Remove Connection")
+      get :show, :id => @group
+      response.should_not have_tag("a[href=?]", invite_group_path(@group))      
+    end
+    
+    it "should display join link for non-member" do
+      login_as(:aaron)
+      get :show, :id => @group
+      response.should have_tag("a[href=?]", group_memberships_path(@group, :dog_id => dogs(:max)))
+    end
+    
+    it "should display leave group link for member" do
+      login_as(:quentin)
+      get :show, :id => @group
+      response.should have_tag("a[href=?]", membership_path(Membership.mem(dogs(:nola), @group)))
+    end
+    
+    it "should display you've been invited link for invited person" do
+      login_as(:aaron)
+      Membership.invite(dogs(:max), @group)
+      get :show, :id => @group
+      response.should have_tag("a[href=?]", edit_membership_path(Membership.mem(dogs(:max), @group)))      
+    end
+    
+    it "should display group owner wording" do
+      login_as(:quentin)
+      get :show, :id => @group
+      response.should have_text("Group owner")       
+    end
+    
+    it "should display request pending wording" do
+      login_as(:aaron)
+      Membership.request(dogs(:max), @group)
+      get :show, :id => @group
+      response.should have_text("Request pending")       
     end
   end
   
   private
     def create_group(options = {})
-      group_hash = { :name => "Quire" }
+      group_hash = { :name => "Group", :description => "Description", :mode => Group::PUBLIC, :dog_id => dogs(:max) }
       post :create, :group => group_hash.merge(options)
       assigns(:group)
     end

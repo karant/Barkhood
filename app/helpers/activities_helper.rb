@@ -7,7 +7,7 @@ module ActivitiesHelper
     when "BlogPost"
       post = activity.item
       blog = post.blog
-      view_blog = blog_link("#{h dog.name}'s blog", blog)
+      view_blog = blog_link("#{h blog.owner.name}'s blog", blog)
       if recent
         %(new blog post  #{post_link(blog, post)})
       else
@@ -29,7 +29,7 @@ module ActivitiesHelper
             #{someones(blog.dog, dog)} blog post
             #{post_link(blog, post)})
         end
-      when "Dog"
+      when "Dog", "Group"
         if recent
           %(commented on #{wall(activity)})
         else
@@ -81,6 +81,18 @@ module ActivitiesHelper
       else
         %(#{dog_link_with_image(dog)}'s description changed)
       end
+    when "Group"
+      if recent
+        %(new group #{group_link(activity.item)})
+      else
+        %(#{dog_link_with_image(dog)} created group #{group_link_with_image(activity.item)})
+      end
+    when "Membership"
+      if recent
+        %(new member in group #{group_link(activity.item.group)})
+      else
+        %(#{dog_link_with_image(dog)} joined group #{group_link_with_image(activity.item.group)})
+      end
     when "Gallery"
       if recent
         %(new gallery #{gallery_link(activity.item)})
@@ -117,8 +129,15 @@ module ActivitiesHelper
     when "BlogPost"
       post = activity.item
       blog = post.blog
+      blog_type = blog.owner.class.to_s
+      case blog_type
+        when 'Dog'
+          description = 'new blog post'
+        when 'Group'
+          description = 'new group blog post'
+      end
       %(#{dog_link(dog)} made a
-        #{post_link("new blog post", blog, post)})
+        #{post_link(description, blog, post)})
     when "Comment"
       parent = activity.item.commentable
       parent_type = parent.class.to_s
@@ -129,7 +148,7 @@ module ActivitiesHelper
         %(#{dog_link(dog)} made a comment on
           #{someones(blog.dog, dog)} 
           #{post_link("blog post", post.blog, post)})
-      when "Dog"
+      when "Dog", "Group"
         %(#{dog_link(activity.item.commenter)} commented on 
           #{wall(activity)}.)
       when "Event"
@@ -153,6 +172,10 @@ module ActivitiesHelper
         #{topic_link("new discussion topic", activity.item)})
     when "Dog"
       %(#{dog_link(dog)}'s description changed)
+    when "Group"
+      %(#{dog_link(dog)} created group #{group_link(activity.item)}) 
+    when "Membership"
+      %(#{dog_link(dog)} joined group #{group_link(activity.item.group)})
     when "Gallery"
       %(#{dog_link(dog)} added a new gallery
         #{gallery_link(activity.item)})
@@ -184,7 +207,7 @@ module ActivitiesHelper
                 "comment.png"
               when "Event"
                 "comment.png"
-              when "Dog"
+              when "Dog", "Group"
                 "sound.png"
               end
             when "Connection"
@@ -199,6 +222,10 @@ module ActivitiesHelper
               "note.png"
             when "Dog"
                 "user_edit.png"
+            when "Group"
+                "group.png"
+            when "Membership"
+                "group_go.png"
             when "Gallery"
               "photos.png"
             when "Photo"
@@ -215,8 +242,8 @@ module ActivitiesHelper
     image_tag("icons/#{img}", :class => "icon")
   end
   
-  def someones(dog, commenter, link = true)
-    link ? "#{dog_link_with_image(dog)}'s" : "#{h dog.name}'s"
+  def someones(parent, commenter, link = true)
+    link ? "#{parent_link_with_image(parent)}'s" : "#{h parent.name}'s"
   end
   
   def blog_link(text, blog)
@@ -272,9 +299,9 @@ module ActivitiesHelper
   # Return a link to the wall.
   def wall(activity)
     commenter = activity.dog
-    dog = activity.item.commentable
-    link_to("#{someones(dog, commenter, false)} wall",
-            dog_path(dog, :anchor => "tWall"))
+    parent = activity.item.commentable
+    link_to("#{someones(parent, commenter, false)} wall",
+            parent_path(parent))
   end
   
   # Only show member photo for certain types of activity
@@ -299,5 +326,23 @@ module ActivitiesHelper
     # (due to ActiveRecord).
     def activity_type(activity)
       activity.item.class.to_s      
+    end
+    
+    def parent_path(parent)
+      case parent.class.to_s
+        when 'Dog'
+          dog_path(parent, :anchor => 'tWall')
+        when 'Group'
+          group_path(parent, :anchor => 'tWall')
+      end
+    end
+    
+    def parent_link_with_image(parent)
+      case parent.class.to_s
+        when 'Dog'
+          dog_link_with_image(parent)
+        when 'Group'
+          group_link_with_image(parent)
+      end
     end
 end

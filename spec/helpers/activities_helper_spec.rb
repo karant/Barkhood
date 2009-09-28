@@ -54,7 +54,7 @@ describe ActivitiesHelper do
   it "should have the right message for a photo" do
     @filename = "rails.png"
     @image = uploaded_file(@filename, "image/png")
-    photo = Photo.new({:uploaded_data => @image, :dog => dogs(:dana), :gallery => @gallery})
+    photo = Photo.new({:uploaded_data => @image, :owner => dogs(:dana), :gallery => @gallery})
     photo.save
     activity = Activity.find_by_item_id(photo)
     feed_message(activity).should =~ /photo/

@@ -4,16 +4,16 @@ public:
   name: Public
   description: Public group!
   mode: 0
-  dog: dana
+  owner: dana
 
 private:
   name: Private
   description: Private group!
   mode: 1
-  dog: dana
+  owner: dana
   
-hiddne:
+hidden:
   name: Hidden
   description: Hidden group!
   mode: 2
-  dog: max
+  owner: max

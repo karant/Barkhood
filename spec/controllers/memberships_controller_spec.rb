@@ -1,131 +1,98 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe MembershipsController do
-
-  def mock_membership(stubs={})
-    @mock_membership ||= mock_model(Membership, stubs)
+  integrate_views
+  
+  before(:each) do
+    login_as(:aaron)
+    @dog = dogs(:max)
+    @group = groups(:private)
   end
   
-  describe "GET index" do
-    it "assigns all memberships as @memberships" do
-      Membership.stub!(:find).with(:all).and_return([mock_membership])
-      get :index
-      assigns[:memberships].should == [mock_membership]
-    end
+  it "should protect the create page" do
+    logout
+    post :create
+    response.should redirect_to(login_url)
   end
-
-  describe "GET show" do
-    it "assigns the requested membership as @membership" do
-      Membership.stub!(:find).with("37").and_return(mock_membership)
-      get :show, :id => "37"
-      assigns[:membership].should equal(mock_membership)
-    end
+  
+  it "should create a new membership request" do
+    Membership.should_receive(:request).with(@dog, @group).
+      and_return(true)
+    post :create, :group_id => @group, :dog_id => @dog
+    response.should redirect_to(home_url)
   end
-
-  describe "GET new" do
-    it "assigns a new membership as @membership" do
-      Membership.stub!(:new).and_return(mock_membership)
-      get :new
-      assigns[:membership].should equal(mock_membership)
-    end
-  end
-
-  describe "GET edit" do
-    it "assigns the requested membership as @membership" do
-      Membership.stub!(:find).with("37").and_return(mock_membership)
-      get :edit, :id => "37"
-      assigns[:membership].should equal(mock_membership)
-    end
-  end
-
-  describe "POST create" do
+  
+  describe "with existing membership" do
+    integrate_views
     
-    describe "with valid params" do
-      it "assigns a newly created membership as @membership" do
-        Membership.stub!(:new).with({'these' => 'params'}).and_return(mock_membership(:save => true))
-        post :create, :membership => {:these => 'params'}
-        assigns[:membership].should equal(mock_membership)
-      end
-
-      it "redirects to the created membership" do
-        Membership.stub!(:new).and_return(mock_membership(:save => true))
-        post :create, :membership => {}
-        response.should redirect_to(membership_url(mock_membership))
-      end
+    before(:each) do
+      Membership.invite(@dog, @group)
+      @membership = Membership.mem(@dog, @group)
     end
     
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved membership as @membership" do
-        Membership.stub!(:new).with({'these' => 'params'}).and_return(mock_membership(:save => false))
-        post :create, :membership => {:these => 'params'}
-        assigns[:membership].should equal(mock_membership)
-      end
-
-      it "re-renders the 'new' template" do
-        Membership.stub!(:new).and_return(mock_membership(:save => false))
-        post :create, :membership => {}
-        response.should render_template('new')
-      end
+    it "should get the edit page" do
+      get :edit, :id => @membership
+      response.should be_success
     end
     
-  end
+    it "should require the right current person" do
+      login_as :quentin
+      get :edit, :id => @membership
+      response.should redirect_to(home_url)
+    end
 
-  describe "PUT update" do
-    
-    describe "with valid params" do
-      it "updates the requested membership" do
-        Membership.should_receive(:find).with("37").and_return(mock_membership)
-        mock_membership.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => "37", :membership => {:these => 'params'}
-      end
-
-      it "assigns the requested membership as @membership" do
-        Membership.stub!(:find).and_return(mock_membership(:update_attributes => true))
-        put :update, :id => "1"
-        assigns[:membership].should equal(mock_membership)
-      end
-
-      it "redirects to the membership" do
-        Membership.stub!(:find).and_return(mock_membership(:update_attributes => true))
-        put :update, :id => "1"
-        response.should redirect_to(membership_url(mock_membership))
-      end
+    it "should accept the membership" do
+      put :update, :id => @membership, :commit => "Accept"
+      Membership.find(@membership).status.should == Membership::ACCEPTED
+      response.should redirect_to(home_url)
     end
     
-    describe "with invalid params" do
-      it "updates the requested membership" do
-        Membership.should_receive(:find).with("37").and_return(mock_membership)
-        mock_membership.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => "37", :membership => {:these => 'params'}
-      end
-
-      it "assigns the membership as @membership" do
-        Membership.stub!(:find).and_return(mock_membership(:update_attributes => false))
-        put :update, :id => "1"
-        assigns[:membership].should equal(mock_membership)
-      end
-
-      it "re-renders the 'edit' template" do
-        Membership.stub!(:find).and_return(mock_membership(:update_attributes => false))
-        put :update, :id => "1"
-        response.should render_template('edit')
-      end
-    end
-    
-  end
-
-  describe "DELETE destroy" do
-    it "destroys the requested membership" do
-      Membership.should_receive(:find).with("37").and_return(mock_membership)
-      mock_membership.should_receive(:destroy)
-      delete :destroy, :id => "37"
+    it "should decline the membership" do
+      put :update, :id => @membership, :commit => "Decline"
+      @membership.should_not exist_in_database
+      response.should redirect_to(home_url)
     end
   
-    it "redirects to the memberships list" do
-      Membership.stub!(:find).and_return(mock_membership(:destroy => true))
-      delete :destroy, :id => "1"
-      response.should redirect_to(memberships_url)
+    it "should end a membership" do
+      lambda do
+        delete :destroy, :id => @membership
+        response.should redirect_to(dog_memberships_url(@dog))
+      end.should change(Membership, :count).by(1)
+    end
+  end  
+  
+  describe "for invitations" do
+    integrate_views
+    
+    before(:each) do
+      @membership = memberships(:public_buba)
+    end
+    
+    it "should subscribe a requested member" do
+      post :subscribe, :id => @membership
+      Membership.find(@membership).status.should == Membership::ACCEPTED
+      response.should redirect_to(members_group_path(@membership.group))
+    end
+    
+    it "should not subscribe a request if current user is not owner" do
+      login_as(:aaron)
+      post :subscribe, :id => @membership
+      response.should redirect_to(home_url)
+    end
+    
+    it "should unsubscribe a member" do
+      @membership = memberships(:public_nola)
+      lambda do
+        delete :unsubscribe, :id => @membership
+        response.should redirect_to(members_group_path(@group))
+      end.should change(Membership, :count).by(1)
+    end
+    
+    it "should not allow unsubscribe if current person is not group owner" do
+      @membership = memberships(:public_nola)
+      login_as(:aaron)
+      delete :unsubscribe, :id => @membership
+      response.should redirect_to(home_url)
     end
   end
-
 end

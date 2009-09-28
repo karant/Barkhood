@@ -1,6 +1,6 @@
 class MembershipsController < ApplicationController
   before_filter :login_required
-  before_filter :authorize_person, :only => [:edit, :update, :destroy, :suscribe, :unsuscribe]
+  before_filter :authorize_person, :only => [:edit, :update, :destroy, :subscribe, :unsubscribe]
   
   
   def edit
@@ -48,31 +48,32 @@ class MembershipsController < ApplicationController
   
   def destroy
     @membership = Membership.find(params[:id])
+    @dog = @membership.dog
     @membership.breakup
     
     respond_to do |format|
       flash[:success] = "You have left the group #{@membership.group.name}"
-      format.html { redirect_to( person_url(current_person)) }
+      format.html { redirect_to( dog_memberships_url(@dog)) }
     end
   end
   
-  def unsuscribe
+  def unsubscribe
     @membership = Membership.find(params[:id])
     @membership.breakup
     
     respond_to do |format|
-      flash[:success] = "You have unsuscribe '#{@membership.dog.name}' from group '#{@membership.group.name}'"
+      flash[:success] = "You have unsubscribe '#{@membership.dog.name}' from group '#{@membership.group.name}'"
       format.html { redirect_to(members_group_path(@membership.group)) }
     end
   end
   
-  def suscribe
+  def subscribe
     @membership = Membership.find(params[:id])
     @membership.accept
     PersonMailer.deliver_membership_accepted(@membership)
  
     respond_to do |format|
-      flash[:success] = "You have accept '#{@membership.dog.name}' for group '#{@membership.group.name}'"
+      flash[:success] = "You have accepted '#{@membership.dog.name}' for group '#{@membership.group.name}'"
       format.html { redirect_to(members_group_path(@membership.group)) }
     end
   end
@@ -83,7 +84,7 @@ class MembershipsController < ApplicationController
     def authorize_person
       @membership = Membership.find(params[:id],
                                     :include => [:dog, :group])
-      if !params[:invitation].blank? or params[:action] == 'suscribe' or params[:action] == 'unsuscribe'
+      if !params[:invitation].blank? or params[:action] == 'subscribe' or params[:action] == 'unsubscribe'
         unless current_person?(@membership.group.owner.owner)
           flash[:error] = "Invalid person."
           redirect_to home_url

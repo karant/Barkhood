@@ -1,7 +1,7 @@
-<h2><%= h @blog.dog.name %>'s Blog</h2>
+<h2><%= h @blog.owner.name %>'s Blog</h2>
 
 
-<%- if current_person?(@blog.dog.owner) -%>
+<%- if current_person?(@blog.person) -%>
   <p><%= link_to "New blog post", new_blog_post_path(@blog) %></p>
 <%- end -%> 
 

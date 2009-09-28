@@ -1,14 +1,14 @@
 class PhotosController < ApplicationController
 
   before_filter :login_required
+  before_filter :get_instance_vars
   before_filter :correct_user_required,
                 :only => [ :edit, :update, :destroy, :set_primary, 
                            :set_avatar ]
   before_filter :correct_gallery_requried, :only => [:new, :create]
   
   def index
-    @dog = Dog.find(params[:dog_id])
-    redirect_to dog_galleries_path(@dog)
+    redirect_to parent_galleries_path
   end
   
   def show
@@ -38,8 +38,7 @@ class PhotosController < ApplicationController
       redirect_to gallery_path(Gallery.find(params[:gallery_id])) and return
     end
 
-    @dog = Gallery.find(params[:gallery_id]).dog
-    photo_data = params[:photo].merge(:dog => @dog)
+    photo_data = params[:photo].merge(:owner => parent)
     @photo = @gallery.photos.build(photo_data)
 
     respond_to do |format|
@@ -66,9 +65,8 @@ class PhotosController < ApplicationController
   end
 
   def destroy
-    @dog = @photo.gallery.dog
     @gallery = @photo.gallery
-    redirect_to dog_galleries_path(@dog) and return if @photo.nil?
+    redirect_to parent_galleries_path and return if @photo.nil?
     @photo.destroy
     flash[:success] = "Photo deleted"
     respond_to do |format|
@@ -78,16 +76,15 @@ class PhotosController < ApplicationController
   
   def set_primary
     @photo = Photo.find(params[:id])
-    @dog = @photo.gallery.dog
     if @photo.nil? or @photo.primary?
-      redirect_to dog_galleries_path(@dog) and return
+      redirect_to parent_galleries_path and return
     end
     # This should only have one entry, but be paranoid.
     @old_primary = @photo.gallery.photos.select(&:primary?)
     respond_to do |format|
       if @photo.update_attributes(:primary => true)
         @old_primary.each { |p| p.update_attributes!(:primary => false) }
-        format.html { redirect_to(dog_galleries_path(@dog)) }
+        format.html { redirect_to(parent_galleries_path) }
         flash[:success] = "Gallery thumbnail set"
       else    
         format.html do
@@ -100,18 +97,17 @@ class PhotosController < ApplicationController
   
   def set_avatar
     @photo = Photo.find(params[:id])
-    @dog = @photo.gallery.dog
     if @photo.nil? or @photo.avatar?
-      redirect_to @dog and return
+      redirect_to parent and return
     end
     # This should only have one entry, but be paranoid.
-    @old_primary = @dog.photos.select(&:avatar?)
+    @old_primary = parent.photos.select(&:avatar?)
   
     respond_to do |format|
       if @photo.update_attributes!(:avatar => true)
         @old_primary.each { |p| p.update_attributes!(:avatar => false) }
         flash[:success] = "Profile photo set"
-        format.html { redirect_to @dog }
+        format.html { redirect_to parent }
       else    
         format.html do
           flash[:error] = "Invalid image!"
@@ -127,7 +123,7 @@ class PhotosController < ApplicationController
       @photo = Photo.find(params[:id])
       if @photo.nil?
         redirect_to home_url
-      elsif !current_person?(@photo.dog.owner)
+      elsif !current_person?(@photo.person)
         redirect_to home_url
       end
     end
@@ -138,11 +134,43 @@ class PhotosController < ApplicationController
         redirect_to home_path
       else
         @gallery = Gallery.find(params[:gallery_id])
-        if @gallery.dog.owner != current_person
+        if @gallery.person != current_person
           flash[:error] = "You cannot add photos to this gallery"
           redirect_to gallery_path(@gallery)
         end
       end
     end
+  
+    def get_instance_vars
+      if dog?
+        @dog = Dog.find(params[:dog_id])
+      elsif group?
+        @group = Group.find(params[:group_id])
+      end
+    end
+    
+    def parent_galleries_path
+      if dog?
+        dog_galleries_path(parent)
+      elsif group?
+        group_galleries_path(parent)
+      end
+    end    
+    
+    def parent
+      if dog?
+        @dog
+      elsif group?
+        @group
+      end
+    end
+    
+    def dog?
+      !params[:dog_id].nil?
+    end
+    
+    def group?
+      !params[:group_id].nil?
+    end  
 end
 

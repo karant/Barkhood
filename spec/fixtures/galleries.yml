@@ -7,16 +7,25 @@
 #   column: value
 
 valid_gallery:
-    dog: dana
-    title: "Title"
-    description: "Some description"
+  owner: dana
+  owner_type: Dog
+  title: "Title"
+  description: "Some description"
     
 nolas_gallery:
-    dog: nola
-    title: "Another title"
-    description: "Another description"
+  owner: nola
+  owner_type: Dog
+  title: "Another title"
+  description: "Another description"
 
 invalid_gallery:
-    dog_id: NULL
-    title: "Title"
-    description: "Some description"
+  owner_id: NULL
+  owner_type: Dog
+  title: "Title"
+  description: "Some description"
+    
+group_gallery:
+  owner: public
+  owner_type: Group
+  title: Title
+  description: Some description

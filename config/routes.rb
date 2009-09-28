@@ -1,11 +1,20 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :groups
-
-  map.resources :memberships
-
-  map.resources :breeds
-
-  map.resources :dogs, :member => { :common_contacts => :get }
+  map.resources :memberships, :member => {:unsubscribe => :delete, :subscribe => :post}
+ 
+  map.resources :groups,
+    :member => { :join => :post,
+       :leave => :post,
+       :members => :get,
+       :invite => :get,
+       :invite_them => :post,
+       :photos => :get,
+       :new_photo => :post,
+       :save_photo => :post,
+       :delete_photo => :delete } do |group|
+    group.resources :memberships
+    group.resources :galleries
+    group.resources :comments
+  end
 
   map.resources :categories
   map.resources :links
@@ -33,18 +42,19 @@ ActionController::Routing::Routes.draw do |map|
                                       :common_contacts => :get }
   map.connect 'people/verify/:id', :controller => 'people',
                                    :action => 'verify_email'
-  map.resources :dogs do |dog|
+  map.resources :dogs, :member => {:common_contacts => :get, :groups => :get, :admin_groups => :get, :request_memberships => :get, :invitations => :get} do |dog|
      dog.resources :messages
      dog.resources :galleries
      dog.resources :connections
      dog.resources :comments
+     dog.resources :memberships
   end
   
   map.resources :galleries do |gallery|
     gallery.resources :photos
   end
   map.namespace :admin do |admin|
-    admin.resources :people, :dogs, :preferences
+    admin.resources :people, :dogs, :preferences, :breeds, :groups
     admin.resources :forums do |forums|
       forums.resources :topics do |topic|
         topic.resources :posts

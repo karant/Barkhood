@@ -102,7 +102,7 @@ class PostsController < ApplicationController
       if forum?
         true  # This will change once there are groups
       elsif blog?
-        redirect_to home_url unless current_person?(@blog.dog.owner)
+        redirect_to home_url unless current_person?(@blog.person)
       end
     end
 
@@ -112,7 +112,7 @@ class PostsController < ApplicationController
         authorized = current_person?(@post.dog.owner) || current_person.admin?
         redirect_to home_url unless authorized
       elsif blog?
-        authorized = current_person?(@blog.dog.owner) && valid_post?
+        authorized = current_person?(@blog.person) && valid_post?
         redirect_to home_url unless authorized
       end
     end

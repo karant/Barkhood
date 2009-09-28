@@ -39,7 +39,7 @@ describe GalleriesController do
       gallery = assigns(:gallery)
       gallery.title.should == "foo"
       gallery.description.should == "bar"
-      gallery.dog.should == @dog
+      gallery.owner.should == @dog
       
       page.delete :destroy, :id => @gallery, :dog_id => @dog
       @gallery.should_not exist_in_database
@@ -47,12 +47,12 @@ describe GalleriesController do
     
     it "should associate dog to the gallery" do
       post :create, :gallery => {:title=>"Title", :dog_id => @dog}
-      assigns(:gallery).dog.should == @dog
+      assigns(:gallery).owner.should == @dog
     end
     
     it "should require the correct user to edit" do
       login_as(:kelly)
-      post :edit, :id => @gallery
+      post :edit, :id => @gallery, :dog_id => @dog
       response.should redirect_to(dog_galleries_url(@dog))
     end
     

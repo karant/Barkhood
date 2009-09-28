@@ -391,6 +391,11 @@ form, div, h2, ul, li {zoom: 1;}
   width: 324px;
 }
 
+div.accept_or_cancel_membership, div.cancel_membership  {
+  float: right;
+  margin: -15px -13px;
+}
+
 /* Bill's additions */
 h2 {
   padding-left: 0px;

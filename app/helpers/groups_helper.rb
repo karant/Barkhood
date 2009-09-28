@@ -31,6 +31,19 @@ module GroupsHelper
     link_to(group.name, group_path(group))
   end
   
+  # Same as dog_link except sets up HTML needed for the image on hover effect
+  def group_link_with_image(text, group = nil, html_options = nil)
+    if group.nil?
+      group = text
+      text = group.name
+    elsif group.is_a?(Hash)
+      html_options = group
+      group = text
+      text = group.name
+    end
+    '<span class="imgHoverMarker">' + image_tag(group.thumbnail) + group_link(text, group, html_options) + '</span>'
+  end  
+  
   def get_groups_modes
     modes = []
     modes << ["Public",0]

@@ -36,12 +36,12 @@ describe PhotosController do
       @filename = "rails.png"
       @image = uploaded_file(@filename, "image/png")
       @primary = Photo.create(:uploaded_data => @image,
-                              :dog => @dog,
+                              :owner => @dog,
                               :gallery => @gallery,
                               :avatar => true, 
                               :primary => true)
       @secondary = Photo.create(:uploaded_data => @image,
-                                :dog => @dog,
+                                :owner => @dog,
                                 :gallery => @gallery,
                                 :avatar => false,
                                 :primary => false)

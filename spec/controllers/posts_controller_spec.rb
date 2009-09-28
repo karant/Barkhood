@@ -133,7 +133,7 @@ describe PostsController do
     
     it "should require the right user for editing" do
       person = login_as(:aaron)
-      @post.blog.dog.owner.should_not == person
+      @post.blog.owner.owner.should_not == person
       get :edit, :blog_id => @blog, :id => @post
       response.should redirect_to(home_url)
     end
@@ -153,7 +153,7 @@ describe PostsController do
     
     it "should require the right user for destroying" do
       person = login_as(:aaron)
-      @post.blog.dog.owner.should_not == person
+      @post.blog.owner.owner.should_not == person
       delete :destroy, :blog_id => @blog, :id => @post
       response.should redirect_to(home_url)
     end

@@ -36,8 +36,8 @@ module ApplicationHelper
     elsif logged_in? and admin_view?
       home =    menu_element("Home", home_path)
       people =  menu_element("People", admin_people_path)
-      dogs = menu_element("Dogs", dogs_path)
-      breeds = menu_element("Breeds", breeds_path)
+      dogs = menu_element("Groups", admin_groups_path)
+      breeds = menu_element("Breeds", admin_breeds_path)
       forums =  menu_element(inflect("Forum", Forum.count),
                              admin_forums_path)
       preferences = menu_element("Prefs", admin_preferences_path)

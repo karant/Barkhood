@@ -9,12 +9,11 @@
     <% end %>
   
     <p>
-      <% if current_person?(@gallery.dog.owner)%>
+      <% if current_person?(@gallery.person)%>
         <%= link_to "Add photo", new_gallery_photo_path(@gallery) %> |
         <%= link_to "Edit gallery", edit_gallery_path %> |
       <% end %>
-      <%= link_to "All galleries", dog_path(@gallery.dog,
-                                   :anchor => 'tGalleries') %>
+      <%= link_to "All galleries", parent_path(@gallery.owner) %>
     </p>
   
     <%- if @photos.empty? -%>

@@ -10,6 +10,8 @@ class HomeController < ApplicationController
       # @some_contacts = current_person.some_contacts
       # @requested_contacts = current_person.requested_contacts
       @dogs = current_person.dogs
+      @requested_membership = Membership.find(:all, 
+          :conditions => ['status = ? AND group_id in (?)', Membership::PENDING, current_person.dogs.each{|d| d.own_group_ids}.flatten.uniq])
     else
       @feed = Activity.global_feed
     end    

@@ -1,0 +1,22 @@
+<%- unless @requested_memberships.empty? -%>
+  <h2>Membership Requests</h2>
+  <ul class="list requests small">
+    <%- @requested_memberships.each do |request| -%>
+      <li>
+        <div class="profile-image">
+          <%= image_link request.dog %>
+        </div>
+        <p><%= dog_link request.dog %> requests membership for
+        <%= group_link request.group %></p>
+        <p class="meta published">
+          <%= time_ago_in_words(request.created_at) %>
+          ago
+        </p>
+        <p>
+          <%= link_to "Respond", edit_membership_path(request)+'?invitation=true' %> |
+          <%= link_to "View group", members_group_path(request.group) %>
+        </p>
+      </li>
+    <%- end -%>
+  </ul>
+<%- end -%>

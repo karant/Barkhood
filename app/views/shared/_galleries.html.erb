@@ -1,9 +1,9 @@
-<h2><%= @dog.name %>'s Galleries </h2>
-<% if current_person?(@dog.owner)%>
+<h2><%= parent.name %>'s Galleries </h2>
+<% if current_person?(parent.person)%>
   <%= link_to "Add Gallery", new_gallery_path %>
 <% end %>
 
 <ul id="gallery_list" class="grid">
-  <%= render :partial => "shared/gallery", :collection => galleries %>
+  <%= render :partial => "shared/gallery", :collection => galleries, :locals => { :parent => parent } %>
 </ul>  
 <%= will_paginate(galleries) %>

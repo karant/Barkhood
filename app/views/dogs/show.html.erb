@@ -27,7 +27,7 @@
 
   <% tabs.create('tGalleries', 'Galleries') do %>
     <%= render :partial => "shared/galleries",
-               :locals => { :galleries => @galleries } %>
+               :locals => { :galleries => @galleries, :parent => @dog } %>
     <div class="clear"></div>
   <% end %>
 

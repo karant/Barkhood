@@ -1,12 +1,21 @@
 one:
-  dog: dana
+  owner: dana
+  owner_type: Dog
 two:
-  dog: nola
+  owner: nola
+  owner_type: Dog
 three:
-  dog: max
+  owner: max
+  owner_type: Dog
 four:
-  dog: parker
+  owner: parker
+  owner_type: Dog
 five:
-  dog: deactivated
+  owner: deactivated
+  owner_type: Dog
 six:
-  dog: deactivated_owner
+  owner: deactivated_owner
+  owner_type: Dog
+group:
+  owner: public
+  owner_type: Group

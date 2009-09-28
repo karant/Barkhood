@@ -21,7 +21,7 @@ class PersonMailer < ActionMailer::Base
     recipients   message.recipient.owner.email
     subject      formatted_subject("New message")
     body         "server" => server, "message" => message,
-                 "preferences_note" => preferences_note(message.recipient)
+                 "preferences_note" => preferences_note(message.recipient.owner)
   end
   
   def connection_request(connection)
@@ -31,8 +31,58 @@ class PersonMailer < ActionMailer::Base
     body         "server" => server,
                  "connection" => connection,
                  "url" => edit_connection_path(connection),
-                 "preferences_note" => preferences_note(connection.dog)
+                 "preferences_note" => preferences_note(connection.dog.owner)
   end
+  
+  def membership_public_group(membership)
+    from "Membership done <membership@#{domain}>"
+    recipients membership.group.owner.owner.email
+    subject formatted_subject("New member in group #{membership.group.name}")
+    body "server" => server,
+                 "membership" => membership,
+                 "url" => members_group_path(membership.group),
+                 "preferences_note" => preferences_note(membership.group.owner.owner)
+  end
+  
+  def membership_request(membership)
+    from "Membership request <membership@#{domain}>"
+    recipients membership.group.owner.owner.email
+    subject formatted_subject("Membership request for group #{membership.group.name}")
+    body "server" => server,
+                 "membership" => membership,
+                 "url" => members_group_path(membership.group),
+                 "preferences_note" => preferences_note(membership.group.owner.owner)
+  end
+  
+  def membership_accepted(membership)
+    from "Membership accepted <membership@#{domain}>"
+    recipients membership.dog.owner.email
+    subject formatted_subject("#{membership.dog.name} has been accepted to join #{membership.group.name}")
+    body "server" => server,
+                 "membership" => membership,
+                 "url" => group_path(membership.group),
+                 "preferences_note" => preferences_note(membership.dog.owner)
+  end
+  
+  def invitation_notification(membership)
+    from "Invitation notification <invitation#{domain}>"
+    recipients membership.dog.owner.email
+    subject formatted_subject("Invitation for #{membership.dog.name} from group #{membership.group.name}")
+    body "server" => server,
+                 "membership" => membership,
+                 "url" => edit_membership_path(membership),
+                 "preferences_note" => preferences_note(membership.dog.owner)
+  end
+  
+  def invitation_accepted(membership)
+    from "Invitation accepted <invitation@#{domain}>"
+    recipients membership.group.owner.owner.email
+    subject formatted_subject("#{membership.dog.name} accepted the invitation")
+    body "server" => server,
+                 "membership" => membership,
+                 "url" => members_group_path(membership.group),
+                 "preferences_note" => preferences_note(membership.group.owner.owner)
+  end  
   
   def blog_comment_notification(comment)
     from         "Comment notification <comment@#{domain}>"
@@ -42,7 +92,7 @@ class PersonMailer < ActionMailer::Base
                  "url" => 
                  blog_post_path(comment.commentable.blog, comment.commentable),
                  "preferences_note" => 
-                    preferences_note(comment.commented_dog)
+                    preferences_note(comment.commented_dog.owner)
   end
   
   def wall_comment_notification(comment)
@@ -52,7 +102,7 @@ class PersonMailer < ActionMailer::Base
     body         "server" => server, "comment" => comment,
                  "url" => dog_path(comment.commentable, :anchor => "wall"),
                  "preferences_note" => 
-                    preferences_note(comment.commented_dog)
+                    preferences_note(comment.commented_dog.owner)
   end
   
   def email_verification(ev)
@@ -72,7 +122,7 @@ class PersonMailer < ActionMailer::Base
       "#{label}#{text}"
     end
   
-    def preferences_note(dog)
-      %(To change your email notification preferences, visit http://#{server}/dogs/#{dog.to_param}/edit#email_prefs)
+    def preferences_note(person)
+      %(To change your email notification preferences, visit http://#{server}/people/#{person.to_param}/edit#email_prefs)
     end
 end

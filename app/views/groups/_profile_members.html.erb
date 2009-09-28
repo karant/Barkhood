@@ -1,9 +1,9 @@
 <%- column_div :type => :primary do -%>
   <h2><span class="fn n"><%= h @group.name %></span>'s Members</h2>
  
-  <% if @group.dogs.count > Dog::MAX_DEFAULT_CONTACTS or group_owner?(current_person,@group) %>
+  <% if @group.dogs.count > Dog::MAX_DEFAULT_CONTACTS or group_owner?(current_person, @group) %>
     <div class='button_container'>
-      <%- if group_owner?(current_person,@group) -%>
+      <%- if group_owner?(current_person, @group) -%>
         <%= link_to "Edit all members", members_group_path(@group) %>
       <%- else -%>
         <%= link_to "All members", members_group_path(@group) %>
@@ -11,9 +11,9 @@
     </div>
   <% end %>
   
-  <% if @group.pending_request.length > 0 and @group.owner?(current_person) %>
+  <% if @pending_requests.length > 0 and @group.owner?(current_person, @group) %>
     <%= render :partial => "dogs",
-               :locals => {:members => (@group.pending_request), :title => "pending request"} %>
+               :locals => {:members => (@pending_requests), :title => "pending requests"} %>
   <% end %>
   <%= render :partial => "dogs",
              :locals => {:members => @some_members, :title => "members"} %>

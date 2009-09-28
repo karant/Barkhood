@@ -11,7 +11,7 @@ class SearchesController < ApplicationController
     model = strip_admin(params[:model])
     page  = params[:page] || 1
 
-    unless %(Dog Message ForumPost).include?(model)
+    unless %(Dog Group Message ForumPost).include?(model)
       flash[:error] = "Invalid search"
       redirect_to home_url and return
     end
@@ -37,6 +37,10 @@ class SearchesController < ApplicationController
         # Convert to dogs so that the routing works.
         @results.map!{ |dog| Dog.find(dog) }
       end
+      if model == "Group"
+        @results.map!{ |group| group.hidden? ? nil:group}
+        @results = @results.compact
+      end      
     end
   rescue Ultrasphinx::UsageError
     flash[:error] = "Invalid search query"

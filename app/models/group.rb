@@ -26,17 +26,17 @@ class Group < ActiveRecord::Base
   has_many :photos, :as => :owner, :dependent => :destroy, :order => "created_at"
   has_many :memberships, :dependent => :destroy
   has_many :dogs, :through => :memberships, :include => [:owner],
-    :conditions => ACCEPTED_AND_ACTIVE, :order => "name ASC"
+    :conditions => ACCEPTED_AND_ACTIVE, :order => "dogs.name ASC"
   has_many :pending_requests, :through => :memberships, :source => "dog", :include => [:owner],
-    :conditions => PENDING_AND_ACTIVE, :order => "name DESC"
+    :conditions => PENDING_AND_ACTIVE, :order => "dogs.name DESC"
   has_many :pending_invitations, :through => :memberships, :source => "dog", :include => [:owner],
-    :conditions => INVITED_AND_ACTIVE, :order => "name DESC"
-  has_many :people, :through => :dogs
+    :conditions => INVITED_AND_ACTIVE, :order => "dogs.name DESC"
+  has_many :people, :through => :dogs, :source => 'owner'
   
   belongs_to :owner, :class_name => "Dog", :foreign_key => "dog_id"
   
-  has_many :activities, :as => :owner, :conditions => ["owner_type = ?","Group"],
-    :foreign_key => "item_id", :dependent => :destroy
+#  has_many :activities, :as => :owner, :conditions => ["owner_type = ?","Group"],
+#    :foreign_key => "item_id", :dependent => :destroy
   
   has_many :galleries, :as => :owner, :dependent => :destroy
   
@@ -47,9 +47,10 @@ class Group < ActiveRecord::Base
   validates_length_of       :description, :maximum => MAX_DESCRIPTION
   
   before_create :create_blog
+  before_validation :handle_nil_description
   after_create :log_activity
-  before_update :set_old_description
-  after_update :log_activity_description_changed
+#  before_update :set_old_description
+#  after_update :log_activity_description_changed
   
   is_indexed :fields => [ 'name', 'description']
   
@@ -69,6 +70,10 @@ class Group < ActiveRecord::Base
     end
   end
   
+  def person
+    owner.owner
+  end
+  
   # Params for use in urls.
   # Profile urls have the form '/groups/1-public'.
   # This works automagically because Group.find(params[:id]) implicitly
@@ -77,12 +82,13 @@ class Group < ActiveRecord::Base
   def to_param
     "#{id}-#{name.to_safe_uri rescue nil}"
   end  
-  
-  def recent_activity
-    Activity.find_all_by_owner_id(self, :order => 'created_at DESC',
-                                        :conditions => "owner_type = 'Group'",
-                                         :limit => 10)
-  end
+
+  # TODO - Need to make activity polymorphic for this to work
+#  def recent_activity
+#    Activity.find_all_by_owner_id(self, :order => 'created_at DESC',
+#                                        :conditions => "owner_type = 'Group'",
+#                                         :limit => 10)
+#  end
   
   def public?
     self.mode == PUBLIC
@@ -100,8 +106,8 @@ class Group < ActiveRecord::Base
     self.owner.owner == person
   end
   
-  def has_invited?(person)
-    Membership.invited?(person,self)
+  def has_invited?(dog)
+    Membership.invited?(dog,self)
   end
   
   ## Photo helpers
@@ -143,20 +149,30 @@ class Group < ActiveRecord::Base
   
   private
   
-  def set_old_description
-    @old_description = Group.find(self).description
-  end
- 
-  def log_activity_description_changed
-    unless @old_description == description or description.blank?
-      add_activities(:item => self, :owner => self)
+      # Handle the case of a nil description.
+    # Some databases (e.g., MySQL) don't allow default values for text fields.
+    # By default, "blank" fields are really nil, which breaks certain
+    # validations; e.g., nil.length raises an exception, which breaks
+    # validates_length_of.  Fix this by setting the description to the empty
+    # string if it's nil.
+    def handle_nil_description
+      self.description = "" if description.nil?
     end
-  end
   
-  def log_activity
-    if not self.hidden?
-      activity = Activity.create!(:item => self, :owner => Dog.find(self.dog_id))
-      add_activities(:activity => activity, :owner => Dog.find(self.dog_id))
+    def set_old_description
+      @old_description = Group.find(self).description
     end
-  end
+   
+    def log_activity_description_changed
+      unless @old_description == description or description.blank?
+        add_activities(:item => self, :dog => self.owner)
+      end
+    end
+    
+    def log_activity
+      if not self.hidden?
+        activity = Activity.create!(:item => self, :dog => self.owner)
+        add_activities(:activity => activity, :dog => self.owner)
+      end
+    end
 end
