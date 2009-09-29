@@ -31,7 +31,7 @@ class Group < ActiveRecord::Base
     :conditions => PENDING_AND_ACTIVE, :order => "dogs.name DESC"
   has_many :pending_invitations, :through => :memberships, :source => "dog", :include => [:owner],
     :conditions => INVITED_AND_ACTIVE, :order => "dogs.name DESC"
-  has_many :people, :through => :dogs, :source => 'owner'
+#  has_many :people, :through => :dogs, :source => 'owner'
   
   belongs_to :owner, :class_name => "Dog", :foreign_key => "dog_id"
   
@@ -74,6 +74,10 @@ class Group < ActiveRecord::Base
     owner.owner
   end
   
+  # Couldn't get it done through associations (has_many :people, :through => :dogs, :as => 'owner')
+  def people
+    Person.find(dogs.map(&:owner_id))
+  end
   # Params for use in urls.
   # Profile urls have the form '/groups/1-public'.
   # This works automagically because Group.find(params[:id]) implicitly

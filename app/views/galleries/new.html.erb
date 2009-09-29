@@ -11,7 +11,7 @@
 
     <div class="form_row">
       <label for="dog">Dog</label>
-      <%= f.select :dog_id, current_person.dogs.map{|d| [d.name, d.id]} %>
+      <%= f.select :owner_id, current_person.dogs.map{|d| [d.name, d.id]} %>
     <div>
 
     <div class="form_row">

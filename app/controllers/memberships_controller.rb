@@ -62,7 +62,7 @@ class MembershipsController < ApplicationController
     @membership.breakup
     
     respond_to do |format|
-      flash[:success] = "You have unsubscribe '#{@membership.dog.name}' from group '#{@membership.group.name}'"
+      flash[:success] = "You have unsubscribed '#{@membership.dog.name}' from group '#{@membership.group.name}'"
       format.html { redirect_to(members_group_path(@membership.group)) }
     end
   end

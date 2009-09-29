@@ -57,7 +57,7 @@ describe MembershipsController do
       lambda do
         delete :destroy, :id => @membership
         response.should redirect_to(dog_memberships_url(@dog))
-      end.should change(Membership, :count).by(1)
+      end.should change(Membership, :count).by(-1)
     end
   end  
   
@@ -69,6 +69,7 @@ describe MembershipsController do
     end
     
     it "should subscribe a requested member" do
+      login_as(:quentin)
       post :subscribe, :id => @membership
       Membership.find(@membership).status.should == Membership::ACCEPTED
       response.should redirect_to(members_group_path(@membership.group))
@@ -83,9 +84,10 @@ describe MembershipsController do
     it "should unsubscribe a member" do
       @membership = memberships(:public_nola)
       lambda do
+        login_as(:quentin)
         delete :unsubscribe, :id => @membership
-        response.should redirect_to(members_group_path(@group))
-      end.should change(Membership, :count).by(1)
+        response.should redirect_to(members_group_path(@membership.group))
+      end.should change(Membership, :count).by(-1)
     end
     
     it "should not allow unsubscribe if current person is not group owner" do

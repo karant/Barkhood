@@ -62,9 +62,6 @@ describe Group do
       lambda do
         group = create_group(:save => true)
       end.should change(Activity, :count).by(1)
-      lambda do
-        group = create_group(:save => true)
-      end.should change(Feed, :count).by(1)
     end
   end
 

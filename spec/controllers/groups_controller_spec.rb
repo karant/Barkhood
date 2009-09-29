@@ -4,6 +4,7 @@ describe GroupsController do
  
   before(:each) do
     @group = groups(:public)
+    @private_group = groups(:private)
     photos = [mock_photo(:primary => true), mock_photo]
     photos.stub!(:find_all_by_primary).and_return(photos.select(&:primary?))
     @group.stub!(:photos).and_return(photos)
@@ -183,14 +184,14 @@ describe GroupsController do
     it "should display group owner wording" do
       login_as(:quentin)
       get :show, :id => @group
-      response.should have_text("Group owner")       
+      response.should have_text(/Group owner/)       
     end
     
     it "should display request pending wording" do
       login_as(:aaron)
-      Membership.request(dogs(:max), @group)
-      get :show, :id => @group
-      response.should have_text("Request pending")       
+      Membership.request(dogs(:max), @private_group)
+      get :show, :id => @private_group
+      response.should have_text(/Request pending/)       
     end
   end
   

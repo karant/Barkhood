@@ -1,0 +1,17 @@
+<h1>Editing breed</h1>
+
+<% form_for :breed,
+		    :url => admin_breeds_path(@breed),
+            :html => { :method => :put } do |f| %>
+  <%= f.error_messages %>
+
+	<%= f.label :name %>
+	<%= f.text_field :name %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', admin_breed_path(@breed) %> |
+<%= link_to 'Back', admin_breeds_path %>

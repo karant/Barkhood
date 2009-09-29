@@ -1,0 +1,19 @@
+<h1>Listing breeds</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @breeds.each do |breed| %>
+  <tr>
+  	<td><%=h breed.name %></td>
+    <td><%= link_to 'Show', admin_breed_path(breed) %></td>
+    <td><%= link_to 'Edit', edit_admin_breed_path(breed) %></td>
+    <td><%= link_to 'Destroy', admin_breed_path(breed), :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New breed', new_admin_breed_path %>

@@ -11,7 +11,7 @@
     </div>
   <% end %>
   
-  <% if @pending_requests.length > 0 and @group.owner?(current_person, @group) %>
+  <% if @pending_requests.length > 0 and @group.owner?(current_person) %>
     <%= render :partial => "dogs",
                :locals => {:members => (@pending_requests), :title => "pending requests"} %>
   <% end %>

@@ -1,4 +1,4 @@
-class BreedsController < ApplicationController
+class Admin::BreedsController < ApplicationController
   # GET /breeds
   # GET /breeds.xml
   def index

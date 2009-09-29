@@ -27,13 +27,13 @@ describe GalleriesController do
       page.get    :show,    :id => @gallery        
       response.should be_success
       
-      page.get    :new                              
+      page.get    :new,     :dog_id => @dog                              
       response.should be_success
       
       page.get    :edit,    :id => @gallery
       response.should be_success
       
-      page.post   :create, :gallery => { :title       => "foo",
+      page.post   :create, :dog_id => @dog, :gallery => { :title       => "foo",
                                          :description => "bar",
                                          :dog_id => @dog }
       gallery = assigns(:gallery)
@@ -46,7 +46,7 @@ describe GalleriesController do
     end
     
     it "should associate dog to the gallery" do
-      post :create, :gallery => {:title=>"Title", :dog_id => @dog}
+      post :create, :gallery => {:title=>"Title", :dog_id => @dog}, :dog_id => @dog
       assigns(:gallery).owner.should == @dog
     end
     

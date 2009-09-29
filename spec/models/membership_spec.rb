@@ -38,7 +38,7 @@ describe Membership do
     
     it "should not send an email when person's notifications are off" do
       @group.owner.owner.toggle!(:connection_notifications)
-      @dog.owner.connection_notifications.should == false
+      @group.owner.owner.connection_notifications.should == false
       lambda do
         Membership.request(@dog, @group)
       end.should_not change(@emails, :length)

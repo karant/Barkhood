@@ -12,7 +12,7 @@ describe Gallery do
   it "should require person_id" do
     @gallery = galleries(:invalid_gallery)
     @gallery.should_not be_valid
-    @gallery.errors.on(:dog_id).should_not be_empty
+    @gallery.errors.on(:owner_id).should_not be_empty
   end
     
   it "should have a max title length" do

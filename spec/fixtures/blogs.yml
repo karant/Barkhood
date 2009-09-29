@@ -19,3 +19,6 @@ six:
 group:
   owner: public
   owner_type: Group
+private_group:
+  owner: private
+  owner_type: Group
