@@ -4,9 +4,9 @@ class Photo < ActiveRecord::Base
   
   # attr_accessible is a nightmare with attachment_fu, so use
   # attr_protected instead.
-  attr_protected :id, :owner_id, :owner_type, :parent_id, :created_at, :updated_at
+  attr_protected :id, :created_by_id, :parent_id, :created_at, :updated_at
   
-  belongs_to :owner, :polymorphic => true
+  belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
   has_attachment :content_type => :image,
                  :storage => :file_system,
                  :max_size => UPLOAD_LIMIT.megabytes,
@@ -24,17 +24,17 @@ class Photo < ActiveRecord::Base
                         :dependent => :destroy
     
   validates_length_of :title, :maximum => 255, :allow_nil => true
-  validates_presence_of :owner_id
+  validates_presence_of :created_by_id
   validates_presence_of :gallery_id
   
   after_create :log_activity
   
   def person
-    @person ||= case owner.class.to_s
+    @person ||= case gallery.owner.class.to_s
                    when "Dog"
-                     owner.owner
+                     gallery.owner.owner
                    when "Group"
-                     owner.owner.owner
+                     gallery.owner.owner.owner
                    end
   end
   
@@ -70,11 +70,11 @@ class Photo < ActiveRecord::Base
   end
   
   def log_activity
-      case owner_type
+      case gallery.owner.class.to_s
         when 'Group'
-          activity_dog = owner.owner
-        else
-          activity_dog = owner
+          activity_dog = gallery.owner.owner
+        when 'Dog'
+          activity_dog = gallery.owner
       end
       activity = Activity.create!(:item => self, :dog => activity_dog)
       add_activities(:activity => activity, :dog => activity_dog)

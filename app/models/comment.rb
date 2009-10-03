@@ -47,7 +47,7 @@ class Comment < ActiveRecord::Base
                          when "Dog"
                            commentable
                          when "Group"
-                           commentable
+                           commentable.owner
                          when "BlogPost"
                            commentable.blog.owner
                          when "Event"

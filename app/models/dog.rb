@@ -45,7 +45,6 @@ class Dog < ActiveRecord::Base
                       :include => [:owner],
                       :conditions => ACCEPTED_AND_ACTIVE,
                       :order => 'dogs.created_at DESC'
-  has_many :photos, :as => :owner, :dependent => :destroy, :order => 'created_at'
   has_many :requested_contacts, :through => :connections,
                                 :include => [:owner],
                                 :source => :contact,
@@ -65,6 +64,7 @@ class Dog < ActiveRecord::Base
 
   has_many :page_views, :order => 'created_at DESC'
   has_many :galleries, :as => :owner
+  has_many :photos, :through => :galleries, :order => 'created_at'  
   has_many :events
   has_many :event_attendees
   has_many :attendee_events, :through => :event_attendees, :source => :event

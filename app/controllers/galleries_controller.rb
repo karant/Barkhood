@@ -1,7 +1,8 @@
 class GalleriesController < ApplicationController
   before_filter :login_required
   before_filter :get_instance_vars
-  before_filter :correct_user_required, :only => [ :edit, :update, :destroy ]
+  before_filter :correct_user_required, :only => [ :new, :create, :edit, :update, :destroy ]
+  before_filter :correct_user_for_deletion, :only => [ :destroy ]
   
   def show
     @body = "galleries"
@@ -20,7 +21,6 @@ class GalleriesController < ApplicationController
   end
   
   def create
-    @dog = current_person.dogs.find(params[:gallery][:dog_id])
     @gallery = parent.galleries.build(params[:gallery])
     respond_to do |format|
       if @gallery.save
@@ -65,15 +65,22 @@ class GalleriesController < ApplicationController
  
   private
   
-    def correct_user_required
-      @gallery = Gallery.find(params[:id])
-      if @gallery.nil?
-        flash[:error] = "No gallery found"
-        redirect_to dog_galleries_path(current_user.dogs.first)
-      elsif @gallery.person != current_person
-        flash[:error] = "You are not the owner of this gallery"
-        redirect_to parent_galleries_path
-      end
+  def correct_user_required
+    if dog? && !current_person.dogs.include?(@dog)
+      flash[:error] = "You are not the owner of this dog"
+      redirect_to dog_galleries_path(@dog)
+    elsif group? && !( @group.owner?(current_person) || Membership.accepted_by_person?(current_person, @group))
+      flash[:error] = "You are not authorized to modify this group's galleries"
+      redirect_to group_galleries_path(@group)
+    end
+  end
+  
+  def correct_user_for_deletion
+    @gallery = Gallery.find(params[:id])
+    if @gallery.person != current_person
+      flash[:error] = "You are not authorized to delete this gallery"
+      redirect_to parent_galleries_path
+    end
   end
   
   def get_instance_vars

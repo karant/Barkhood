@@ -89,7 +89,7 @@ class CommentsController < ApplicationController
           redirect_to @dog
         end
       elsif group_wall?
-        unless is_member_of?(group)
+        unless is_member_of?(parent)
           flash[:notice] = "You must be a member of the group to complete that action"
           redirect_to @group          
         end

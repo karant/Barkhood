@@ -27,8 +27,18 @@ module GroupsHelper
   end
   
   
-  def group_link(group)
-    link_to(group.name, group_path(group))
+  def group_link(text, group = nil, html_options = nil)
+    if group.nil?
+      group = text
+      text = group.name
+    elsif group.is_a?(Hash)
+      html_options = group
+      group = text
+      text = group.name
+    end
+    # We normally write link_to(..., group) for brevity, but that breaks
+    # activities_helper_spec due to an RSpec bug.
+    link_to(h(text), group, html_options)
   end
   
   # Same as dog_link except sets up HTML needed for the image on hover effect

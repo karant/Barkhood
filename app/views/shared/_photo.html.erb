@@ -10,7 +10,7 @@
     <%= link_to image_tag(photo.public_filename(:thumbnail)),
                 '#gpu' + photo_id(photo), :rel => 'facebox' %>
   </div>
-  <%- if current_person?(photo.dog.owner) -%>
+  <%- if current_person?(photo.person) -%>
   <div class='gallPhotoMeta'>
       <%= link_to image_tag("icons/picture_edit.png", :class => 'actioner'), 
                   edit_photo_path(photo),
@@ -19,9 +19,15 @@
         photo_path(photo), :method => :delete,
         :confirm => 'Really delete this photo?',
          :title => 'Delete photo' %>
-      <%= link_to image_tag("default_thumbnail.png", :class => 'actioner', 
-        :style => 'height: 16px;'), set_avatar_photo_path(photo), 
-        :method => :put, :title => 'Select as your profile photo' %>
+	  <% if photo.gallery.owner.class.to_s == 'Group' %>
+	      <%= link_to image_tag("g_default_thumbnail_small.png", :class => 'actioner', 
+	        :style => 'height: 16px;'), set_avatar_photo_path(photo), 
+	        :method => :put, :title => "Select as group's profile photo" %>	  
+	  <% else %>
+	      <%= link_to image_tag("default_thumbnail_small.png", :class => 'actioner', 
+	        :style => 'height: 16px;'), set_avatar_photo_path(photo), 
+	        :method => :put, :title => 'Select as your profile photo' %>
+	  <% end %>
       <%= link_to image_tag("icons/photo.png", :class => 'actioner', 
         :style => 'height: 16px;'), set_primary_photo_path(photo), 
         :method => :put, :title => 'Select as gallery thumbnail' %>

@@ -36,12 +36,12 @@ describe PhotosController do
       @filename = "rails.png"
       @image = uploaded_file(@filename, "image/png")
       @primary = Photo.create(:uploaded_data => @image,
-                              :owner => @dog,
+                              :created_by => @person,
                               :gallery => @gallery,
                               :avatar => true, 
                               :primary => true)
       @secondary = Photo.create(:uploaded_data => @image,
-                                :owner => @dog,
+                                :created_by => @person,
                                 :gallery => @gallery,
                                 :avatar => false,
                                 :primary => false)
@@ -99,7 +99,7 @@ describe PhotosController do
       login_as :aaron
       Photo.should_receive(:find).and_return(@photo)
       get :edit, :id => @photo
-      response.should redirect_to(home_url)
+      response.should redirect_to(dog_galleries_path(@photo.gallery.owner))
     end
     
     it "should be able to set the photo as avatar" do

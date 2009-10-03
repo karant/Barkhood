@@ -18,6 +18,11 @@
       <label for="mode">Mode</label>
       <%= f.select :mode, get_groups_modes %>
     </div>
+	
+	<div class="form_row">
+      <label for="group_owner">Group owner</label>
+      <%= f.select :dog_id, current_person.dogs.collect{|d| [d.name, d.id] } %>
+    </div>
     
     <div class="form_row">
       <%= f.submit "Create", :class => "button" %>

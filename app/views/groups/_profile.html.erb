@@ -17,6 +17,7 @@
 	  <% if @group.hidden? %>
 	          <%= link_to "Invite contacts", invite_group_path(@group) %> |
 	  <% end %>
+	  <%= link_to "Change photo", group_galleries_path(@group) %> |	  
 	  <%= link_to "Delete group", group_path(@group), :confirm => 'Are you sure?', :method => :delete %>
     </div>
   <%- elsif current_person.admin? %>

@@ -23,7 +23,6 @@ class Group < ActiveRecord::Base
                           Membership::PENDING, false, false]                           
   
   has_one :blog, :as => :owner
-  has_many :photos, :as => :owner, :dependent => :destroy, :order => "created_at"
   has_many :memberships, :dependent => :destroy
   has_many :dogs, :through => :memberships, :include => [:owner],
     :conditions => ACCEPTED_AND_ACTIVE, :order => "dogs.name ASC"
@@ -39,6 +38,7 @@ class Group < ActiveRecord::Base
 #    :foreign_key => "item_id", :dependent => :destroy
   
   has_many :galleries, :as => :owner, :dependent => :destroy
+  has_many :photos, :through => :galleries, :order => "created_at"  
   
   has_many :comments, :as => :commentable, :order => 'created_at DESC',
                       :limit => NUM_WALL_COMMENTS, :dependent => :destroy

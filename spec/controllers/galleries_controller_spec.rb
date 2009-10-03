@@ -33,9 +33,7 @@ describe GalleriesController do
       page.get    :edit,    :id => @gallery
       response.should be_success
       
-      page.post   :create, :dog_id => @dog, :gallery => { :title       => "foo",
-                                         :description => "bar",
-                                         :dog_id => @dog }
+      page.post   :create, :dog_id => @dog, :gallery => { :title => "foo", :description => "bar" }
       gallery = assigns(:gallery)
       gallery.title.should == "foo"
       gallery.description.should == "bar"
@@ -46,7 +44,7 @@ describe GalleriesController do
     end
     
     it "should associate dog to the gallery" do
-      post :create, :gallery => {:title=>"Title", :dog_id => @dog}, :dog_id => @dog
+      post :create, :gallery => {:title=>"Title"}, :dog_id => @dog
       assigns(:gallery).owner.should == @dog
     end
     
@@ -67,6 +65,22 @@ describe GalleriesController do
       flash[:success].should =~ /successfully deleted/
       delete :destroy, :id => @dog.reload.galleries.first, :dog_id => @dog
       flash[:error].should =~ /can't delete the final gallery/
+    end
+    
+    describe "group galleries" do
+      before(:each) do
+        @gallery = galleries(:group_gallery)
+        @group = groups(:public)
+      end
+      
+      it "should associate the group with the gallery" do
+        post :create, :gallery => {:title=>"Title"}, :group_id => @group
+        assigns(:gallery).owner.should == @group        
+      end
+      
+      it "should allow owner to edit group gallery" do
+        post :edit, :id => @gallery, :group_id => @group        
+      end
     end
   end
 end

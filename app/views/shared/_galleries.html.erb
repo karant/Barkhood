@@ -1,6 +1,6 @@
 <h2><%= parent.name %>'s Galleries </h2>
 <% if current_person?(parent.person)%>
-  <%= link_to "Add Gallery", new_gallery_path %>
+  <%= link_to "Add Gallery", new_parent_gallery_path(parent) %>
 <% end %>
 
 <ul id="gallery_list" class="grid">

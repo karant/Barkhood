@@ -11,7 +11,7 @@
 <%- end -%>
 <%- if current_person?(@dog.owner) -%>
   <%= link_to "Edit profile", edit_dog_path(@dog) %> |
-  <%= link_to "Change photo", @dog.galleries.first %>
+  <%= link_to "Change photo", dog_galleries_path(@dog) %>
 <%- end -%>
 <%- if current_person?(@dog.owner) || current_person.admin? -%>
     <div class="clear"></div>

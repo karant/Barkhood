@@ -1,11 +1,11 @@
 class PhotosController < ApplicationController
 
   before_filter :login_required
-  before_filter :get_instance_vars
+  before_filter :get_instance_vars, :except => [ :index ]
   before_filter :correct_user_required,
-                :only => [ :edit, :update, :destroy, :set_primary, 
-                           :set_avatar ]
-  before_filter :correct_gallery_requried, :only => [:new, :create]
+                :only => [ :edit, :update, :destroy ]
+  before_filter :owner_required, :only => [ :set_primary, :set_avatar ]
+  before_filter :correct_gallery_required, :only => [:new, :create]
   
   def index
     redirect_to parent_galleries_path
@@ -17,8 +17,7 @@ class PhotosController < ApplicationController
 
   
   def new
-    @photo = Photo.new
-    @gallery = Gallery.find(params[:gallery_id])
+    @photo = @gallery.photos.build
     respond_to do |format|
       format.html
     end
@@ -38,7 +37,7 @@ class PhotosController < ApplicationController
       redirect_to gallery_path(Gallery.find(params[:gallery_id])) and return
     end
 
-    photo_data = params[:photo].merge(:owner => parent)
+    photo_data = params[:photo].merge(:created_by => current_person)
     @photo = @gallery.photos.build(photo_data)
 
     respond_to do |format|
@@ -120,32 +119,44 @@ class PhotosController < ApplicationController
   private
   
     def correct_user_required
-      @photo = Photo.find(params[:id])
-      if @photo.nil?
-        redirect_to home_url
-      elsif !current_person?(@photo.person)
-        redirect_to home_url
+      if ( dog? && @gallery.person != current_person ) || ( group? && !( @group.owner?(current_person) || @photo.created_by == current_person))
+        redirect_to parent_galleries_path
       end
     end
     
-    def correct_gallery_requried
+    def correct_gallery_required
       if params[:gallery_id].nil?
         flash[:error] = "You cannot add photo without specifying gallery"
-        redirect_to home_path
-      else
-        @gallery = Gallery.find(params[:gallery_id])
-        if @gallery.person != current_person
-          flash[:error] = "You cannot add photos to this gallery"
-          redirect_to gallery_path(@gallery)
-        end
+        redirect_to parent_galleries_path
+      elsif ( dog? && @gallery.person != current_person ) || ( group? && !( @group.owner?(current_person) || Membership.accepted_by_person?(current_person, @group)))
+        flash[:error] = "You cannot add photos to this gallery"
+        redirect_to gallery_path(@gallery)
       end
+    end
+    
+    def owner_required
+      if ( dog? && @gallery.person != current_person ) || ( group? && !@group.owner?(current_person))
+        flash[:error] = "You are not the owner of this " + @gallery.owner.class.to_s.downcase
+        redirect_to gallery_path(@gallery)
+      end      
     end
   
     def get_instance_vars
-      if dog?
-        @dog = Dog.find(params[:dog_id])
-      elsif group?
-        @group = Group.find(params[:group_id])
+      if params[:id]
+        @photo = Photo.find(params[:id])
+        @gallery = @photo.gallery      
+      elsif params[:gallery_id]
+        @gallery = Gallery.find(params[:gallery_id])  
+      end
+      if @gallery
+        if dog?
+          @dog = @gallery.owner
+        elsif group?
+          @group = @gallery.owner
+        end
+      else
+        flash[:error] = "Gallery could not be determined"
+        redirect_to home_path
       end
     end
     
@@ -164,13 +175,13 @@ class PhotosController < ApplicationController
         @group
       end
     end
-    
+  
     def dog?
-      !params[:dog_id].nil?
+      @gallery.owner.class.to_s == 'Dog'
     end
     
     def group?
-      !params[:group_id].nil?
-    end  
+      @gallery.owner.class.to_s == 'Group'
+    end
 end
 
