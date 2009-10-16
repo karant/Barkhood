@@ -14,6 +14,7 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :memberships
     group.resources :galleries
     group.resources :comments
+    group.resources :events
   end
 
   map.resources :categories
@@ -48,6 +49,7 @@ ActionController::Routing::Routes.draw do |map|
      dog.resources :connections
      dog.resources :comments
      dog.resources :memberships
+     dog.resources :events
   end
   
   map.resources :galleries do |gallery|

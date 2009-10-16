@@ -62,9 +62,14 @@ describe Dog do
       initial_dog = create_dog(:save => true)
       dog         = create_dog(:email => "new@foo.com", :name => "Foo",
                                      :save => true)
-      Connection.connect(dog, initial_dog)
-      initial_dog.activities.length.should == 1
+      initial_dog.activities.each do |activity|
+        puts activity.to_yaml
+      end
+      initial_dog.activities.length.should == 5
       dog.destroy
+      initial_dog.reload.activities.each do |activity|
+        puts activity.to_yaml
+      end
       initial_dog.reload.activities.length.should == 0
     end
   end
@@ -320,6 +325,15 @@ describe Dog do
       @dog.owner.toggle!(:deactivated)
       [:active, :all_active].each do |method|
         Dog.send(method).should_not contain(@dog)
+      end
+    end
+  end
+  
+  describe "callback methods" do
+    it "should connect the new dog to all other dogs of same owner upon create" do
+      new_dog = create_dog
+      new_dog.owner.dogs.find(:all, :conditions => ["id <> ?", new_dog.id]).each do |dog|
+        Connection.connected?(dog, new_dog).should be_true
       end
     end
   end

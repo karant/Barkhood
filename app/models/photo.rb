@@ -29,15 +29,6 @@ class Photo < ActiveRecord::Base
   
   after_create :log_activity
   
-  def person
-    @person ||= case gallery.owner.class.to_s
-                   when "Dog"
-                     gallery.owner.owner
-                   when "Group"
-                     gallery.owner.owner.owner
-                   end
-  end
-  
   def self.per_page
     16
   end
@@ -72,7 +63,14 @@ class Photo < ActiveRecord::Base
   def log_activity
       case gallery.owner.class.to_s
         when 'Group'
-          activity_dog = gallery.owner.owner
+          activity_dog = nil
+          created_by.dogs.each do |dog|
+            if Membership.accepted?(dog, gallery.owner)
+              activity_dog = dog
+              break
+            end
+          end
+          activity_dog = gallery.owner.owner unless activity_dog
         when 'Dog'
           activity_dog = gallery.owner
       end

@@ -29,6 +29,7 @@ class PostsController < ApplicationController
   # Used for both forum and blog posts.
   def new
     @post = model.new
+    @post.dog = @topic.dog if forum? && current_person?(@topic.dog.owner)
 
     respond_to do |format|
       format.html { render :action => resource_template("new") }

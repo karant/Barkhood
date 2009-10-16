@@ -1,12 +1,15 @@
 class EventsController < ApplicationController
 
-  before_filter :in_progress unless test?
+  # before_filter :in_progress unless test?
   before_filter :login_required
   before_filter :load_event, :except => [:index, :new, :create]
   before_filter :load_date, :only => [:index, :show]
   before_filter :authorize_show, :only => :show
   before_filter :authorize_change, :only => [:edit, :update]
   before_filter :authorize_destroy, :only => :destroy
+  before_filter :authorize_attend, :only => :attend
+  before_filter :load_dogs, :only => [:new, :edit, :show, :create, :update, :index]
+  before_filter :load_privacies, :only => [:new, :edit, :create, :update]
   
   def index
     @month_events = Event.monthly_events(@date).person_events(current_person)
@@ -46,7 +49,13 @@ class EventsController < ApplicationController
   end
 
   def create
-    @event = Event.new(params[:event])
+    @group = Group.find(params[:group_id]) if params[:group_id]
+    @event = if @group
+               @group.events.build(params[:event])
+             else
+               Event.new(params[:event])
+             end
+    @event.privacy = params[:event][:privacy] if Event::PRIVACY.values.include?(params[:event][:privacy].to_i)
     @event.dog = current_person.dogs.find(params[:event][:dog_id])
 
     respond_to do |format|
@@ -84,12 +93,11 @@ class EventsController < ApplicationController
   end
 
   def attend
-    @dog = current_person.dogs.find(params[:dog_id])
     if @event.attend(@dog)
-      flash[:notice] = "#{h(@dog.name)} is now attending this event."
+      flash[:notice] = "#{@dog.name} is now attending this event."
       redirect_to @event
     else
-      flash[:error] = "You can only attend once."
+      flash[:error] = "#{@dog.name} can only attend this event once."
       redirect_to @event
     end
   end
@@ -97,10 +105,10 @@ class EventsController < ApplicationController
   def unattend
     @dog = current_person.dogs.find(params[:dog_id])
     if @event.unattend(@dog)
-      flash[:notice] = "#{h(@dog.name)} is no longer attending this event."
+      flash[:notice] = "#{@dog.name} is no longer attending this event."
       redirect_to @event
     else
-      flash[:error] = "You are not attending this event."
+      flash[:error] = "#{@dog.name} is not attending this event."
       redirect_to @event
     end
   end
@@ -113,9 +121,20 @@ class EventsController < ApplicationController
     end
   
     def authorize_show
-      if (@event.only_contacts? and
-          not (current_person.dogs.any?{|dog| @event.dog.contact_ids.include?(dog.id)} or
-               current_person?(@event.dog.owner) or current_person.admin?))
+      if  (@event.only_contacts? and
+          not (current_person.dogs.any?{|dog| @event.dog.contact_ids.include?(dog.id)})) or
+          (@event.only_group? and
+          not (current_person.dogs.any?{|dog| Membership.accepted?(dog, @event.group)})) and
+          not (current_person?(@event.dog.owner) or current_person.admin?)
+        redirect_to home_url 
+      end
+    end
+    
+    def authorize_attend
+      @dog = current_person.dogs.find(params[:dog_id])
+      if ((@event.only_contacts? and !@event.dog.contacts.include?(@dog)) or
+          (@event.only_group? and !Membership.accepted?(@dog, @event.group))) and
+         @event.dog != @dog
         redirect_to home_url 
       end
     end
@@ -151,4 +170,20 @@ class EventsController < ApplicationController
       @event = Event.find(params[:id])
     end
 
+    def load_dogs
+      if params[:group_id]
+        @group = Group.find(params[:group_id])
+        @dogs = current_person.dogs.reject{|dog| !Membership.accepted?(dog, @group)}
+      else
+        @dogs = current_person.dogs
+      end
+    end
+  
+    def load_privacies
+      @privacies = if params[:group_id]
+                     [["Public", Event::PRIVACY[:public]],["Group members only", Event::PRIVACY[:group]]]
+                   else
+                     [["Public", Event::PRIVACY[:public]],["Me and my contacts", Event::PRIVACY[:contacts]]]
+                   end
+    end
 end

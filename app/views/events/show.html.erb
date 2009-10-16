@@ -4,7 +4,7 @@
     <%= render :partial => @event %>
   </ul>
 
-  <h2>People attending this event</h2>
+  <h2>Dogs attending this event</h2>
   <% unless @attendees.empty? -%>
     <% paginated_section @attendees do  %>
     <ul class="grid contacts medium">
@@ -37,6 +37,9 @@
     <% form_for :comment, :url => event_comments_path(@event),
                           :html => { :id => "eventcomment" } do |f| %>
       <div class="form_row">
+      	<%= f.select :commenter_id, current_person.dogs.map{|d| [d.name, d.id]} %>
+	  </div>
+	  <div class="form_row">
         <%= f.text_area :body, :rows => 10 %>
       </div>
   

@@ -4,7 +4,7 @@ module ApplicationHelper
   ## Application-wide values
   def app_name
     name = global_prefs.app_name
-    default = "Insoshi"
+    default = "Barkhood"
     name.blank? ? default : name
   end
 
@@ -13,6 +13,7 @@ module ApplicationHelper
   def menu
     home     = menu_element("Dashboard",   home_path)
     dogs   = menu_element("Dogs", dogs_path)
+    groups = menu_element("Groups", groups_path)
     if Forum.count == 1
       forum = menu_element("Forum", forum_path(Forum.find(:first)))
     else
@@ -27,9 +28,8 @@ module ApplicationHelper
       #contacts = menu_element("Contacts",
       #                        person_connections_path(current_person))
       events   = menu_element("Events", events_path)
-      groups = menu_element("Groups", groups_path())
       #links = [home, profile, contacts, messages, blog, people, forum]
-      links = [home, profile, messages, dogs, groups, forum]
+      links = [home, profile, messages, dogs, groups, events, forum]
       # TODO: put this in once events are ready.
       # links.push(events)
       

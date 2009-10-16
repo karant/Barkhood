@@ -1,5 +1,7 @@
 require 'date'
 
+# Anton 10/10/09 - Modified to account for Time.zone returning nil on line 136
+
 # CalendarHelper allows you to draw a databound calendar with fine-grained CSS formatting
 module CalendarHelper
 
@@ -131,7 +133,8 @@ module CalendarHelper
       cell_attrs ||= {}
       cell_attrs[:class] ||= options[:day_class]
       cell_attrs[:class] += " weekendDay" if [0, 6].include?(cur.wday) 
-      cell_attrs[:class] += " today" if (cur == (Time.respond_to?(:zone) ? Time.zone.now.to_date : Date.today)) and options[:show_today]
+      # cell_attrs[:class] += " today" if (cur == (Time.respond_to?(:zone) ? Time.zone.now.to_date : Date.today)) and options[:show_today]
+      cell_attrs[:class] += " today" if (cur == ((Time.respond_to?(:zone) && !Time.zone.nil?) ? Time.zone.now.to_date : Date.today)) and options[:show_today]
       cell_attrs = cell_attrs.map {|k, v| %(#{k}="#{v}") }.join(" ")
       cal << "<td #{cell_attrs}>#{cell_text}</td>"
       cal << "</tr><tr>" if cur.wday == last_weekday

@@ -13,6 +13,7 @@ describe "/dogs/show.html.erb" do
     assigns[:galleries] = @dog.galleries.paginate(:page => 1)
     assigns[:some_contacts] = @dog.some_contacts
     assigns[:common_contacts] = []
+    assigns[:dogs] = @person.dogs
     render "/dogs/show.html.erb"
   end
 

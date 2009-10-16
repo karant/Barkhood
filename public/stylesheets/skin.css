@@ -364,6 +364,10 @@ div.photo-small:hover {
   background-color: #ccccff;
 }
 
+.form_row {
+	clear: both;
+}
+
 .form_row a {
   margin-left: 2px;
   font-size: 80%;

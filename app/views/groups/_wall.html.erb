@@ -5,7 +5,7 @@
   <% form_for :comment, :url => group_comments_path(@group) do |f| %>
        <div class="form_row">
        	<%= f.label :from %>
-        <%= f.select :commenter_id, current_person.dogs.map{|d| [d.name, d.id]} %>
+        <%= f.select :commenter_id, @dogs.map{|d| [d.name, d.id]} %>
       </div>   
       <div class="form_row">
         <%= f.text_area :body, :rows => 2, :cols => 80 %>
@@ -16,14 +16,8 @@
   <% end %>
 <%- else -%>
   <p>
-  You must be member of <%= h @group.name %> to leave a wall comment.
+  You must be member of <%= h @group.name %> to leave a wall comment.  Go to the <%= link_to 'Profile', @group %> tab to request a membership.
   </p>
-  <% unless @group.hidden? %>
-	  <p>
-	  <%= link_to "Join #{h @group.name} now",
-	              group_memberships_path(@group), :method => :post %>
-	  </p>
-  <% end %>
 <%- end -%>
  
  

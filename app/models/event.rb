@@ -1,13 +1,14 @@
 class Event < ActiveRecord::Base
   include ActivityLogger
 
-  attr_accessible :title, :description
+  attr_accessible :title, :description, :start_time, :end_time, :reminder, :group_id
 
   MAX_DESCRIPTION_LENGTH = MAX_STRING_LENGTH
   MAX_TITLE_LENGTH = 40
-  PRIVACY = { :public => 1, :contacts => 2 }
+  PRIVACY = { :public => 1, :contacts => 2, :group => 3 }
 
   belongs_to :dog
+  belongs_to :group
   has_many :event_attendees
   has_many :attendees, :through => :event_attendees, :source => :dog
   has_many :comments, :as => :commentable, :order => 'created_at DESC'
@@ -18,6 +19,9 @@ class Event < ActiveRecord::Base
   validates_presence_of :title, :start_time, :dog, :privacy
   validates_length_of :title, :maximum => MAX_TITLE_LENGTH
   validates_length_of :description, :maximum => MAX_DESCRIPTION_LENGTH, :allow_blank => true
+  validates_inclusion_of :privacy, :in => [PRIVACY[:public], PRIVACY[:contacts]], :if => Proc.new { |event| event.group.nil? }
+  validates_inclusion_of :privacy, :in => [PRIVACY[:public], PRIVACY[:group]], :if => Proc.new { |event| !event.group.nil? }  
+  validate :valid_group?
 
   named_scope :dog_events, 
               lambda { |dog| { :conditions => ["dog_id = ? OR (privacy = ? OR (privacy = ? AND (dog_id IN (?))))", 
@@ -31,7 +35,7 @@ class Event < ActiveRecord::Base
                                                   person.dog_ids,
                                                   PRIVACY[:public], 
                                                   PRIVACY[:contacts], 
-                                                  person.contact_ids] } }  
+                                                  person.contact_ids] } }                                               
 
   named_scope :period_events,
               lambda { |date_from, date_until| { :conditions => ['start_time >= ? and start_time <= ?',
@@ -76,6 +80,10 @@ class Event < ActiveRecord::Base
   def only_contacts?
     self.privacy == PRIVACY[:contacts]
   end
+  
+  def only_group?
+    self.privacy == PRIVACY[:group]
+  end
 
   private
 
@@ -83,4 +91,7 @@ class Event < ActiveRecord::Base
       add_activities(:item => self, :dog => self.dog)
     end
 
+    def valid_group?
+      self.errors.add(:group, "is not included in organizer's memberships") if !group.nil? && !dog.groups.include?(group)
+    end
 end

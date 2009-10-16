@@ -30,6 +30,7 @@ class Group < ActiveRecord::Base
     :conditions => PENDING_AND_ACTIVE, :order => "dogs.name DESC"
   has_many :pending_invitations, :through => :memberships, :source => "dog", :include => [:owner],
     :conditions => INVITED_AND_ACTIVE, :order => "dogs.name DESC"
+  has_many :events
 #  has_many :people, :through => :dogs, :source => 'owner'
   
   belongs_to :owner, :class_name => "Dog", :foreign_key => "dog_id"

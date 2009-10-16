@@ -90,6 +90,14 @@ describe CommentsController do
         response.should redirect_to(dog_url(@dog)+'#tWall')
       end.should change(Comment, :count).by(1)
     end
+    
+    it "should not allow create if dogs are not connected" do
+      lambda do
+        post :create, :dog_id => @dog,
+                      :comment => { :body => "The body", :commenter_id => dogs(:parker).id }            
+        response.should redirect_to(dog_url(@dog))
+      end.should_not change(Comment, :count)      
+    end
       
     it "should associate a dog to a comment" do
       with_options :dog_id => @dog do |page|
@@ -123,6 +131,36 @@ describe CommentsController do
       comment = comments(:wall_comment)
       delete :destroy, :dog_id => @dog, :id => comment
       response.should redirect_to(home_url)
+    end
+  end
+  
+  describe "group wall comments" do
+    integrate_views
+    
+    before(:each) do
+      login_as(:kelly)
+      @commenter_good = dogs(:buba)
+      @commenter_bad = dogs(:sharik)
+      @group = groups(:public)
+      Membership.accept(@commenter_good, @group)
+    end    
+    
+    it "should allow member of group to post a wall comment" do
+      lambda do
+        post :create, :group_id => @group,
+                      :comment => { :body => "The body", :commenter_id => @commenter_good }
+        #should go directly to the group's wall              
+        response.should redirect_to(group_url(@group)+'#tWall')
+      end.should change(Comment, :count).by(1)      
+    end
+    
+    it "should not allow a non-member to post to group wall" do
+      lambda do
+        post :create, :group_id => @group,
+                      :comment => { :body => "The body", :commenter_id => @commenter_bad }
+        #should go directly to the group's wall              
+        response.should redirect_to(group_url(@group))
+      end.should_not change(Comment, :count)       
     end
   end
 end

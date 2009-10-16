@@ -15,7 +15,7 @@
 /* Skin */
 .ui-tabs-nav, .ui-tabs-panel {
     font-family: "Trebuchet MS", Trebuchet, Verdana, Helvetica, Arial, sans-serif;
-    font-size: 12px;
+    font-size: 1em;
 }
 .ui-tabs-nav {
     list-style: none;

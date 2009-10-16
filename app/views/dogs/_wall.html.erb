@@ -5,7 +5,7 @@
   <% form_for :comment, :url => dog_comments_path(@dog) do |f| %>
        <div class="form_row">
        	<%= f.label :from %>
-        <%= f.select :commenter_id, current_person.dogs.map{|d| [d.name, d.id]} %>
+        <%= f.select :commenter_id, @dogs.map{|d| [d.name, d.id]} %>
       </div> 
       <div class="form_row">
         <%= f.text_area :body, :rows => 2, :cols => 80 %>
@@ -16,11 +16,7 @@
   <% end %>
 <%- else -%>
   <p>
-  You must be connected to <%= h @dog.name %> to leave a wall comment.
-  </p>
-  <p>
-  <%= link_to "Connect with #{h @dog.name} now",
-              dog_connections_path(@dog), :method => :post %>
+  You must be connected to <%= h @dog.name %> to leave a wall comment.  Go to the <%= link_to 'Profile', @dog %> tab to request a connection.
   </p>
 <%- end -%>
 

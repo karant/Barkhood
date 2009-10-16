@@ -2,6 +2,7 @@ class GroupsController < ApplicationController
   before_filter :login_required
   before_filter :group_owner, :only => [:edit, :update, :destroy,
     :new_photo, :save_photo, :delete_photo]
+  before_filter :load_date, :only => :show   
   
   def index
     @groups = Group.not_hidden(params[:page])
@@ -17,10 +18,19 @@ class GroupsController < ApplicationController
     num_contacts = Dog::MAX_DEFAULT_CONTACTS
     @members = @group.dogs
     @some_members = @members[0...num_contacts]
-    @pending_requests = @group.pending_requests
-    @blog = @group.blog
-    @posts = @group.blog.posts.paginate(:page => params[:page])
-    @galleries = @group.galleries.paginate(:page => params[:page])    
+    if logged_in?    
+      @pending_requests = @group.pending_requests
+      @blog = @group.blog
+      @posts = @group.blog.posts.paginate(:page => params[:page])
+      @galleries = @group.galleries.paginate(:page => params[:page])  
+      @dogs = current_person.dogs.reject{|d| !Membership.accepted?(d, @group)}
+      @month_events = @group.events.monthly_events(@date)
+      unless filter_by_day?
+        @events = @month_events
+      else
+        @events = Event.daily_events(@date).person_events(current_person)
+      end      
+    end
     group_redirect_if_not_public
   end
  
@@ -175,4 +185,18 @@ class GroupsController < ApplicationController
       end
     end
   end
+
+  def load_date
+    now = Time.now
+    year = (params[:year] || now.year).to_i
+    month = (params[:month] || now.month).to_i
+    day = (params[:day] || now.mday).to_i
+    @date = DateTime.new(year,month,day)
+    rescue ArgumentError
+      @date = Time.now
+  end
+
+  def filter_by_day?
+    !params[:day].nil?
+  end  
 end

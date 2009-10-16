@@ -27,6 +27,7 @@
   padding-bottom: 0.3em;
   background-color: #303030;
   color: white;
+  font-family: Helvetica,Arial,Univers,Tahoma,sans-serif
 }
 
 .otherMonth, .day, .specialDay {
@@ -38,6 +39,7 @@
 .otherMonth {
   color: #eeeeee;
   background-color: white;
+  text-align: center;
 }
 
 .day, .specialDay {

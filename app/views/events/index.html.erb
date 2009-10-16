@@ -2,13 +2,13 @@
 <h2>Listing events</h2>
 
 <ol class="list full">
-  <%= render :partial => @events %>
+  <%= render :partial => "shared/event", :collection => @events %>
 </ol>
 
 <% end -%>
 
 <% column_div :type => :secondary do -%>
-  <%= render :partial => 'calendar',
+  <%= render :partial => 'shared/calendar',
              :locals => { :events => @month_events, :date => @date } %>
 
   <h2>Add new event</h2>

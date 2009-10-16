@@ -11,6 +11,8 @@ class TopicsController < ApplicationController
   def show
     @topic = Topic.find(params[:id])
     @posts = @topic.posts
+    @post = Post.new
+    @post.dog = @topic.dog if current_person?(@topic.dog.owner)
     
     respond_to do |format|
       format.html

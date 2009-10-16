@@ -36,6 +36,7 @@ class DogsController < ApplicationController
       @some_groups = @groups[0...num_contacts]
       @own_groups = current_person == @dog.owner ? @dog.own_groups : @dog.own_not_hidden_groups
       @some_own_groups = @own_groups[0...num_contacts]
+      @dogs = current_person.dogs.reject{|d| !Connection.connected?(@dog, d) && !current_person?(@dog.owner)}
     end
     respond_to do |format|
       format.html

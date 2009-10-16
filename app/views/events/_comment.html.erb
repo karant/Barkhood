@@ -1,17 +1,19 @@
 <li>
   <div class="profile-image">
-    <%= image_link comment.commenter, :image => :thumbnail %>
-    <%= image_tag "icons/comment.png", :class => "icon", :alt => "Comment" %>
+    <%= image_link(comment.commenter, :image => :thumbnail) %>
   </div>
-  <p class="meta">
-    <%= dog_link comment.commenter %> posted a comment
-    <%= time_ago_in_words(comment.created_at) %> ago:
+  <p class="meta published">
+    <%= dog_link comment.commenter %> said
+    <%= time_ago_in_words(comment.created_at) %> ago
+    <%- if (current_person?(comment.commentable.dog.owner) or
+            current_person?(comment.commenter.owner)) -%>
+      <%= link_to image_tag("icons/comment_delete.png", :class => 'actioner'), 
+                  event_comment_path(@event, comment),
+                  :method => :delete,
+                  :confirm => 'Delete this event comment?',
+                  :title => 'Delete event comment' %>
+    <%- end -%>  
   </p>
   <%= display comment.body %>
-  <%- if current_person?(comment.commentable.dog.owner) -%>
-  <div>
-    <%= link_to "delete", event_comment_path(@event, comment),
-                          :method => :delete %>
-  </div>
-  <%- end -%>
+  <div class="clear"></div>
 </li>

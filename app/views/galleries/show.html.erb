@@ -9,8 +9,10 @@
     <% end %>
   
     <p>
+	  <% if current_person?(@gallery.person) || ( @gallery.owner.class.to_s == 'Group' && Membership.accepted_by_person?(current_person, @gallery.owner) ) %>
+		  <%= link_to "Add photo", new_gallery_photo_path(@gallery) %> |
+	  <% end %>
       <% if current_person?(@gallery.person)%>
-        <%= link_to "Add photo", new_gallery_photo_path(@gallery) %> |
         <%= link_to "Edit gallery", edit_gallery_path %> |
       <% end %>
       <%= link_to "All galleries", parent_path(@gallery.owner) %>

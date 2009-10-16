@@ -70,6 +70,25 @@ describe PostsController do
                        :id => @post, :dog_id => @dog
       response.should redirect_to(home_url)
     end
+    
+    it "should default post author to topic author for topic author's owner" do
+      topic = @forum.topics.build(:name => "New topic")
+      topic.dog = dogs(:nola)
+      topic.save      
+      topic.should be_valid
+      get :new, :forum_id => @forum, :topic_id => topic
+      assigns(:post).dog.should == dogs(:nola)
+    end
+    
+    it "should not default post author if topic's owner is not current user" do
+      login_as :aaron
+      topic = @forum.topics.build(:name => "New topic")
+      topic.dog = dogs(:nola)
+      topic.save
+      topic.should be_valid
+      get :new, :forum_id => @forum, :topic_id => topic
+      assigns(:post).dog.should be_nil   
+    end
   end
   
   describe "blog posts" do

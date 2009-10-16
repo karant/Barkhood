@@ -36,14 +36,17 @@ module ActivitiesHelper
           %(#{dog_link_with_image(activity.item.commenter)}
             commented on #{wall(activity)})
         end
+      when "Event"
+        event = activity.item.commentable
+        commenter = activity.item.commenter
+        if recent
+          %(commented on event #{event_link(event.title, event)})
+        else
+          %(#{dog_link_with_image(commenter)} commented on 
+          #{someones(event.dog, commenter)} event 
+          #{event_link(event.title, event)})
+        end
       end
-    when "Event"
-      # TODO: make recent/long versions for this
-      event = activity.item.commentable
-      commenter = activity.item.commenter
-      %(#{dog_link_with_image(commenter)} commented on 
-        #{someones(event.dog, commenter)} event: 
-        #{event_link(event.title, event)}.)
     when "Connection"
       if activity.item.contact.owner.admin?
         if recent

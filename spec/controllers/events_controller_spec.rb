@@ -6,6 +6,7 @@ describe EventsController do
   before(:each) do
     @person = login_as(:aaron)
     @dog = dogs(:max)
+    @group = groups(:hidden)
   end
 
   def mock_event(stubs={})
@@ -14,10 +15,12 @@ describe EventsController do
       :update_attributes => true,
       :destroy => true,
       :dog => @dog,
+      :group => @group,
       :to_xml => '',
       :start_time => Time.now,
       :attendees => [],
-      :only_contacts? => false
+      :only_contacts? => false,
+      :only_group? => false,
     }.merge(stubs)
     @mock_event ||= mock_model(Event, stubs)
   end
@@ -112,6 +115,20 @@ describe EventsController do
       response.should be_redirect
     end
     
+    it "should allow to see group events if member" do
+      Event.should_receive(:find).and_return(mock_event)
+      mock_event.should_receive(:only_group?).and_return(true)
+      get :show, :id => "1"
+      response.should be_success      
+    end
+    
+    it "should not allow to see group events if not member" do
+      login_as(:quentin)
+      Event.should_receive(:find).and_return(mock_event)
+      mock_event.should_receive(:only_group?).and_return(true)
+      get :show, :id => "1"
+      response.should be_redirect      
+    end    
   end
 
   describe "responding to GET /events/1.xml" do
@@ -163,6 +180,18 @@ describe EventsController do
       assigns[:event].should equal(mock_event)
     end
 
+    it "should populate dogs from all dogs of current person when creating non-group event" do
+      Event.should_receive(:new).and_return(mock_event)
+      get :new
+      assigns[:dogs].should == @person.dogs      
+    end
+    
+    it "should populate dogs from members of group when creating group event" do
+      Event.should_receive(:new).and_return(mock_event)
+      get :new, :group_id => groups(:hidden).id
+      assigns[:dogs].should_not include(dogs(:parker))     
+      assigns[:dogs].should include(dogs(:max))
+    end
   end
 
   describe "responding to GET /events/1/edit" do
@@ -320,6 +349,44 @@ describe EventsController do
       response.should redirect_to(events_url)
     end
 
+  end
+
+  describe "attending an event" do
+    it "should allow to attend private events if contact" do
+      login_as(:quentin)
+      contact = dogs(:dana)
+      Event.should_receive(:find).and_return(mock_event)
+      mock_event.should_receive(:only_contacts?).and_return(true)
+      mock_event.should_receive(:attend).with(contact).and_return(true)
+      Connection.connect(@dog,contact)
+      get :attend, :id => "1", :dog_id => contact.id
+      response.should redirect_to(event_url(mock_event))
+    end
+
+    it "should not allow to attend private events if not contact" do
+      login_as(:quentin)
+      contact = dogs(:dana)      
+      Event.should_receive(:find).and_return(mock_event)
+      mock_event.should_receive(:only_contacts?).and_return(true)
+      get :attend, :id => "1", :dog_id => contact.id
+      response.should redirect_to(home_url)
+    end
+    
+    it "should allow to attend group events if member" do
+      Event.should_receive(:find).and_return(mock_event)
+      mock_event.should_receive(:only_group?).and_return(true)
+      mock_event.should_receive(:attend).with(@dog).and_return(true)
+      get :attend, :id => "1", :dog_id => @dog.id
+      response.should redirect_to(event_url(mock_event))   
+    end
+    
+    it "should not allow to attend group events if not member" do
+      other_dog = dogs(:parker)
+      Event.should_receive(:find).and_return(mock_event)
+      mock_event.should_receive(:only_group?).and_return(true)
+      get :attend, :id => "1", :dog_id => other_dog.id
+      response.should redirect_to(home_url)
+    end  
   end
 
 end

@@ -6,6 +6,7 @@ class CommentsController < ApplicationController
   before_filter :get_instance_vars
   before_filter :authorize_destroy, :only => [:destroy]
   before_filter :connection_required
+  before_filter :connection_required_for_creation, :only => [:create]
 
   def index
     redirect_to comments_url
@@ -93,6 +94,20 @@ class CommentsController < ApplicationController
           flash[:notice] = "You must be a member of the group to complete that action"
           redirect_to @group          
         end
+      end
+    end
+    
+    def connection_required_for_creation
+      if wall?
+        unless current_person?(dog.owner) || Connection.connected?(dog, current_person.dogs.find(params[:comment][:commenter_id]))
+          flash[:notice] = "The commented dog must be connected to the recipient dog to complete that action"
+          redirect_to @dog          
+        end
+      elsif group_wall?
+        unless current_person?(@group.person) || Membership.accepted?(current_person.dogs.find(params[:comment][:commenter_id]), @group)
+          flash[:notice] = "The commented dog must be a member of the group to complete that action"
+          redirect_to @group          
+        end        
       end
     end
     

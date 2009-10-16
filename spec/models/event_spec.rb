@@ -16,6 +16,13 @@ describe Event do
   it "should create a new instance given valid attributes" do
     Event.unsafe_create!(@valid_attributes)
   end
+  
+  describe "utility methods" do
+    it "should determine if event is for group only" do
+      events(:public).only_group?.should be_false
+      events(:group).only_group?.should be_true
+    end
+  end
 
   describe "privacy settings" do
     before(:each) do
@@ -84,6 +91,40 @@ describe Event do
     
     it "should add an activity to the creator" do
       @event.dog.recent_activity.should contain(@activity)
+    end
+  end
+  
+  describe "group association" do
+    before(:each) do
+      @event = Event.new(@valid_attributes)
+      @event.group = groups(:private)
+      @event.dog = dogs(:dana)
+      @event.privacy = Event::PRIVACY[:public]
+      @event.save
+    end
+    
+    it "should belong to a group" do
+      @event.should be_valid
+      @event.group.should_not be_nil
+    end
+    
+    it "should not be valid if privacy is set to contacts" do
+      @event.privacy = Event::PRIVACY[:contacts]
+      @event.should_not be_valid
+      @event.errors.on(:privacy).should_not be_nil
+    end
+    
+    it "should not be valid if not assigned to group and set to group privacy" do
+      @event.group = nil
+      @event.privacy = Event::PRIVACY[:group]
+      @event.should_not be_valid
+      @event.errors.on(:privacy).should_not be_nil
+    end
+    
+    it "should not be valid if organizer dog is not a member of the group" do
+      @event.dog = dogs(:parker)
+      @event.should_not be_valid
+      @event.errors.on(:group).should_not be_nil
     end
   end
 

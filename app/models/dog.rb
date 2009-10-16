@@ -87,6 +87,7 @@ class Dog < ActiveRecord::Base
   validates_uniqueness_of   :identity_url, :allow_nil => true
 
   before_create :create_blog
+  after_create  :connect_to_existing_dogs
   before_validation :handle_nil_description
 
   before_update :set_old_description
@@ -331,5 +332,9 @@ class Dog < ActiveRecord::Base
             people.last_logged_in_at >= ?)),
          false, false, TIME_AGO_FOR_MOSTLY_ACTIVE]
       end
-    end  
+    end
+  
+    def connect_to_existing_dogs
+      owner.dogs.find(:all, :conditions => ["id <> ?", self.id]).each{|dog| Connection.connect(dog, self, false)}
+    end
 end

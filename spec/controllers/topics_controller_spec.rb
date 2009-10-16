@@ -6,6 +6,7 @@ describe TopicsController do
   before(:each) do
     @topic = topics(:one)
     @dog = dogs(:dana)
+    @forum = forums(:one)
   end
   
   it "should require login for new" do
@@ -35,9 +36,27 @@ describe TopicsController do
   
   it "should redirect properly on topic deletion" do
     person = login_as(:admin)
-    @forum = Forum.find(@topic.forum)
     delete :destroy, :id => @topic, :forum_id => @forum
     response.should redirect_to(forum_url(@forum))
   end
   
+  it "should default post author to topic author for topic author's owner" do
+    login_as :quentin
+    topic = @forum.topics.build(:name => "New topic")
+    topic.dog = dogs(:nola)
+    topic.save      
+    topic.should be_valid
+    get :show, :forum_id => @forum, :id => topic
+    assigns(:post).dog.should == dogs(:nola)
+  end
+  
+  it "should not default post author if topic's owner is not current user" do
+    login_as :aaron
+    topic = @forum.topics.build(:name => "New topic")
+    topic.dog = dogs(:nola)
+    topic.save
+    topic.should be_valid
+    get :show, :forum_id => @forum, :id => topic
+    assigns(:post).dog.should be_nil   
+  end  
 end

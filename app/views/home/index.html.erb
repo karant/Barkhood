@@ -23,7 +23,7 @@
 	               :title => "Admin Groups", :link => "admin"} %>
     	<%= render :partial => 'shared/groups',
 	               :locals => { :dog => dog, :groups => dog.groups,
-	               :title => "Groups", :link => "groups"} %>				   
+	               :title => dog.name + "'s Groups", :link => "groups"} %>				   
 	<% end %>
 	<%= render :partial => 'requested_memberships' %>
   <%- else -%>

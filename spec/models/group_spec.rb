@@ -209,6 +209,11 @@ describe Group do
     it "should have associated galleries" do
       @group.galleries.should_not be_nil
     end
+    
+    it "should have associated events" do
+      @private_group.events.should_not be_nil
+      @private_group.events.should be_a_kind_of(Array)
+    end
   end
   
   describe "photo methods" do
