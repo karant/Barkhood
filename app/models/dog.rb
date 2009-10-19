@@ -335,6 +335,6 @@ class Dog < ActiveRecord::Base
     end
   
     def connect_to_existing_dogs
-      owner.dogs.find(:all, :conditions => ["id <> ?", self.id]).each{|dog| Connection.connect(dog, self, false)}
+      owner.dogs.find(:all, :conditions => ["id <> ? AND deactivated = ?", self.id, false]).each{|dog| Connection.connect(self, dog, false)}
     end
 end

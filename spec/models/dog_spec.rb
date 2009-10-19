@@ -62,15 +62,9 @@ describe Dog do
       initial_dog = create_dog(:save => true)
       dog         = create_dog(:email => "new@foo.com", :name => "Foo",
                                      :save => true)
-      initial_dog.activities.each do |activity|
-        puts activity.to_yaml
-      end
       initial_dog.activities.length.should == 5
       dog.destroy
-      initial_dog.reload.activities.each do |activity|
-        puts activity.to_yaml
-      end
-      initial_dog.reload.activities.length.should == 0
+      initial_dog.reload.activities.length.should == 2
     end
   end
 
