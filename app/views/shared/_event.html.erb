@@ -31,11 +31,13 @@
   <% end -%>
   <p>
   	<% @dogs.each do |dog| %>
-	    <% unless event.attending?(dog) -%>
-	    <%= link_to "#{h(dog.name)} will attend", attend_event_path(event, :dog_id => dog.id) %><br />
-	    <% else -%>
-	    <%= link_to "#{h(dog.name)} won't attend", unattend_event_path(event, :dog_id => dog.id) %><br />
-	    <% end -%>
+		<% unless event.privacy == Event::PRIVACY[:group] && !Membership.accepted?(dog, event.group) %>
+		    <% unless event.attending?(dog) -%>
+		    <%= link_to "#{h(dog.name)} will attend", attend_event_path(event, :dog_id => dog.id) %><br />
+		    <% else -%>
+		    <%= link_to "#{h(dog.name)} won't attend", unattend_event_path(event, :dog_id => dog.id) %><br />
+		    <% end -%>
+		<% end %>
 	<% end %>
   </p>
 </li>

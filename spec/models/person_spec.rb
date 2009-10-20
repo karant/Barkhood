@@ -67,6 +67,11 @@ describe Person do
       param = "#{@person.id}-michael-and-hartl"
       @person.to_param.should == param
     end
+    
+    it "should return an array of group ids for all dogs" do
+      @person.group_ids.should be_kind_of(Array)
+      @person.group_ids.should contain(groups(:public).id)
+    end
   end  
   
   describe "associations" do

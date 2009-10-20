@@ -24,18 +24,22 @@ class Event < ActiveRecord::Base
   validate :valid_group?
 
   named_scope :dog_events, 
-              lambda { |dog| { :conditions => ["dog_id = ? OR (privacy = ? OR (privacy = ? AND (dog_id IN (?))))", 
+              lambda { |dog| { :conditions => ["dog_id = ? OR (privacy = ? OR (privacy = ? AND (dog_id IN (?))) OR (privacy = ? AND (group_id IN (?))))", 
                                                   dog.id,
                                                   PRIVACY[:public], 
                                                   PRIVACY[:contacts], 
-                                                  dog.contact_ids] } }
+                                                  dog.contact_ids,
+                                                  PRIVACY[:group],
+                                                  dog.group_ids] } }
                                                   
   named_scope :person_events,
-              lambda { |person| { :conditions => ["dog_id IN (?) OR (privacy = ? OR (privacy = ? AND (dog_id IN (?))))", 
+              lambda { |person| { :conditions => ["dog_id IN (?) OR (privacy = ? OR (privacy = ? AND (dog_id IN (?))) OR (privacy = ? AND (group_id IN (?))))", 
                                                   person.dog_ids,
                                                   PRIVACY[:public], 
                                                   PRIVACY[:contacts], 
-                                                  person.contact_ids] } }                                               
+                                                  person.contact_ids,
+                                                  PRIVACY[:group],
+                                                  person.group_ids] } }                                               
 
   named_scope :period_events,
               lambda { |date_from, date_until| { :conditions => ['start_time >= ? and start_time <= ?',

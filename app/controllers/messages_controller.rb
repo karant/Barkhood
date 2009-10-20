@@ -40,6 +40,7 @@ class MessagesController < ApplicationController
   def new    
     @message = Message.new
     @recipient = Dog.find(params[:dog_id])
+    @dogs = current_person.dogs.reject{|d| !Connection.connected?(d, @recipient)}
 
     respond_to do |format|
       format.html
@@ -62,15 +63,17 @@ class MessagesController < ApplicationController
   end
 
   def create
-    @dog = current_person.dogs.find(params[:message][:sender_id])
     @message = Message.new(params[:message])
     @recipient = Dog.find(params[:dog_id])
+    @dog = current_person.dogs.find(params[:message][:sender_id])
+    redirect_to home_url and return unless Connection.connected?(@dog, @recipient)
     @message.sender    = @dog
     @message.recipient = @recipient
     if reply?
       @message.parent = Message.find(params[:message][:parent_id])
       redirect_to home_url and return unless @message.valid_reply?
     end
+    @dogs = current_person.dogs.reject{|d| !Connection.connected?(d, @recipient)}    
   
     respond_to do |format|
       if !preview? and @message.save

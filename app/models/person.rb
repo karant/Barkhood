@@ -86,6 +86,14 @@ class Person < ActiveRecord::Base
   def to_param
     "#{id}-#{name.to_safe_uri}"
   end
+  
+  def group_ids
+    group_ids = []
+    dogs.each do |dog|
+      group_ids << dog.group_ids
+    end
+    return group_ids.flatten.uniq
+  end
 
   ## Feeds
 
