@@ -23,6 +23,13 @@ describe Group do
     end
   end
   
+  describe "callbacks" do
+    it "should create membership for owner upon group create" do
+      g = create_group(:save => true)
+      g.dogs.should contain(g.owner)
+    end
+  end  
+  
   describe "length validations" do
     it "should enforce a maximum name length" do
       @group.should have_maximum(:name, Group::MAX_NAME)
@@ -61,7 +68,7 @@ describe Group do
     it "should log an activity when the group is created" do
       lambda do
         group = create_group(:save => true)
-      end.should change(Activity, :count).by(1)
+      end.should change(Activity, :count).by(2)
     end
   end
 

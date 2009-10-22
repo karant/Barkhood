@@ -11,6 +11,7 @@ describe MessagesController do
     @other_person = people(:aaron)
     @dog = dogs(:dana)
     @other_dog = dogs(:max)
+    Connection.connect(@dog, @other_dog)
     @message = @dog.received_messages.first
   end
 

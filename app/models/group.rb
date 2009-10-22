@@ -49,7 +49,7 @@ class Group < ActiveRecord::Base
   
   before_create :create_blog
   before_validation :handle_nil_description
-  after_create :log_activity
+  after_create :log_activity, :create_owner_membership
 #  before_update :set_old_description
 #  after_update :log_activity_description_changed
   
@@ -179,5 +179,12 @@ class Group < ActiveRecord::Base
         activity = Activity.create!(:item => self, :dog => self.owner)
         add_activities(:activity => activity, :dog => self.owner)
       end
+  end
+  
+  def create_owner_membership
+    Membership.request(owner, self, false)
+    unless mode == PUBLIC
+      Membership.accept(owner, self)
     end
+  end
 end

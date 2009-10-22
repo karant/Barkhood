@@ -59,6 +59,14 @@ describe MembershipsController do
         response.should redirect_to(dog_memberships_url(@dog))
       end.should change(Membership, :count).by(-1)
     end
+    
+    it "should not allow to end membership of group owner" do
+      membership = memberships(:hidden_max)
+      lambda do
+        delete :destroy, :id => membership
+        response.should redirect_to(dog_memberships_url(membership.dog))
+      end.should_not change(Membership, :count)
+    end
   end  
   
   describe "for invitations" do
@@ -95,6 +103,14 @@ describe MembershipsController do
       login_as(:aaron)
       delete :unsubscribe, :id => @membership
       response.should redirect_to(home_url)
+    end
+    
+    it "should not allow to unsubsribe a group owner" do
+      membership = memberships(:hidden_max)
+      lambda do
+        delete :unsubscribe, :id => membership
+        response.should redirect_to(members_group_path(membership.group))
+      end.should_not change(Membership, :count)
     end
   end
 end

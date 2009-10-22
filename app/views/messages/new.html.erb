@@ -13,7 +13,11 @@
               :url => dog_messages_path(@recipient)) do |f| %>
     <div class="form_row full">
 		<%= f.label :from %>
-		<%= f.select :sender_id, @dogs.map{|d| [d.name, d.id]} %>
+		<% if controller.action_name == 'reply' %>
+			<%=h @dog.name %><br /><br />
+		<% else %>
+			<%= f.select :sender_id, @dogs.map{|d| [d.name, d.id]} %>
+		<% end %>
       <!-- TODO: be able to change recipients with this
 	  <label for="recipient">To</label>
       <%= text_field_tag :recipient, h(@recipient.name) %>

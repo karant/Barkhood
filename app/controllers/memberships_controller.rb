@@ -1,6 +1,7 @@
 class MembershipsController < ApplicationController
   before_filter :login_required
   before_filter :authorize_person, :only => [:edit, :update, :destroy, :subscribe, :unsubscribe]
+  before_filter :check_for_owner_deletion, :only => [:destroy, :unsubscribe]
   
   
   def edit
@@ -98,5 +99,17 @@ class MembershipsController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       flash[:error] = "Invalid or expired membership request"
       redirect_to home_url
+    end
+  
+    def check_for_owner_deletion
+      @membership = Membership.find(params[:id])
+      if @membership.group.owner == @membership.dog
+        flash[:error] = "You cannot delete membership of the group owner"
+        if action_name == 'unsubscribe'
+          redirect_to members_group_path(@membership.group)
+        else
+          redirect_to dog_memberships_path(@membership.dog)
+        end
+      end
     end
 end

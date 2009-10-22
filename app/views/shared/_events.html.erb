@@ -1,5 +1,5 @@
 <%- column_div :type => :primary do -%>
-<h2>Events</h2>
+<h2>Group Events</h2>
 
 <ol class="list full">
   <%= render :partial => "shared/event", :collection => events %>
@@ -8,8 +8,13 @@
 <% end -%>
 
 <% column_div :type => :secondary do -%>
-  <%= render :partial => 'shared/calendar',
-             :locals => { :events => month_events, :date => date } %>
+  <% if @group %>
+	  <%= render :partial => 'shared/group_calendar',
+	             :locals => { :events => month_events, :date => date, :group => @group } %>  
+  <% else %>
+	  <%= render :partial => 'shared/calendar',
+	             :locals => { :events => month_events, :date => date } %>
+  <% end %>
 
   <h2>Add new event</h2>
   <%= link_to "Click here", new_group_event_path(group) %>

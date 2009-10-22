@@ -31,43 +31,43 @@
 <div class="toolbox">
   <%= image_tag @dog.main_photo, :class => "profile-image photo",
                                     :alt => h(@dog.name) %>
-  <%- unless current_person?(@dog.owner) -%>
+  <%- if logged_in? && !current_person.dogs.empty? -%>									
     <h3><%= @dog.name %></h3>
     <ul class="tools">
-      <%- if logged_in? && !current_person.dogs.empty? -%>
 	  	<li>Connections with:
 			<ul>
 				<% current_person.dogs.each do |dog| %>
-					<li><%=h dog.name %> - 
-					        <%- unless Connection.exists?(@dog, dog) -%>
-					          <%= link_to "Request Connection",
-					                          dog_connections_path(@dog, :contact_id => dog.id ),
-					                          :method => :post %>
-					        <%- end -%>
-					        <%- if Connection.connected?(@dog, dog) -%>
-					          You're connected!
-						          <%= link_to image_tag('icons/user_delete.png'),
-						                      connection_path(Connection.conn(dog,
-						                                                      @dog)),
-						                          :method => :delete,
-						                      :title => "Remove connection",
-						             :confirm => "Are you sure you want to remove this connection?" %>
-					        <%- end -%>
-					          <%- if Connection.pending?(@dog, dog) -%>
-					            <%= h @dog.name %> has contacted you
-							            (<%= link_to "respond to contact request",
-							                         edit_connection_path(Connection.conn(dog,
-							                                                              @dog)) %>)
-					          <%- end -%>
-					          <%- if Connection.pending?(dog, @dog) -%>
-					            You've contacted <%= h @dog.name %>
-					          <%- end -%>
-					</li>
+					<% unless dog == @dog %>
+						<li><%=h dog.name %> - 
+						        <%- unless Connection.exists?(@dog, dog) -%>
+						          <%= link_to "Request Connection",
+						                          dog_connections_path(@dog, :contact_id => dog.id ),
+						                          :method => :post %>
+						        <%- end -%>
+						        <%- if Connection.connected?(@dog, dog) -%>
+						          You're connected!
+							          <%= link_to image_tag('icons/user_delete.png'),
+							                      connection_path(Connection.conn(dog,
+							                                                      @dog)),
+							                          :method => :delete,
+							                      :title => "Remove connection",
+							             :confirm => "Are you sure you want to remove this connection?" %>
+						        <%- end -%>
+						          <%- if Connection.pending?(@dog, dog) -%>
+						            <%= h @dog.name %> has contacted you
+								            (<%= link_to "respond to contact request",
+								                         edit_connection_path(Connection.conn(dog,
+								                                                              @dog)) %>)
+						          <%- end -%>
+						          <%- if Connection.pending?(dog, @dog) -%>
+						            You've contacted <%= h @dog.name %>
+						          <%- end -%>
+						</li>
+					<% end %>
 				<% end %>
 			</ul>
 		</li>
 		<li><%= email_link(@dog) %></li>
-      <%- end -%>
     </ul>
   <%- end -%>
 </div>

@@ -174,6 +174,9 @@ class EventsController < ApplicationController
       if params[:group_id]
         @group = Group.find(params[:group_id])
         @dogs = current_person.dogs.reject{|dog| !Membership.accepted?(dog, @group)}
+      elsif !@event.blank? && !@event.group.blank?
+        @group = @event.group
+        @dogs = current_person.dogs.reject{|dog| !Membership.accepted?(dog, @group)}
       else
         @dogs = current_person.dogs
       end

@@ -37,7 +37,7 @@
     <% form_for :comment, :url => event_comments_path(@event),
                           :html => { :id => "eventcomment" } do |f| %>
       <div class="form_row">
-      	<%= f.select :commenter_id, current_person.dogs.map{|d| [d.name, d.id]} %>
+      	<%= f.select :commenter_id, @dogs.map{|d| [d.name, d.id]} %>
 	  </div>
 	  <div class="form_row">
         <%= f.text_area :body, :rows => 10 %>
@@ -57,6 +57,6 @@
              :locals => { :events => @month_events, :date => @date } %>
 
   <h2>Add new event</h2>
-  <%= link_to "Click here", new_event_path %>
+  <%= link_to "Click here", parent_new_event_path %>
 <% end -%>
 

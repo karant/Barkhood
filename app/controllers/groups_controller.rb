@@ -28,7 +28,7 @@ class GroupsController < ApplicationController
       unless filter_by_day?
         @events = @month_events
       else
-        @events = Event.daily_events(@date).person_events(current_person)
+        @events = @group.events.daily_events(@date).person_events(current_person)
       end      
     end
     group_redirect_if_not_public
