@@ -84,6 +84,18 @@ describe Dog do
     it "should return person as owner" do
       @dog.person.should == @dog.owner
     end
+    
+    it "should return lat from owner" do
+      @dog.lat.should == @dog.owner.lat
+    end
+    
+    it "should return lan from owner" do
+      @dog.lng.should == @dog.owner.lng
+    end
+    
+    it "should return address from owner" do
+      @dog.address.should == @dog.owner.address
+    end
   end
 
   describe "contact associations" do

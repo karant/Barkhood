@@ -4,7 +4,7 @@ class PeopleController < ApplicationController
   skip_before_filter :admin_warning, :only => [ :show, :update ]
   before_filter :login_required, :only => [ :show, :edit, :update,
                                             :common_contacts ]
-  before_filter :correct_user_required, :only => [ :edit, :update ]
+  before_filter :correct_user_required, :only => [ :edit, :update, :show ]
   before_filter :setup
   
   def show
@@ -123,6 +123,6 @@ class PeopleController < ApplicationController
     end
   
     def correct_user_required
-      redirect_to home_url unless Person.find(params[:id]) == current_person
+      redirect_to home_url unless Person.find(params[:id]) == current_person || current_person.admin
     end
 end

@@ -10,6 +10,7 @@ class Dog < ActiveRecord::Base
                {:association_name => 'breed', :field => 'name', :as => 'breed_name'}
              ],
              :conditions => "deactivated = false"
+  
   MAX_NAME = 40
   MAX_DESCRIPTION = 5000
   TRASH_TIME_AGO = 1.month.ago
@@ -85,6 +86,8 @@ class Dog < ActiveRecord::Base
   validates_length_of       :name,  :maximum => MAX_NAME
   validates_length_of       :description, :maximum => MAX_DESCRIPTION
   validates_uniqueness_of   :identity_url, :allow_nil => true
+  
+  acts_as_mappable :through => :owner
 
   before_create :create_blog
   after_create  :connect_to_existing_dogs
@@ -134,6 +137,18 @@ class Dog < ActiveRecord::Base
   # '1-dana'.to_i == 1
   def to_param
     "#{id}-#{name.to_safe_uri rescue nil}"
+  end
+
+  def lng
+    owner.lng
+  end
+  
+  def lat
+    owner.lat
+  end
+  
+  def address
+    owner.address
   end
 
   ## Feeds

@@ -38,13 +38,33 @@ class SearchesController < ApplicationController
         @results.map!{ |dog| Dog.find(dog) }
       end
       if model == "Group"
-        @results.map!{ |group| group.hidden? ? nil:group}
-        @results = @results.compact
+        @results = @results.reject{ |group| group.hidden?}
       end      
     end
   rescue Ultrasphinx::UsageError
     flash[:error] = "Invalid search query"
     redirect_to searches_url(:q => "", :model => params[:model])
+  end
+  
+  def address
+    @address = params[:address]
+    location = Geokit::Geocoders::MultiGeocoder.geocode(@address)
+    @within = params[:within]
+    
+    @dogs = Dog.find(:all, :include => [:owner], :origin => @address, :within => @within, :order => 'distance')
+    
+    @map = GMap.new("map_div")
+    @map.control_init(:large_map => true,:map_type => true)
+    @map.center_zoom_init([location.lat, location.lng], 15)
+    
+    @dogs.each do |dog|
+      @map.overlay_init(GMarker.new([dog.lat, dog.lng],:title => dog.name, :info_window => render_to_string(:partial => 'dog_info', :object => dog)))    
+    end
+    
+    respond_to do |format|
+      format.html # address.html.erb
+      format.xml  { render :xml => @dogs }
+    end
   end
   
   private

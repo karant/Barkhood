@@ -1,0 +1,15 @@
+<% column_div :type => :primary do %>
+  <h2>Search results</h2>
+    <%- if @dogs.empty? -%>
+      <h3>No results</h3>
+    <%- else -%>
+	  <%= @map.div(:width => 600, :height => 400) %>	
+      <ul class="list people">
+        <%= render :partial => 'dogs/dog', :collection => @dogs %>
+      </ul>
+    <%- end -%>
+<%- end -%>
+
+<% column_div :type => :secondary do %>
+  <%= render :partial => 'searches/box' %>
+<%- end -%>

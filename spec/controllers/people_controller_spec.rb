@@ -26,6 +26,7 @@ describe PeopleController do
     end
     
     it "should have a working show page" do
+      login_as(:quentin)
       get :show, :id => @person
       response.should be_success
       response.should render_template("show")
@@ -36,22 +37,6 @@ describe PeopleController do
       get :edit, :id => @person
       response.should be_success
       response.should render_template("edit")
-    end
-    
-    it "should redirect to home for deactivated users" do
-      @person.toggle!(:deactivated)
-      get :show, :id => @person
-      response.should redirect_to(home_url)
-      flash[:error].should =~ /not active/
-    end
-    
-    it "should redirect to home for email unverified users" do
-      enable_email_notifications
-      @person.email_verified = false; @person.save!
-      @person.should_not be_active
-      get :show, :id => @person
-      response.should redirect_to(home_url)
-      flash[:error].should =~ /not active/
     end
   end
   
@@ -222,23 +207,27 @@ describe PeopleController do
       response.should have_tag("a[href=?]", edit_person_path(@person))
     end
     
-    it "should not display the edit link for other viewers" do
+    it "should not display user if it is not current user" do
       login_as(:aaron)
-      get :show, :id => @person
-      response.should_not have_tag("a[href=?]", edit_person_path(@person))
-    end
-    
-    it "should not display the edit link for non-logged-in viewers" do
-      logout
-      get :show, :id => @person
-      response.should_not have_tag("a[href=?]", edit_person_path(@person))
-    end
-    
-    it "should not display a deactivated person" do
-      @person.toggle!(:deactivated)
       get :show, :id => @person
       response.should redirect_to(home_url)
     end
+    
+    it "should log out a deactivated person" do
+      login_as(@person)
+      @person.toggle!(:deactivated)
+      get :show, :id => @person
+      response.should redirect_to(logout_url)      
+    end
+    
+    it "should log out a an email unverified user" do
+      person = people(:aaron)
+      enable_email_notifications
+      person.email_verified = false; person.save!
+      person.should_not be_active
+      get :show, :id => person
+      response.should redirect_to(logout_url)
+    end    
   end
   
   private
