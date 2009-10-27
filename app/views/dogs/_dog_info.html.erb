@@ -1,0 +1,8 @@
+<div class="profile-image">
+<%= image_link dog_info,  
+      :image_options => { :class => "photo fn" },
+      :image => :bounded_icon %>
+</div>
+<p><%= dog_link dog_info, :class => "url fn" %><br />
+<%=h dog_info.breed.name  %></p>
+<div class="clear"></div>

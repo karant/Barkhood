@@ -322,14 +322,14 @@ describe Dog do
   describe "active class methods" do
     it "should not return deactivated dogs" do
       @dog.toggle!(:deactivated)
-      [:active, :all_active].each do |method|
+      [:active].each do |method|
         Dog.send(method).should_not contain(@dog)
       end
     end
     
     it "should not return dogs with deactivated owners" do
       @dog.owner.toggle!(:deactivated)
-      [:active, :all_active].each do |method|
+      [:active].each do |method|
         Dog.send(method).should_not contain(@dog)
       end
     end

@@ -99,36 +99,21 @@ class Dog < ActiveRecord::Base
 
   alias person owner
 
-  class << self
+  named_scope :active, :include => [:owner], 
+                       :conditions => [%(dogs.deactivated = ? AND people.deactivated = ?), false, false],
+                       :order => 'dogs.created_at DESC'
 
-    # Return the paginated active dogs.
-    def active(page = 1)
-      paginate(:all, :include => [:owner],
-                     :page => page,
-                     :per_page => RASTER_PER_PAGE,
-                     :conditions => conditions_for_active)
-    end
-    
-    # Return the dogs who are 'mostly' active.
-    # Dogs are mostly active if their owner/user has logged in recently enough.
-    def mostly_active(page = 1)
-      paginate(:all, :page => page,
-                     :include => [:owner],
-                     :per_page => RASTER_PER_PAGE,
-                     :conditions => conditions_for_mostly_active,
-                     :order => "dogs.created_at DESC")
-    end
-    
-    # Return *all* the active dogs.
-    def all_active
-      find(:all, :include => [:owner], :conditions => conditions_for_active)
-    end
-    
-    def find_recent
-      find(:all, :order => "dogs.created_at DESC",
-                 :include => :photos, :limit => NUM_RECENT)
-    end
-  end
+  named_scope :mostly_active, :include => [:owner], 
+                              :conditions => [%(dogs.deactivated = ? AND
+                                                people.deactivated = ? AND
+                                                (people.last_logged_in_at IS NOT NULL AND
+                                                 people.last_logged_in_at >= ?)),
+                                               false, false, TIME_AGO_FOR_MOSTLY_ACTIVE],
+                              :order => 'dogs.created_at DESC'
+                              
+  named_scope :recent, :include => [:photos], 
+                       :limit => NUM_RECENT,
+                       :order => 'dogs.created_at DESC'
 
   # Params for use in urls.
   # Profile urls have the form '/dogs/1-dana'.
@@ -327,26 +312,6 @@ class Dog < ActiveRecord::Base
     
     def destroy_groups
       Group.find_all_by_dog_id(self).each {|g| g.destroy}
-    end    
-
-    ## Other private method(s)
-    
-    class << self
-    
-      # Return the conditions for a dog to be active.
-      def conditions_for_active
-        [%(dogs.deactivated = ? AND people.deactivated = ?),
-         false, false]
-      end
-      
-      # Return the conditions for a dog to be 'mostly' active.
-      def conditions_for_mostly_active
-        [%(dogs.deactivated = ? AND
-           people.deactivated = ? AND
-           (people.last_logged_in_at IS NOT NULL AND
-            people.last_logged_in_at >= ?)),
-         false, false, TIME_AGO_FOR_MOSTLY_ACTIVE]
-      end
     end
   
     def connect_to_existing_dogs

@@ -4,7 +4,7 @@ class HomeController < ApplicationController
   def index
     @body = "home"
     @topics = Topic.find_recent
-    @members = Dog.find_recent
+    @members = Dog.recent
     if logged_in?
       @feed = current_person.feed
       # @some_contacts = current_person.some_contacts
@@ -14,7 +14,8 @@ class HomeController < ApplicationController
           :conditions => ['status = ? AND group_id in (?)', Membership::PENDING, current_person.dogs.each{|d| d.own_group_ids}.flatten.uniq])
     else
       @feed = Activity.global_feed
-    end    
+    end
+    
     respond_to do |format|
       format.html
       format.atom

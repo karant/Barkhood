@@ -25,7 +25,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :preferences
-  map.resources :searches
+  map.resources :searches, :collection => { :address => :get }
   map.resources :activities
   map.resources :connections
   map.resources :password_reminders

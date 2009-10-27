@@ -17,7 +17,7 @@ describe DogsController do
     it "should have a working index" do
       get :index
       response.should be_success
-      response.should render_template("index")
+      response.should render_template("dogs/_dog_info.html.erb")
     end
  
     it "should have a working new page" do

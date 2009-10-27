@@ -50,15 +50,22 @@ class SearchesController < ApplicationController
     @address = params[:address]
     location = Geokit::Geocoders::MultiGeocoder.geocode(@address)
     @within = params[:within]
+    if params[:breed_ids].include?('all')
+      @breeds = Breed.find(:all)
+    else
+      @breeds = Breed.find(params[:breed_ids])
+    end
+    @breedsarray = Breed.find(:all).collect{|b| [b.name, b.id]}
+    @breedsarray.insert(0, ["All Breeds", "all"])    
     
-    @dogs = Dog.find(:all, :include => [:owner], :origin => @address, :within => @within, :order => 'distance')
+    @dogs = Dog.mostly_active(:conditions => ["breed_id in (?)", @breeds.map(&:id)], :origin => @address, :within => @within, :order => 'distance').paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
     
     @map = GMap.new("map_div")
     @map.control_init(:large_map => true,:map_type => true)
     @map.center_zoom_init([location.lat, location.lng], 15)
     
     @dogs.each do |dog|
-      @map.overlay_init(GMarker.new([dog.lat, dog.lng],:title => dog.name, :info_window => render_to_string(:partial => 'dog_info', :object => dog)))    
+      @map.overlay_init(GMarker.new([dog.lat, dog.lng],:title => dog.name, :info_window => render_to_string(:partial => 'dogs/dog_info', :object => dog)))    
     end
     
     respond_to do |format|

@@ -1,3 +1,5 @@
+<%= render :partial => 'searches/address' %>
+<%= @map.div(:width => 744, :height => 400) %>
 <%- column_div :type => :primary do -%>
   <% unless @dogs.empty? -%>
     <h2>Dogs</h2>

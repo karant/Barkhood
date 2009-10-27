@@ -291,6 +291,28 @@ body.single-col .col1 form input.checkbox {
   width: 72px;
 }
 
+#frmSearchAddress {
+  border: 0;
+  margin: 0 0 0 0px;
+  padding: 0;
+  position: relative;
+  zoom: 1;
+}
+
+#frmSearchAddress input.txt {
+  display: inline;
+  vertical-align: middle;
+  margin-top: 12px;
+  width: 470px;
+}
+#frmSearchAddress #btnSearch.button {
+  display: inline;
+  clear: none;
+  margin: 0;
+  width: 72px;
+  padding: 0;
+}
+
 form a.add-recipient {
   position: absolute;
   right: 12px;

@@ -11,6 +11,10 @@
     <%= auto_discovery_link_tag(:atom, :action => :index, 
     :format => :atom ) %>
   <% end %>
+  <% if @map %>
+  	<%= GMap.header %>
+  	<%= @map.to_html %>
+  <% end %>
     <%= stylesheet_link_tag "default" %>
     <%= stylesheet_link_tag "jquery-flora.tabs.css", "jquery.tooltip.css", 
                             "facebox.css" %>

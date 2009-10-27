@@ -1,15 +1,12 @@
-<% column_div :type => :primary do %>
-  <h2>Search results</h2>
-    <%- if @dogs.empty? -%>
-      <h3>No results</h3>
-    <%- else -%>
-	  <%= @map.div(:width => 600, :height => 400) %>	
-      <ul class="list people">
-        <%= render :partial => 'dogs/dog', :collection => @dogs %>
-      </ul>
-    <%- end -%>
-<%- end -%>
-
-<% column_div :type => :secondary do %>
-  <%= render :partial => 'searches/box' %>
+<%= render :partial => 'searches/address' %>
+<%= @map.div(:width => 744, :height => 400) %>
+<%- column_div :type => :primary do -%>
+  <% unless @dogs.empty? -%>
+    <h2>Dogs</h2>
+    <%= will_paginate @dogs %>
+    <ul class="list dogs">
+      <%= render :partial => @dogs %>
+    </ul>
+    <%= will_paginate @dogs %>
+  <% end -%>
 <%- end -%>

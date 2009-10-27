@@ -204,6 +204,22 @@ p.welcome {
   width: 398px;
 }
 
+/* Map Info Box */
+.gmnoprint .profile-image {
+  clear: left;
+  float: left;
+  display: inline;	
+}
+.gmnoprint p {
+	margin-bottom: 0;
+	margin-left: 50px;
+	font-size: 0.8em;
+}
+
+.gmnoprint p .fn {
+	font-size: 1em;
+}
+
 /* Grid */
 .grid {
   clear: both;
