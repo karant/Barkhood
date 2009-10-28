@@ -5,6 +5,8 @@ quentin:
   name: Quentin
   email: quentin@example.com
   address: 4188 Justin Way, Sacramento CA 95826
+  lat: 38.541644
+  lng: -121.3492724
   crypted_password: <%= password %>
   created_at: <%= 5.days.ago.to_s :db %>
   last_logged_in_at: <%= 1.day.ago.to_s :db %>
@@ -18,7 +20,9 @@ quentin:
 aaron:
   name: Aaron
   email: aaron@example.com
-  address: 4188 Justin Way, Sacramento CA 95826
+  address: 3858 N Lakeshore Blvd, Loomis CA
+  lat: 38.813846
+  lng: -121.1101104
   crypted_password: <%= password %>
   created_at: <%= 1.day.ago.to_s :db %>
   deactivated: false

@@ -111,6 +111,27 @@ describe SearchesController do
         assigns(:results).should == [dogs(:dana)].paginate
       end
     end
+    
+    describe "by address" do
+      it "should require login" do
+        logout
+        get :address, :address => "4188 Justin Way, Sacramento CA", :within => "2"
+        response.should redirect_to(login_url)
+      end
+      
+      it "should search by correct address" do
+        get :address, :address => "4188 Justin Way, Sacramento CA", :within => "2"
+        response.should be_success
+        assigns(:dogs).should contain(dogs(:dana))
+        assigns(:dogs).should_not contain(dogs(:max))
+        assigns(:map).should_not be_nil
+      end
+      
+      it "should rescue bad address searches" do
+        get :address, :address => "Address or City", :within => "2"  
+        response.should be_redirect
+      end
+    end
   end
   
   describe "Message searches" do

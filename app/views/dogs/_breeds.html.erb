@@ -1,0 +1,10 @@
+<% if !dog_breeds.empty? %>
+	<h2>Breeds</h2>
+	<ul>
+	<% if params[:breed_id] %>
+		<li><%= link_to "<< All Breeds", address_searches_path(:address => params[:address], :within => params[:within]) %></li>
+	<% end %>
+	<% dog_breeds.each do |breed, dogs| %>
+		<li><%= link_to breed.name + ' (' + dogs.size.to_s + ')', address_searches_path(:address => params[:address], :within => params[:within], :breed_id => breed.id) %></li>
+	<% end %>
+<% end %>

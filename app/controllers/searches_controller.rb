@@ -49,29 +49,32 @@ class SearchesController < ApplicationController
   def address
     @address = params[:address]
     location = Geokit::Geocoders::MultiGeocoder.geocode(@address)
-    @within = params[:within]
-    if params[:breed_ids].include?('all')
-      @breeds = Breed.find(:all)
-    else
-      @breeds = Breed.find(params[:breed_ids])
-    end
-    @breedsarray = Breed.find(:all).collect{|b| [b.name, b.id]}
-    @breedsarray.insert(0, ["All Breeds", "all"])    
+    @within = params[:within] == 'any' ? '' : params[:within]
+    conditions = params[:breed_id] ? ["breed_id = ?", params[:breed_id]] : []
     
-    @dogs = Dog.mostly_active(:conditions => ["breed_id in (?)", @breeds.map(&:id)], :origin => @address, :within => @within, :order => 'distance').paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
+    all_dogs = Dog.mostly_active.find(:all, :conditions => conditions, :include => [:breed], :origin => @address, :within => @within, :order => 'distance')
+    @size = all_dogs.size
+    @dogs = all_dogs.paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
+    @dog_breeds = @dogs.group_by(&:breed)
     
     @map = GMap.new("map_div")
     @map.control_init(:large_map => true,:map_type => true)
     @map.center_zoom_init([location.lat, location.lng], 15)
     
+    markers = []
     @dogs.each do |dog|
-      @map.overlay_init(GMarker.new([dog.lat, dog.lng],:title => dog.name, :info_window => render_to_string(:partial => 'dogs/dog_info', :object => dog)))    
+      markers << GMarker.new([dog.lat, dog.lng], :title => dog.name, :description => render_to_string(:partial => 'dogs/dog_link', :object => dog), :info_window => render_to_string(:partial => 'dogs/dog_info', :object => dog))    
     end
+    clusterer = Clusterer.new(markers, :max_visible_markers => 1, :min_markers_per_cluster => 2)
+    @map.overlay_init clusterer
     
     respond_to do |format|
       format.html # address.html.erb
       format.xml  { render :xml => @dogs }
     end
+  rescue Geokit::Geocoders::GeocodeError
+    flash[:error] = "Incorrect address"
+    redirect_to dogs_path
   end
   
   private

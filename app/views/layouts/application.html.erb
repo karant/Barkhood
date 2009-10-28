@@ -12,8 +12,10 @@
     :format => :atom ) %>
   <% end %>
   <% if @map %>
+    <%= javascript_include_tag("clusterer") %>
   	<%= GMap.header %>
   	<%= @map.to_html %>
+	<%= javascript_include_tag("clusterer") %>
   <% end %>
     <%= stylesheet_link_tag "default" %>
     <%= stylesheet_link_tag "jquery-flora.tabs.css", "jquery.tooltip.css", 

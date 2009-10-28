@@ -16,16 +16,20 @@ class DogsController < ApplicationController
     else
       location = Geokit::Geocoders::MultiGeocoder.geocode('Sacramento, CA')
     end
-    @dogs = Dog.mostly_active(:origin => location, :within => 10, :order => 'distance').paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
+    all_dogs = Dog.mostly_active.find(:all, :origin => location, :within => 10, :order => 'distance')
+    @size = all_dogs.size
+    @dogs = all_dogs.paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
     @map = GMap.new("map_div")
     @map.control_init(:large_map => true,:map_type => true)
     @map.center_zoom_init([location.lat, location.lng], 15)
-    @dogs.each do |dog|
-      @map.overlay_init(GMarker.new([dog.lat, dog.lng],:title => dog.name, :info_window => render_to_string(:partial => 'dogs/dog_info', :object => dog)))    
-    end        
-    @breedsarray = Breed.find(:all).collect{|b| [b.name, b.id]}
-    @breedsarray.insert(0, ["All Breeds", "all"])
 
+    markers = []
+    @dogs.each do |dog|
+      markers << GMarker.new([dog.lat, dog.lng], :title => dog.name, :description => render_to_string(:partial => 'dogs/dog_link', :object => dog), :info_window => render_to_string(:partial => 'dogs/dog_info', :object => dog))    
+    end
+    clusterer = Clusterer.new(markers, :max_visible_markers => 1, :min_markers_per_cluster => 2)
+    @map.overlay_init clusterer
+    
     respond_to do |format|
       format.html
     end

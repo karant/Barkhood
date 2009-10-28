@@ -155,6 +155,17 @@ module ApplicationHelper
     else 
       "HTML formatting supported"
     end
+  end  
+  
+  # Within distances for address search
+  def within_distances
+     [['2 miles', '2'],
+      ['5 miles', '5'],
+      ['10 miles', '10'],
+      ['25 miles', '25'],
+      ['50 miles', '50'],
+      ['100 miles', '100'],
+      ['Any distance', 'any']]
   end
 
   private

@@ -1,20 +1,14 @@
-<% default_label = "Address or City" %>
+<% default_label = params[:address] || "Address or City" %>
 <h2>Search <%= search_type %> by Address</h2>
 <% form_tag address_searches_path, :method => :get, :id => "frmSearchAddress" do %>
   <fieldset title="Search Barkhood">
-  	<%= select_tag :breed_ids, options_for_select(@breedsarray, "all"), :multiple => true %><br />
-  	Within <%= select_tag :within, '<option value="5" selected>5 miles</option>
-									  <option value="10">10 miles</option>
-									  <option value="25">25 miles</option>
-									  <option value="50">50 miles</option>
-									  <option value="100">100 miles</option>
-									  <option value="">Any distance</option>' %> of
+  	Within <%= select_tag :within, options_for_select(within_distances, params[:within]) %> of
     <%= text_field_tag :address, h(params[:address]), :id => "txtSearchAddress", :class => "txt",
                                           :maxlength => 100,
 										  :style => "color:#aaa;",
       									  :value => default_label,
-      									  :onfocus => "if($(this).value == '#{default_label}'){$(this).clear();$(this).style.color = '#000';}",
-      								      :onblur => "if($(this).value == ''){$(this).setValue('#{default_label}');$(this).style.color = '#aaa';}" %>								  
+      									  :onfocus => "if($(this).val() == '#{default_label}'){$(this).val('');$(this).css('color', '#000');}",
+      								      :onblur => "if($(this).val() == ''){$(this).val('#{default_label}');$(this).css('color', '#aaa');}" %>								  
     <%= submit_tag "Search", :name => nil, :id => "btnSearch",
                              :class => "button"  %>
     <%= hidden_field_tag "model", search_model %>

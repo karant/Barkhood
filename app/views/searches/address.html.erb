@@ -1,12 +1,18 @@
 <%= render :partial => 'searches/address' %>
 <%= @map.div(:width => 744, :height => 400) %>
 <%- column_div :type => :primary do -%>
-  <% unless @dogs.empty? -%>
-    <h2>Dogs</h2>
+  <% if @dogs.empty? -%>
+  	<br />
+  	No dogs were found!
+  <% else -%>
+    <h2>Dogs (<%= @size %>)</h2>
     <%= will_paginate @dogs %>
     <ul class="list dogs">
       <%= render :partial => @dogs %>
     </ul>
     <%= will_paginate @dogs %>
   <% end -%>
+<%- end -%>
+<%- column_div :type => :secondary do -%>
+  <%= render :partial => 'dogs/breeds', :locals => { :dog_breeds => @dog_breeds } %>
 <%- end -%>
