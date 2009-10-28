@@ -1,7 +1,4 @@
 <h2>Owner Profile</h2>
-<p>
-	Name: <%=h @person.name %>
-</p>
 <%- if current_person?(@person) || current_person.admin? -%>
   <div class="button_container">
 <%- end -%>

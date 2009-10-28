@@ -2,7 +2,6 @@
 <% password = Person.encrypt('test').inspect %>
 
 quentin:
-  name: Quentin
   email: quentin@example.com
   address: 4188 Justin Way, Sacramento CA 95826
   lat: 38.541644
@@ -18,7 +17,6 @@ quentin:
   email_verified: true
 
 aaron:
-  name: Aaron
   email: aaron@example.com
   address: 3858 N Lakeshore Blvd, Loomis CA
   lat: 38.813846
@@ -33,7 +31,6 @@ aaron:
   email_verified: true
 
 kelly:
-  name: Kelly
   email: kelly@example.com
   address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>
@@ -45,7 +42,6 @@ kelly:
   blog_comment_notifications: true
   
 admin:
-  name: Admin
   email: admin@example.com
   address: 4188 Justin Way, Sacramento CA 95826
   admin: true
@@ -58,7 +54,6 @@ admin:
   blog_comment_notifications: true
 
 deactivated:
-  name: Deactivated
   email: deactivated@example.com
   address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>
@@ -66,7 +61,6 @@ deactivated:
   deactivated: true
 
 email_unverified:
-  name: Email Unverified
   email: inactive@example.com
   address: 4188 Justin Way, Sacramento CA 95826
   crypted_password: <%= password %>

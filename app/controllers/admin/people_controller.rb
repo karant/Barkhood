@@ -3,7 +3,7 @@ class Admin::PeopleController < ApplicationController
   before_filter :login_required, :admin_required
 
   def index
-    @people = Person.paginate(:all, :page => params[:page], :order => :name)
+    @people = Person.paginate(:all, :page => params[:page], :order => :email)
   end
 
   def update
@@ -12,7 +12,7 @@ class Admin::PeopleController < ApplicationController
       flash[:error] = "Action failed."
     else
       @person.toggle!(params[:task])
-      flash[:success] = "#{CGI.escapeHTML @person.name} updated."
+      flash[:success] = "#{CGI.escapeHTML @person.email} updated."
     end
     respond_to do |format|
       format.html { redirect_to :back }

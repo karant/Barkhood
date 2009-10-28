@@ -18,16 +18,10 @@
     <%= f.text_field :email, :maxlength => Person::MAX_EMAIL %>
     <%= set_focus_to "person_email" %>  
   </div>
-  
-  <div class="form_row">
-    <label for="person_name">Owner's Name <span class="small">(never made public)</span></label>
-    <%= f.text_field :name, :maxlength => Person::MAX_NAME %>
-  </div>
 
   <div class="form_row">
     <label for="person_address">Address 
-      <span class="small">(will be used to locate other dogs near you)</span><br />
-	<span class="small">Examples - 1 1st Blvd, Sacramento CA or Sacramento CA</span></label>
+      <span class="small">(will be used to locate other dogs near you)</span></label>
     <%= f.text_field :address, :maxlength => Person::MAX_ADDRESS %>
   </div>
 

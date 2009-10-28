@@ -234,7 +234,6 @@ describe PeopleController do
 
     def create_person(options = {})
       person_hash = { :email => 'quire@foo.com',
-                      :name => 'Quire',
                       :password => 'quux', :password_confirmation => 'quux',
                       :address => '4188 Justin Way, Sacramento CA 95826'}
       post :create, :person => person_hash.merge(options)

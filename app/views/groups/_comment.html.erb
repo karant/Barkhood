@@ -3,7 +3,7 @@
     <%= image_link(comment.commenter, :image => :thumbnail) %>
   </div>
   <p class="meta published">
-    <%= person_link comment.commenter %> said
+    <%= dog_link comment.commenter %> said
     <%= time_ago_in_words(comment.created_at) %> ago
     <%- if (@group.owner?(current_person) or
             current_person?(comment.commenter)) -%>

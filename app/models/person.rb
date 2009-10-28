@@ -4,9 +4,8 @@ class Person < ActiveRecord::Base
   attr_accessor :password, :verify_password, :new_password
   attr_accessible :email, :password, :password_confirmation, :connection_notifications,
                   :message_notifications, :wall_comment_notifications,
-                  :blog_comment_notifications, :address, :identity_url, :name
+                  :blog_comment_notifications, :address, :identity_url
   MAX_EMAIL = MAX_PASSWORD = 40
-  MAX_NAME = 40
   MAX_ADDRESS = 120
   EMAIL_REGEX = /\A[A-Z0-9\._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}\z/i
   TIME_AGO_FOR_MOSTLY_ACTIVE = 1.month.ago
@@ -18,14 +17,13 @@ class Person < ActiveRecord::Base
   has_many :_sent_messages, :through => :dogs
   has_many :_received_messages, :through => :dogs
  
-  validates_presence_of     :email, :name, :address
+  validates_presence_of     :email, :address
   validates_presence_of     :password,              :if => :password_required?
   validates_presence_of     :password_confirmation, :if => :password_required?
   validates_length_of       :password, :within => 4..MAX_PASSWORD,
                                        :if => :password_required?
   validates_confirmation_of :password, :if => :password_required?
   validates_length_of       :email, :within => 6..MAX_EMAIL
-  validates_length_of       :name,  :maximum => MAX_NAME
   validates_format_of       :email,
                             :with => EMAIL_REGEX,
                             :message => "must be a valid email address"
@@ -76,15 +74,6 @@ class Person < ActiveRecord::Base
       find(:first, :conditions => ["admin = ?", true],
                    :order => :created_at)
     end
-  end
-  
-  # Params for use in urls.
-  # Profile urls have the form '/people/1-michael-hartl'.
-  # This works automagically because Person.find(params[:id]) implicitly
-  # converts params[:id] into an int, and in Ruby
-  # '1-michael-hartl'.to_i == 1
-  def to_param
-    "#{id}-#{name.to_safe_uri}"
   end
   
   def group_ids

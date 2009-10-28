@@ -35,11 +35,6 @@ describe Person do
       end.should raise_error(ActiveRecord::StatementInvalid)
     end
 
-    it "should require name" do
-      p = create_person(:name => nil)
-      p.errors.on(:name).should_not be_nil
-    end
-
     it "should strip spaces in email field" do
       create_person(:email => 'example@example.com ').should be_valid
     end
@@ -47,27 +42,9 @@ describe Person do
     it "should allow a plus sign in the email address" do
       create_person(:email => 'foo+bar@example.com').should be_valid
     end
-  end
+  end 
   
-  describe "length validations" do
-    it "should enforce a maximum name length" do
-      @person.should have_maximum(:name, Person::MAX_NAME)
-    end
-  end  
-  
-  describe "utility methods" do
-    it "should have the right to_param method" do
-      # Person params should have the form '1-michael-hartl'.
-      param = "#{@person.id}-quentin"
-      @person.to_param.should == param
-    end
- 
-    it "should have a safe uri" do
-      @person.name = "Michael & Hartl"
-      param = "#{@person.id}-michael-and-hartl"
-      @person.to_param.should == param
-    end
-    
+  describe "utility methods" do    
     it "should return an array of group ids for all dogs" do
       @person.group_ids.should be_kind_of(Array)
       @person.group_ids.should contain(groups(:public).id)
@@ -324,7 +301,6 @@ describe Person do
 
     def create_person(options = {})
       record = Person.new({ :email => 'quire@example.com',
-                            :name => 'Name',
                             :password => 'quire',
                             :password_confirmation => 'quire',
                             :address => '4188 Justin Way, Sacramento CA 95826'}.merge(options))

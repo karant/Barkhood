@@ -3,12 +3,7 @@
 
   <div id="profile_edit">
     <%= error_messages_for :person %>
-    <% form_for @person do |f| %>
-      <div class="form_row">
-        <%= f.label :name %>
-        <%= f.text_field :name, :maxlength => Person::MAX_NAME %>
-      </div>
-	  
+    <% form_for @person do |f| %> 
 	  <div class="form_row">
         <%= f.label :address %>
         <%= f.text_field :address, :maxlength => Person::MAX_ADDRESS, :size => 60 %>
