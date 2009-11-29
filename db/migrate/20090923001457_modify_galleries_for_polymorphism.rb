@@ -1,7 +1,7 @@
 class ModifyGalleriesForPolymorphism < ActiveRecord::Migration
   def self.up
-#    add_column :galleries, :owner_id, :integer
-#    add_column :galleries, :owner_type, :string
+    add_column :galleries, :owner_id, :integer
+    add_column :galleries, :owner_type, :string
     remove_column :galleries, :dog_id
   end
  
