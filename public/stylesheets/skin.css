@@ -2,10 +2,11 @@
 
 body {
   text-align: center;
+  background-color: #ebebeb;
 }
 #header-wrap {
   /* background: #069; */
-  background: #069 url('/images/header_background.png');
+  background: url(/images/header-grad.png) repeat-x;
   float: left;
   width: 100%;
 }
@@ -14,9 +15,22 @@ body {
   text-align: left;
   width: 744px;
 }
+#wrap {
+  width: 100%;
+  background: url(/images/content-grad.jpg) repeat-x;
+  background-color: #ebebeb;
+}
+#content_wrap {
+  width: 744px;
+  margin-left: auto;
+  margin-right: auto;
+}
 #content {
+  background-color: #ffffff;	
   width: 744px;
   float: left;
+  padding: 20px;
+  margin-top: 20px;
 }
 .col1 {
   float: left;
@@ -47,7 +61,7 @@ body {
 /* Header */
 #header {
   position: relative;
-  height: 80px;
+  height: 69px;
 }
 
 #header h1 {
@@ -60,33 +74,39 @@ body {
 
 /* Header-nav */
 #nav {
-  margin: 44px 0 0 0;
+  margin: 41px 0 0 0;
   width: 600px;
   float: right;
 }
 #nav li {
-  background: #069 url(/images/header-grad.jpg) bottom repeat-x;
+  background: #069 url(/images/button.png) bottom repeat-x;
   float: left;
-  height: 36px;
-  line-height: 36px;
+  height: 28px;
+  line-height: 28px;
   list-style-type: none;
   margin: 0 0 0 0;
+  margin-right: 5px;
   padding: 0;
   text-align: center;
   width: 70px;
 }
 #nav li a {
-  color: #fff;
+  color: #666666;
   display: block;
-  height: 36px;
+  height: 28px;
   font-size: 12px;
+  outline: 0; /* @ Firefox, prevent dotted border after click */   
 }
 #nav li a:hover {
-  background: url(/images/header-grad-inv.jpg) top repeat-x;
+  background: url(/images/button-hover.png) top repeat-x;
 }
 #nav li.active a, #nav li.active a:hover {
-  background: #fff;
-  color: #069;
+  background: url(/images/current-button.png) repeat-x;
+  border-left: solid #ebebeb 1px; 
+  border-right: solid #ebebeb 1px;
+  height: 28px;
+  width: 68px;
+  color: #000000;
 }
 #nav li.n-home {
   margin-left: 0;
@@ -103,8 +123,7 @@ body {
 }
 
 #footer-nav {
-  border-top: 1px solid #ccc;
-  padding-top: 24px;
+  padding-top: 14px;
 }
 
 /* Welcome message */
@@ -455,7 +474,7 @@ ul.ui-tabs-nav li {
 .ui-tabs-panel {
   min-height: 540px;
   width: 96%;
-  border: 1px solid #4A70B1;
+  border: 1px solid #50a029;
 }
 .comments li div {border-bottom: 1px solid #ccc;}
 .imgHoverMarker {display: inline;}
