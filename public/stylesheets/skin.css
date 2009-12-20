@@ -27,18 +27,18 @@ body {
 }
 #content {
   background-color: #ffffff;	
-  width: 744px;
+  width: 704px;
   float: left;
   padding: 20px;
   margin-top: 20px;
 }
 .col1 {
   float: left;
-  width: 490px;
+  width: 460px;
 }
 .col2 {
   float: right;
-  width: 240px;
+  width: 230px;
 }
 .single-col .col1 {
   margin: 0 210px;

@@ -62,17 +62,17 @@
   <% form_for @person, :html => { :id => "change_password" } do |f| %>
     <div class="form_row">
       <%= label :person, :verify_password, "Current Password" %>
-      <%= f.password_field :verify_password, :size => 34, :maxlength => Person::MAX_PASSWORD %>
+      <%= f.password_field :verify_password, :size => 30, :maxlength => Person::MAX_PASSWORD %>
     </div>
 
     <div class="form_row">
       <%= label :person, :new_password %>
-      <%= f.password_field :new_password, :size => 34, :maxlength => Person::MAX_PASSWORD %>
+      <%= f.password_field :new_password, :size => 30, :maxlength => Person::MAX_PASSWORD %>
     </div>
 
     <div class="form_row">
       <%= label :person, :password_confirmation, "Confirm Password" %>
-      <%= f.password_field :password_confirmation,  :size => 34, :maxlength => Person::MAX_PASSWORD, :value => "" %>
+      <%= f.password_field :password_confirmation,  :size => 30, :maxlength => Person::MAX_PASSWORD, :value => "" %>
     </div>
 
     <div class="form_row">

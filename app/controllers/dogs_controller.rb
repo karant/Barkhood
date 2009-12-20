@@ -64,7 +64,6 @@ class DogsController < ApplicationController
   end
 
   def new
-    @body = "register single-col"
     @dog = current_person.dogs.build
 
     respond_to do |format|
@@ -79,7 +78,6 @@ class DogsController < ApplicationController
         flash[:notice] = "You dog profile has been created."
         format.html { redirect_back_or_default(home_url) }
       else
-        @body = "register single-col"
         format.html { render :action => 'new' }
       end
     end

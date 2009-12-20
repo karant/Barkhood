@@ -212,7 +212,6 @@ a.show-follow:visited {
 
 /* Forms */
 form {
-  border-bottom: 1px solid #ccc;
   padding-bottom: 1em;
   margin-bottom: 2em;
 }
@@ -252,7 +251,7 @@ div.button {
 }
 
 .col1 textarea {
-  width: 478px;
+  width: 448px;
 }
 body.single-col .col1 form input {
   width: 312px;
@@ -266,7 +265,7 @@ body.single-col .col1 form input.checkbox {
   position: relative;
 }
 .form_row.full input {
-  width: 478px;
+  width: 448px;
 }
 
 #frmSearch {
@@ -304,7 +303,7 @@ body.single-col .col1 form input.checkbox {
   display: inline;
   vertical-align: middle;
   margin-top: 12px;
-  width: 470px;
+  width: 430px;
 }
 #frmSearchAddress #btnSearch.button {
   display: inline;
