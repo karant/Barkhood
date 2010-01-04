@@ -1,4 +1,4 @@
-<% default_label = params[:address] || "Address or City" %>
+<% default_label = params[:address] || ( logged_in? ? current_person.address : "Address or City" ) %>
 <h2>Search <%= search_type %> by Address</h2>
 <% form_tag address_searches_path, :method => :get, :id => "frmSearchAddress" do %>
   <fieldset title="Search Barkhood">

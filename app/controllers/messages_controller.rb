@@ -43,7 +43,12 @@ class MessagesController < ApplicationController
     @dogs = current_person.dogs.reject{|d| !Connection.connected?(d, @recipient)}
 
     respond_to do |format|
-      format.html
+      if @dogs.blank?
+        flash[:error] = "You are not connected with this dog."
+        format.html { redirect_to @recipient }
+      else
+        format.html        
+      end
     end
   end
 

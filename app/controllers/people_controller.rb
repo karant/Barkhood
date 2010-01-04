@@ -40,11 +40,11 @@ class PeopleController < ApplicationController
           @person.email_verifications.create
           flash[:notice] = %(Thanks for signing up! Check your email
                              to activate your account.)
-          format.html { redirect_to(home_url) }
+          format.html { redirect_to(@person) }
         else
           self.current_person = @person
           flash[:notice] = "Thanks for signing up!"
-          format.html { redirect_back_or_default(home_url) }
+          format.html { redirect_back_or_default(@person) }
         end
       else
         @body = "register single-col"

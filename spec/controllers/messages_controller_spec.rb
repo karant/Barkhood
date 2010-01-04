@@ -37,6 +37,7 @@ describe MessagesController do
     end
     
     it "should have a working new page" do
+      login_as(:aaron)
       get :new, :dog_id => @dog
       response.should be_success
       response.should render_template("new")

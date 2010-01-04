@@ -1,7 +1,7 @@
 <h1>New breed</h1>
 
 <% form_for :breed,
-		    :url => admin_breeds_path(@breed),
+		    :url => admin_breeds_path,
             :html => { :method => :post } do |f| %>
   <%= f.error_messages %>
 

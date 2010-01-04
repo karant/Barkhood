@@ -105,13 +105,21 @@ module Ultrasphinx
 
           raise UsageError, "field #{field.inspect} is invalid" unless type
           
+          exclude = false
+          
+          # check for exclude flag attached to filter
+          if value.is_a?(Hash)
+            exclude = value[:exclude]
+            value = value[:value]
+          end
+
           begin
             case value
               when Integer, Float, BigDecimal, NilClass, Array
                 # XXX Hack to force floats to be floats
                 value = value.to_f if type == 'float'
                 # Just bomb the filter in there
-                request.filters << Riddle::Client::Filter.new(field, Array(value), false)
+                request.filters << Riddle::Client::Filter.new(field, Array(value), exclude)
               when Range
                 # Make sure ranges point in the right direction
                 min, max = [value.begin, value.end].map {|x| x._to_numeric }
@@ -119,7 +127,7 @@ module Ultrasphinx
                 min, max = max, min if min > max
                 # XXX Hack to force floats to be floats
                 min, max = min.to_f, max.to_f if type == 'float'
-                request.filters << Riddle::Client::Filter.new(field, min..max, false)
+                request.filters << Riddle::Client::Filter.new(field, min..max, exclude)
               when String
                 # XXX Hack to move text filters into the query
                 opts['parsed_query'] << " @#{field} #{value}"
@@ -243,12 +251,19 @@ module Ultrasphinx
                 (configuration['association_sql'] or "LEFT OUTER JOIN #{association_model.table_name} AS #{table_alias} ON #{table_alias}.#{klass.to_s.downcase}_id = #{klass.table_name}.#{association_model.primary_key}")
               ]
             when 'concatenate'
-              # Wait for someone to complain before worrying about this
-              raise "Concatenation text facets have not been implemented"
+              raise "Concatenation text facets have only been implemented for when :association_sql is defined" if configuration['association_sql'].blank?
+              
+              table_alias = configuration['table_alias']
+              
+              [ "#{table_alias}.#{configuration['field']}",
+                configuration['association_sql']
+              ]
           end
           
-          klass.connection.execute("SELECT #{field_string} AS value, #{SQL_FUNCTIONS[ADAPTER]['hash']._interpolate(field_string)} AS hash FROM #{klass.table_name} #{join_string} GROUP BY value").each do |value, hash|
-            FACET_CACHE[facet][hash.to_i] = value
+          query = "SELECT #{field_string} AS value, #{SQL_FUNCTIONS[ADAPTER]['hash']._interpolate(field_string)} AS hash FROM #{klass.table_name} #{join_string} GROUP BY value"
+          
+          klass.connection.execute(query).each do |hash|
+            FACET_CACHE[facet][hash[1].to_i] = hash[0]
           end                            
           klass
         end
@@ -270,7 +285,7 @@ module Ultrasphinx
         end.map do |item|
           class_name = IDS_TO_MODELS[item[:doc] % number_of_models]
           raise DaemonError, "Impossible Sphinx document id #{item[:doc]} in query result" unless class_name
-          [class_name, item[:doc] / number_of_models]
+          [class_name, (item[:doc] / number_of_models).to_i]
         end
       end
 

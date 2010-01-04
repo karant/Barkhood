@@ -1,4 +1,7 @@
 class Admin::BreedsController < ApplicationController
+   
+  before_filter :login_required, :admin_required
+  
   # GET /breeds
   # GET /breeds.xml
   def index
@@ -45,7 +48,7 @@ class Admin::BreedsController < ApplicationController
     respond_to do |format|
       if @breed.save
         flash[:notice] = 'Breed was successfully created.'
-        format.html { redirect_to(@breed) }
+        format.html { redirect_to(admin_breed_path(@breed)) }
         format.xml  { render :xml => @breed, :status => :created, :location => @breed }
       else
         format.html { render :action => "new" }
@@ -62,7 +65,7 @@ class Admin::BreedsController < ApplicationController
     respond_to do |format|
       if @breed.update_attributes(params[:breed])
         flash[:notice] = 'Breed was successfully updated.'
-        format.html { redirect_to(@breed) }
+        format.html { redirect_to(admin_breed_path(@breed)) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -78,7 +81,7 @@ class Admin::BreedsController < ApplicationController
     @breed.destroy
 
     respond_to do |format|
-      format.html { redirect_to(breeds_url) }
+      format.html { redirect_to(admin_breeds_path) }
       format.xml  { head :ok }
     end
   end

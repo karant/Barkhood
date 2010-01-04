@@ -76,7 +76,7 @@ class SearchTest < Test::Unit::TestCase
     assert_equal @page - 1, @s.previous_page
     assert_equal @page + 1, @s.next_page
     assert_equal @per_page * (@page - 1), @s.offset
-    assert @s.total_pages >= @s.total_entries / @per_page.to_f
+    assert @s.page_count >= @s.total_entries / @per_page.to_f
    end
   
   def test_empty_query
@@ -197,6 +197,17 @@ class SearchTest < Test::Unit::TestCase
       Seller.count(:conditions => "company_name = 'seller17'"),
       S.new(:class_names => 'Seller', :filters => {'company_name' => 'seller17'}).run.size
     )  
+  end
+
+  def test_exclusion_filter
+    assert_equal(
+      Seller.count(:conditions => 'user_id = 17'),
+      S.new(:class_names => 'Seller', :filters => { 'user_id' => { 'value' => 17, 'exclude' => false } }).run.size
+    )
+    assert_equal(
+      Seller.count(:conditions => 'user_id != 17'),
+      S.new(:class_names => 'Seller', :filters => { 'user_id' => { 'value' => 17, 'exclude' => true } }).run.size
+    )
   end
   
   def test_invalid_filter

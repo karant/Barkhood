@@ -31,7 +31,7 @@
 <div class="toolbox">
   <%= image_tag @dog.main_photo, :class => "profile-image photo",
                                     :alt => h(@dog.name) %>
-  <%- if logged_in? && !current_person.dogs.empty? -%>									
+  <%- if logged_in? && !current_person.dogs.empty? && !( current_person?(@dog.owner) && current_person.dogs.size < 2 )-%>									
     <h3><%= @dog.name %></h3>
     <ul class="tools">
 	  	<li>Connections with:
@@ -47,19 +47,19 @@
 						        <%- if Connection.connected?(@dog, dog) -%>
 						          You're connected!
 							          <%= link_to image_tag('icons/user_delete.png'),
-							                      connection_path(Connection.conn(dog,
-							                                                      @dog)),
+							                      connection_path(Connection.conn(@dog,
+							                                                      dog)),
 							                          :method => :delete,
 							                      :title => "Remove connection",
 							             :confirm => "Are you sure you want to remove this connection?" %>
 						        <%- end -%>
-						          <%- if Connection.pending?(@dog, dog) -%>
+						          <%- if Connection.pending?(dog, @dog) -%>
 						            <%= h @dog.name %> has contacted you
 								            (<%= link_to "respond to contact request",
 								                         edit_connection_path(Connection.conn(dog,
 								                                                              @dog)) %>)
 						          <%- end -%>
-						          <%- if Connection.pending?(dog, @dog) -%>
+						          <%- if Connection.pending?(@dog, dog) -%>
 						            You've contacted <%= h @dog.name %>
 						          <%- end -%>
 						</li>
@@ -67,7 +67,9 @@
 				<% end %>
 			</ul>
 		</li>
-		<li><%= email_link(@dog) %></li>
+		<% if connected_to?(@dog) && !current_person?(@dog.owner) %>
+			<li><%= email_link(@dog) %></li>
+		<% end %>
     </ul>
   <%- end -%>
 </div>

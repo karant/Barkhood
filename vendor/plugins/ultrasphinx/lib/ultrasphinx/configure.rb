@@ -16,20 +16,20 @@ module Ultrasphinx
                   filename = filename[0..-4]
                   begin                
                     File.basename(filename).camelize.constantize
-                  rescue NameError => e
+                  rescue LoadError, NameError => e
                     filename.camelize.constantize
                   end
                 end
               rescue Object => e
                 say "warning: critical autoload error on #{filename}; try referencing \"#{filename.camelize}\" directly in the console"
-                #say e.backtrace.join("\n") if RAILS_ENV == "development"
+                say e.backtrace.join("\n") if RAILS_ENV == "development"
               end
             end 
           end
         end
   
         # Build the field-to-type mappings.
-        Fields.instance.configure(MODEL_CONFIGURATION)
+        Ultrasphinx::Fields.instance.configure(MODEL_CONFIGURATION)
       end
       
                     
@@ -39,7 +39,9 @@ module Ultrasphinx
         load_constants
               
         say "rebuilding configurations for #{RAILS_ENV} environment" 
-        say "available models are #{MODEL_CONFIGURATION.keys.to_sentence}"
+        # stable sort classes by name rather than rely on hash order
+        model_list = MODEL_CONFIGURATION.keys.sort
+        say "available models are #{model_list.to_sentence}"
         File.open(CONF_PATH, "w") do |conf|              
           conf.puts global_header            
           say "generating SQL"    
@@ -48,9 +50,8 @@ module Ultrasphinx
             sources = []
             cached_groups = Fields.instance.groups.join("\n")
 
-            MODEL_CONFIGURATION.each_with_index do |model_and_options, class_id|              
-              # This relies on hash sort order being deterministic per-machine
-              model, options = model_and_options
+            model_list.each_with_index do |model, class_id|
+              options = MODEL_CONFIGURATION[model]
               klass = model.constantize
               source = "#{model.tableize.gsub('/', '__')}_#{index}"
  
@@ -88,14 +89,16 @@ module Ultrasphinx
       def setup_source_database(klass)
         # Supporting Postgres now
         connection_settings = klass.connection.instance_variable_get("@config")
-        raise ConfigurationError, "Unsupported database adapter" unless connection_settings
+        raise ConfigurationError, "Unsupported database adapter" unless connection_settings || defined?(JRUBY_VERSION)
 
         adapter_defaults = DEFAULTS[ADAPTER]
         raise ConfigurationError, "Unsupported database adapter" unless adapter_defaults
 
         conf = [adapter_defaults]                  
         connection_settings.reverse_merge(CONNECTION_DEFAULTS).each do |key, value|
-          conf << "#{CONFIG_MAP[key]} = #{value}" if CONFIG_MAP[key]          
+          if CONFIG_MAP[key] && !SOURCE_SETTINGS[CONFIG_MAP[key]]
+            conf << "#{CONFIG_MAP[key]} = #{value}"
+          end
         end                 
         conf.sort.join("\n")
       end
@@ -130,7 +133,17 @@ module Ultrasphinx
       
       
       def setup_source_arrays(index, klass, fields, class_id, conditions, order)
-        condition_strings = Array(conditions).map do |condition| 
+        if((klass.column_names.include? klass.inheritance_column) and (klass.superclass != ActiveRecord::Base))
+          if conditions.nil?
+            conditions = ""
+          else
+            conditions += " AND  "
+          end
+          conditions +=  "#{klass.table_name}.#{klass.inheritance_column} = '#{klass.name.to_s}'  "
+        end
+     	
+
+	condition_strings = Array(conditions).map do |condition| 
           "(#{condition})"
         end
         
@@ -199,7 +212,7 @@ module Ultrasphinx
         
         primary_key = "#{klass.table_name}.#{klass.primary_key}"
         group_bys = case ADAPTER
-          when 'mysql'
+          when 'mysql', 'jdbcmysql'
             primary_key
           when 'postgresql'
             # Postgres is very fussy about GROUP_BY 
@@ -266,7 +279,7 @@ module Ultrasphinx
           end
           
           source_string = "#{entry['table_alias']}.#{entry['field']}"
-          group_bys << source_string
+          group_bys << source_string unless entry['dont_group_by']
           column_strings, remaining_columns = install_field(fields, source_string, entry['as'], entry['function_sql'], entry['facet'], entry['sortable'], column_strings, remaining_columns)                         
         end
         

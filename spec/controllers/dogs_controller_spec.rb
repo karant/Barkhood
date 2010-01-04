@@ -163,7 +163,7 @@ describe DogsController do
     it "should display break up link if connected" do
       login_as(:quentin)
       @contact = dogs(:max)
-      conn = Connection.connect(@dog, @contact)
+      conn = Connection.connect(@contact, @dog)
       get :show, :id => @contact.reload
       response.should have_tag("a[href=?]", connection_path(conn))
     end

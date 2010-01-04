@@ -13,6 +13,8 @@ class DogsController < ApplicationController
 #    @dogs = Dog.mostly_active(params[:page])
     if session[:geo_location]
       location = session[:geo_location]
+    elsif logged_in?
+      location = Geokit::Geocoders::MultiGeocoder.geocode(current_person.address)
     else
       location = Geokit::Geocoders::MultiGeocoder.geocode('Sacramento, CA')
     end
@@ -76,7 +78,7 @@ class DogsController < ApplicationController
     respond_to do |format|
       if @dog.save
         flash[:notice] = "You dog profile has been created."
-        format.html { redirect_back_or_default(home_url) }
+        format.html { redirect_back_or_default(@dog) }
       else
         format.html { render :action => 'new' }
       end
