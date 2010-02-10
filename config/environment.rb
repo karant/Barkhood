@@ -71,7 +71,6 @@ Rails::Initializer.run do |config|
   config.gem 'chronic'
   config.gem 'BlueCloth', :lib => 'bluecloth'
   config.gem 'geokit'
-  config.gem "rack", :version => "1.1.0"
 end
 
 require "#{RAILS_ROOT}/vendor/plugins/jquery_ui_rails_helpers/helpers/tabs_renderer"
