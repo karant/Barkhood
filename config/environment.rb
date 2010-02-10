@@ -9,7 +9,7 @@ RAILS_GEM_VERSION = '2.3.5' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
-require 'rails_generator/secret_key_generator'
+# require 'rails_generator/secret_key_generator'
 
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
@@ -45,7 +45,7 @@ Rails::Initializer.run do |config|
   if File.exist?(secret_file)
     secret = File.read(secret_file)
   else
-    secret = Rails::SecretKeyGenerator.new("insoshi").generate_secret
+    secret = ActiveSupport::SecureRandom.hex(64)
     File.open(secret_file, 'w') { |f| f.write(secret) }
   end
   config.action_controller.session = {
