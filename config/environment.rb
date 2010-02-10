@@ -41,16 +41,9 @@ Rails::Initializer.run do |config|
   # If you change this key, all old sessions will become invalid!
   # Make sure the secret is at least 30 characters and all random, 
   # no regular words or you'll be exposed to dictionary attacks.
-  secret_file = File.join(RAILS_ROOT, "secret")
-  if File.exist?(secret_file)
-    secret = File.read(secret_file)
-  else
-    secret = ActiveSupport::SecureRandom.hex(64)
-    File.open(secret_file, 'w') { |f| f.write(secret) }
-  end
   config.action_controller.session = {
-    :session_key => '_instant_social_session',
-    :secret => secret
+    :session_key => app_credentials['session_key'],
+    :secret      => app_credentials['secret']
   }
 
   # Use the database for sessions instead of the cookie-based default,
