@@ -67,9 +67,10 @@ describe SearchesController do
     describe "as a normal user" do
       
       it "should not return deactivated dogs" do
-        people(:deactivated).should be_deactivated
+        deactivated_dog = dogs(:deactivated)
+        deactivated_dog.should be_deactivated
         get :index, :q => "deactivated", :model => "Dog"
-        assigns(:results).should == [].paginate
+        assigns(:results).should_not contain(deactivated_dog)
       end
       
 #      it "should not return email unverified users" do
@@ -90,13 +91,13 @@ describe SearchesController do
       end
 
 # TBD
-# I have no idea why this test is not passing...
-#      it "should return deactivated users" do
-#        deactivated_dog = dogs(:deactivated)
-#        deactivated_dog.should be_deactivated
-#        get :index, :q => "deactivated", :model => "Dog"
-#        assigns(:results).should contain(deactivated_dog)
-#      end
+
+      it "should return deactivated users" do
+        deactivated_dog = dogs(:deactivated)
+        deactivated_dog.should be_deactivated
+        get :index, :q => "deactivated", :model => "Dog"
+        assigns(:results).should contain(deactivated_dog)
+      end
       
 #      it "should return email unverified users" do
 #        @preference.email_verifications = true

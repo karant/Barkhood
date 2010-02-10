@@ -11,7 +11,7 @@ class Person < ActiveRecord::Base
   TIME_AGO_FOR_MOSTLY_ACTIVE = 1.month.ago
   FEED_SIZE = 10
 
-  has_many :dogs, :foreign_key => 'owner_id', :dependent => :destroy, :order => "created_at"
+  has_many :dogs, :foreign_key => 'owner_id', :dependent => :destroy, :order => "dogs.deactivated, dogs.created_at"
   has_many :contacts, :through => :dogs, :source => :connections
   has_many :email_verifications
   has_many :_sent_messages, :through => :dogs

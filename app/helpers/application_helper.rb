@@ -11,7 +11,7 @@ module ApplicationHelper
   ## Menu helpers
   
   def menu
-    home     = menu_element("Dashboard",   home_path)
+    home     = menu_element("Home",   home_path)
     dogs   = menu_element("Dogs", dogs_path)
     groups = menu_element("Groups", groups_path)
     if Forum.count == 1

@@ -5,6 +5,7 @@ dana:
   dob: <%= 2.years.ago.to_s(:db) %>
   sex: Female
   breed: german_pointer
+  created_at: <%= 3.days.ago.to_s(:db) %>
   
 nola:
   owner: quentin
@@ -13,6 +14,7 @@ nola:
   dob: <%= 3.years.ago.to_s(:db) %>
   sex: Female
   breed: newfoundland
+  created_at: <%= 2.days.ago.to_s(:db) %>
   
 max:
   owner: aaron
@@ -54,6 +56,7 @@ deactivated:
   sex: Male
   breed: bulldog
   deactivated: true
+  created_at: <%= 1.day.ago.to_s(:db) %>
   
 deactivated_owner:
   owner: deactivated

@@ -114,7 +114,7 @@ describe PeopleController do
         it "should have the right notice" do
           person = create_person
           flash[:notice].should =~ /activate your account/
-          response.should redirect_to(person)
+          response.should redirect_to(person_path(person))
         end
         
         it "should verify a person" do
