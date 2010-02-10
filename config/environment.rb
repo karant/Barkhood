@@ -37,6 +37,8 @@ Rails::Initializer.run do |config|
   # (by default production uses :info, the others :debug)
   # config.log_level = :debug
 
+  app_credentials = YAML.load_file(File.join(RAILS_ROOT, 'config', 'credentials.yml'))
+
   # Your secret key for verifying cookie session data integrity.
   # If you change this key, all old sessions will become invalid!
   # Make sure the secret is at least 30 characters and all random, 

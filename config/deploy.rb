@@ -142,7 +142,7 @@ namespace :deploy do
   end
   
   task :after_update_code do
-    # symlink_config_yaml_files    
+    symlink_config_yaml_files    
   end
 
   task :after_symlink do
