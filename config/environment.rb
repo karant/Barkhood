@@ -45,12 +45,12 @@ Rails::Initializer.run do |config|
   if File.exist?(secret_file)
     secret = File.read(secret_file)
   else
-    secret = ActiveSupport::SecureRandom.hex(64)
+    secret = Rails::SecretKeyGenerator.new("insoshi").generate_secret
     File.open(secret_file, 'w') { |f| f.write(secret) }
   end
   config.action_controller.session = {
     :session_key => '_instant_social_session',
-    :secret      => secret
+    :secret => secret
   }
 
   # Use the database for sessions instead of the cookie-based default,
