@@ -14,6 +14,8 @@ db/schema.rb
 db/schema.sql
 db/*.sqlite3*
 config/database.yml
+config/amazon_s3.yml
+config/credentials.yml
 public/photos/*
 public/thumbnails
 uuid.state
