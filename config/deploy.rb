@@ -10,6 +10,7 @@ end
 
 set :application, "barkhood"
 set :domain, "#{application}.aptanacloud.com"
+set :rails_root, "#{File.dirname(__FILE__)}/.."
 
 server domain, :app, :web, :db, :primary => true
 
