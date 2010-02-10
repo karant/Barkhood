@@ -133,22 +133,22 @@ namespace :deploy do
   end
   
   task :after_setup do
-    shared_sphinx_folder if rails_env == "production"
+    # shared_sphinx_folder if rails_env == "production"
   end
   
   task :before_update_code do
     # Stop UltraSphinx before the update so it finds its configuration file.
-    ultrasphinx.stop if rails_env == "production"
+    # ultrasphinx.stop if rails_env == "production"
   end
   
   task :after_update_code do
-    symlink_config_yaml_files    
+    # symlink_config_yaml_files    
   end
 
   task :after_symlink do
-    symlink_sphinx_indexes if rails_env == "production"
-    ultrasphinx.configure if rails_env == "production"
-    ultrasphinx.start if rails_env == "production"
+    # symlink_sphinx_indexes if rails_env == "production"
+    # ultrasphinx.configure if rails_env == "production"
+    # ultrasphinx.start if rails_env == "production"
     cleanup
   end
   
