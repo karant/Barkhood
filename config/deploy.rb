@@ -159,11 +159,13 @@ namespace :deploy do
   desc "Link up Sphinx's indexes."
   task :symlink_sphinx_indexes, :roles => [:app] do
     run "ln -nfs #{shared_path}/config/ultrasphinx #{release_path}/config/ultrasphinx"
+    run "ln -nfs #{shared_path}/sphinx #{release_path}/sphinx"
   end
   
   desc "Add the shared folder for sphinx files for the production environment"
   task :shared_sphinx_folder, :roles => :web do
     run "mkdir -p #{shared_path}/config/ultrasphinx"
+    run "mkdir -p #{shared_path}/sphinx"
   end 
   
   desc "Link config YAML files with credentials."
