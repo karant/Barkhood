@@ -159,7 +159,6 @@ namespace :deploy do
   desc "Link up Sphinx's indexes."
   task :symlink_sphinx_indexes, :roles => [:app] do
     run "ln -nfs #{shared_path}/config/ultrasphinx/production.base #{release_path}/config/ultrasphinx/production.base"
-    run "mkdir -p #{release_path}/sphinx"
     run "ln -nfs #{shared_path}/sphinx #{release_path}/sphinx"
   end
   
