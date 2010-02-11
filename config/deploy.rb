@@ -138,7 +138,7 @@ namespace :deploy do
   
   task :before_update_code do
     # Stop UltraSphinx before the update so it finds its configuration file.
-    # ultrasphinx.stop if rails_env == "production"
+    ultrasphinx.stop if rails_env == "production"
   end
   
   task :after_update_code do
@@ -146,9 +146,9 @@ namespace :deploy do
   end
 
   task :after_symlink do
-    # symlink_sphinx_indexes if rails_env == "production"
-    # ultrasphinx.configure if rails_env == "production"
-    # ultrasphinx.start if rails_env == "production"
+    symlink_sphinx_indexes if rails_env == "production"
+    ultrasphinx.configure if rails_env == "production"
+    ultrasphinx.start if rails_env == "production"
     cleanup
   end
   
@@ -158,12 +158,12 @@ namespace :deploy do
 
   desc "Link up Sphinx's indexes."
   task :symlink_sphinx_indexes, :roles => [:app] do
-    run "ln -nfs #{shared_path}/db/sphinx #{release_path}/db/sphinx"
+    run "ln -nfs #{shared_path}/config/ultrasphinx #{release_path}/config/ultrasphinx"
   end
   
   desc "Add the shared folder for sphinx files for the production environment"
   task :shared_sphinx_folder, :roles => :web do
-    run "mkdir -p #{shared_path}/db/sphinx"
+    run "mkdir -p #{shared_path}/config/ultrasphinx"
   end 
   
   desc "Link config YAML files with credentials."

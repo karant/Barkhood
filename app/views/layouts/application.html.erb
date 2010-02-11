@@ -13,7 +13,7 @@
   <% end %>
   <% if @map %>
     <%= javascript_include_tag("clusterer") %>
-  	<%= GMap.header %>
+  	<%= GMap.header(:with_vml => false, :host => request.host) %>
   	<%= @map.to_html %>
 	<%= javascript_include_tag("clusterer") %>
   <% end %>
