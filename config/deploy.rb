@@ -166,6 +166,8 @@ namespace :deploy do
   task :symlink_config_yaml_files, :roles => [:app] do
     run "ln -nfs #{shared_path}/config/amazon_s3.yml #{release_path}/config/amazon_s3.yml"   
     run "ln -nfs #{shared_path}/config/credentials.yml #{release_path}/config/credentials.yml"
+    run "ln -nfs #{shared_path}/rsa_key #{release_path}/rsa_key"
+    run "ln -nfs #{shared_path}/rsa_key.pub #{release_path}/rsa_key.pub"
   end
   
   namespace :web do
