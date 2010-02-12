@@ -10,4 +10,4 @@ test:
  <%= GeoKit::Geocoders::google %>
 
 production:
- barkhood.com:  <%= GeoKit::Geocoders::google %>
+ <%= GeoKit::Geocoders::google %>
