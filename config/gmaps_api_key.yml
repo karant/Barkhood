@@ -2,6 +2,7 @@
 #In this sample:
 #For development and test, we have only one possible host (localhost:3000), so there is only a single key associated with the mode.
 #In production, the app can be accessed through 2 different hosts: thepochisuperstarmegashow.com and exmaple.com. There then needs a 2-key hash. If you deployed to one host, only the API key would be needed (as in development and test).
+# Anton 02/11/10 - Couldn't make this work by pulling production key from Geokit::Geocoders::google
 
 development:
  <%= GeoKit::Geocoders::google %>
@@ -10,4 +11,4 @@ test:
  <%= GeoKit::Geocoders::google %>
 
 production:
- <%= GeoKit::Geocoders::google %>
+ ABQIAAAAbBxnLteegpuKswPPhnFDKhRE49LT3mCyoQbSrfdDk4stGQIGCxSX1leJirdNf25zCSCxnh7qHsCxkQ
