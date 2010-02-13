@@ -79,7 +79,7 @@ body {
   float: right;
 }
 #nav li {
-  background: #069 url(/images/button.png) bottom repeat-x;
+  background: url(/images/button.png) bottom repeat-x;
   float: left;
   height: 28px;
   line-height: 28px;

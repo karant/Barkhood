@@ -8,7 +8,7 @@ class Photo < ActiveRecord::Base
   
   belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
   has_attachment :content_type => :image,
-                 :storage => :file_system,
+                 :storage => :s3,
                  :max_size => UPLOAD_LIMIT.megabytes,
                  :min_size => 1,
                  :resize_to => '240>',
@@ -77,5 +77,13 @@ class Photo < ActiveRecord::Base
       activity = Activity.create!(:item => self, :dog => activity_dog)
       add_activities(:activity => activity, :dog => activity_dog)
   end
-
+  
+  def base_path(thumbnail = nil)
+    file_system_path = (thumbnail.blank? ? self : thumbnail_class).attachment_options[:path_prefix].to_s
+    File.join(file_system_path, attachment_path_id)
+  end
+      
+  def full_filename(thumbnail = nil)
+    File.join(base_path(thumbnail), thumbnail_name_for(thumbnail))
+  end  
 end

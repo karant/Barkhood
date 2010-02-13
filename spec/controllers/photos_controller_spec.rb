@@ -6,12 +6,12 @@ class Thumbnail
   # Override full_filename to avoid writing files to the public image directory.
   # They go instead to Dir::tmpdir, which on *nix systems is usually /tmp.
   # See http://www.fngtps.com/2007/04/testing-with-attachment_fu for more info.  
-  def full_filename(thumbnail = nil)
-    klass = thumbnail.nil? ? self : thumbnail_class
-    file_system_path = klass.attachment_options[:path_prefix].to_s
-    File.join(Dir::tmpdir, file_system_path,
-              *partitioned_path(thumbnail_name_for(thumbnail)))
-  end
+  #  def full_filename(thumbnail = nil)
+  #    klass = thumbnail.nil? ? self : thumbnail_class
+  #    file_system_path = klass.attachment_options[:path_prefix].to_s
+  #    File.join(Dir::tmpdir, file_system_path,
+  #              *partitioned_path(thumbnail_name_for(thumbnail)))
+  #  end
 end
 
 describe PhotosController do
