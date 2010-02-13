@@ -68,6 +68,7 @@ Rails::Initializer.run do |config|
   # config.gem 'mislav-will_paginate', :version => '~> 2.3.2',
   #                                    :lib => 'will_paginate',
   #                                    :source => 'http://gems.github.com'
+  config.gem "aws-s3", :lib => 'aws/s3'
   config.gem 'chronic'
   config.gem 'BlueCloth', :lib => 'bluecloth'
   config.gem 'geokit'
