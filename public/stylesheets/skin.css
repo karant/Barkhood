@@ -9,6 +9,7 @@ body {
   background: url(/images/header-grad.png) repeat-x;
   float: left;
   width: 100%;
+  height: 69px;
 }
 #header, #wrap, #footer {
   margin: 0 auto;
