@@ -72,12 +72,16 @@ body {
   width: 144px;
 }
 
+#header .logo {
+	float: left;
+}
+
 
 /* Header-nav */
 #nav {
-  margin: 41px 0 0 0;
-  width: 600px;
-  float: right;
+  margin: 41px 0 0 10px;
+  width: 530px;
+  float: left;
 }
 #nav li {
   background: url(/images/button.png) bottom repeat-x;
@@ -133,6 +137,7 @@ p.welcome {
   right: 0;
   text-align: right;
   top: 12px;
+  float: right;
 }
 
 

@@ -1,6 +1,6 @@
 <div id="header-wrap">
   <div id="header">
-	<%= link_to image_tag('/images/logo.png'), home_url %>
+	<%= link_to image_tag('/images/logo.png'), home_url, { :class => 'logo' } %>
     <ul id="nav">
       <%- menu.each do |link| -%>
         <%= menu_li link %>
