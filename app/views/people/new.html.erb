@@ -20,8 +20,8 @@
   </div>
 
   <div class="form_row">
-    <label for="person_address">Address 
-      <span class="small">(will be used to locate other dogs near you)</span></label>
+    <label for="person_address">Physical Address 
+      <span class="small">(to locate other dogs near you)</span></label>
     <%= f.text_field :address, :maxlength => Person::MAX_ADDRESS %>
   </div>
 
@@ -37,7 +37,25 @@
                          :value => "" %>
   </div>
   <div class="form_row">
-    <%= submit_tag 'Sign up', :class => "button" %>
+  	<span class="small"><%= check_box_tag :agree_to_tos, params[:agree_to_tos], { :autocomplete => "off" } %> I agree to the <%= link_to "Terms of Service", tos_path, :target => "_blank" %> and <%= link_to "Privacy Policy", privacy_path, :target => "_blank" %></span>
+  </div>
+  <div class="form_row">
+    <%= submit_tag 'Sign up', :class => "button", :id => "submit" %>
   </div>
   <% end %>
 <%- end -%>
+<script type="text/javascript">
+		$(document).ready(function() {
+            $("#submit").attr("disabled", "disabled");
+
+            $("#agree_to_tos").click(function() {
+                var checked_status = this.checked;
+                if (checked_status == true) {
+                    $("#submit").removeAttr("disabled");
+                }
+                else {
+                    $("#submit").attr("disabled", "disabled");
+                }
+            });
+        });
+</script>

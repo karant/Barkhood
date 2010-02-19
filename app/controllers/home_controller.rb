@@ -21,4 +21,12 @@ class HomeController < ApplicationController
       format.atom
     end  
   end
+  
+  def tos
+    # tos.html.erb
+  end
+
+  def privacy
+    # privacy.html.erb
+  end
 end
