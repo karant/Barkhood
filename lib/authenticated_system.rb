@@ -73,7 +73,7 @@ module AuthenticatedSystem
             redirect_to login_url
           end
         end
-        format.any do
+        format.any(:json, :xml) do
           request_http_basic_authentication 'Web Password'
         end
       end
