@@ -17,6 +17,7 @@ body {
   width: 744px;
 }
 #wrap {
+  clear: both;
   width: 100%;
   background: url(/images/content-grad.jpg) repeat-x;
   background-color: #ebebeb;

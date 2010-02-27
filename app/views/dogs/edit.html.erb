@@ -8,6 +8,11 @@
         <%= f.label :name %>
         <%= f.text_field :name, :maxlength => Dog::MAX_NAME %>
       </div>
+	  
+      <div class="form_row">
+        <%= f.label :gender %>
+        <%= f.select :gender, ['Female', 'Male'] %>
+      </div>	  
       
       <div class="form_row">
         <%= f.label :breed %>

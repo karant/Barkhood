@@ -62,6 +62,14 @@ module DogsHelper
     dog.deactivated? ? "Activate" : "Deactivate"
   end
   
+  def gender_image(dog)
+    if dog.gender == 'Female'
+      image_tag('female.png', :title => 'Female')
+    elsif dog.gender == 'Male'
+      image_tag('male.png', :title => 'Male')
+    end
+  end
+  
   private
     
     # Make captioned images.

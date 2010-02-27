@@ -12,6 +12,13 @@
     <%= f.text_field :name, :maxlength => Dog::MAX_NAME %>
     <%= set_focus_to "dog_name" %>  
   </div>
+  
+  <div class="form_row">
+    <label for="dog_gender">
+      Gender
+    </label>
+    <%= f.select :gender, ['Female', 'Male'] %> 
+  </div>  
 
   <div class="form_row">
     <label for="dog_breed">

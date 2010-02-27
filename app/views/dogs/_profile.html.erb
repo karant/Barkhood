@@ -73,4 +73,7 @@
     </ul>
   <%- end -%>
 </div>
-<%= display @dog.description %>
+<p>Gender: <%= @dog.gender %></p>
+<p>Breed: <%= @dog.breed.name rescue nil %></p>
+<p>Age: <%= distance_of_time_in_words(@dog.dob, Time.now) %></p>
+<p><%= display @dog.description %></p>

@@ -2,7 +2,7 @@
   <div class="profile-image">
     <%= image_link dog, :class => "photo", :image => :thumbnail %>
   </div>
-  <p><%= dog_link dog, :class => "url fn" %></p>
+  <p><%= dog_link dog, :class => "url fn" %> <%= gender_image dog %></p>
   <%= display(truncate(dog.description, :length => 150),
               :class => "note") %>
   <div class="clear"></div>

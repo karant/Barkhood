@@ -179,7 +179,7 @@ describe DogsController do
   private
  
     def create_dog(options = {})
-      dog_hash = { :name => "Quire" }
+      dog_hash = { :name => "Quire", :gender => "Male" }
       post :create, :dog => dog_hash.merge(options)
       assigns(:dog)
     end

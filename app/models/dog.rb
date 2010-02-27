@@ -3,7 +3,7 @@ class Dog < ActiveRecord::Base
   extend PreferencesHelper
 
   attr_accessor :sorted_photos
-  attr_accessible :name, :description, :dob, :breed_id, :identity_url
+  attr_accessible :name, :description, :dob, :breed_id, :identity_url, :gender
   # Indexed fields for Sphinx
   is_indexed :fields => [ 'name', 'description', 'deactivated'],
              :include => [
@@ -82,9 +82,10 @@ class Dog < ActiveRecord::Base
   has_many :groups_not_hidden, :through => :memberships, :source => :group,
     :conditions => [%(status = ? AND mode != ?), Membership::ACCEPTED, Group::HIDDEN], :order => "name ASC"
 
-  validates_presence_of     :name
+  validates_presence_of     :name, :gender
   validates_length_of       :name,  :maximum => MAX_NAME
   validates_length_of       :description, :maximum => MAX_DESCRIPTION
+  validates_inclusion_of    :gender, :in => %w( Male Female)
   validates_uniqueness_of   :identity_url, :allow_nil => true
   
   acts_as_mappable :through => :owner

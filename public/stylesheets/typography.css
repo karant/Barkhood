@@ -256,6 +256,9 @@ div.button {
 body.single-col .col1 form input {
   width: 312px;
 }
+body.single-col .col1 form input.agree_to_tos {
+  width: 20px;
+}
 label.checkbox {float: left;margin-right: 12px; width: 120px;}
 body.single-col .col1 form input.checkbox {
   display: inline;

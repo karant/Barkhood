@@ -16,6 +16,26 @@ describe Dog do
       p.errors.on(:name).should_not be_nil
     end
     
+    it "should require sex" do
+      p = create_dog(:gender => nil)
+      p.errors.on(:gender).should_not be_nil
+    end
+    
+    it "should only accept valid gender" do
+      good = %w( Male Female )
+      bad = %w( 1 ' ' '' Foobar )
+      
+      good.each do |gender|
+        p = create_dog(:gender => gender)
+        p.should be_valid
+      end
+      
+      bad.each do |gender|
+        p = create_dog(:gender => gender)
+        p.errors.on(:gender).should_not be_nil
+      end
+    end
+    
     it "should be valid even with a nil description" do
       p = create_dog(:description => nil)
       p.should be_valid
@@ -348,7 +368,7 @@ describe Dog do
 
     def create_dog(options = {})
       record = people(:quentin).dogs.build({ :name => 'Kashtanka', :description => 'A new dog', :breed => breeds(:german_pointer), 
-                                             :dob => 2.years.ago, :sex => 'Female' }.merge(options))
+                                             :dob => 2.years.ago, :gender => 'Female' }.merge(options))
       record.valid?
       record.save! if options[:save]
       record

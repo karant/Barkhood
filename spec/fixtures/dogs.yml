@@ -3,7 +3,7 @@ dana:
   name: Dana
   description: I'm Dana!
   dob: <%= 2.years.ago.to_s(:db) %>
-  sex: Female
+  gender: Female
   breed: german_pointer
   created_at: <%= 3.days.ago.to_s(:db) %>
   
@@ -12,7 +12,7 @@ nola:
   name: Nola
   description: I'm Nola!
   dob: <%= 3.years.ago.to_s(:db) %>
-  sex: Female
+  gender: Female
   breed: newfoundland
   created_at: <%= 2.days.ago.to_s(:db) %>
   
@@ -21,7 +21,7 @@ max:
   name: Max
   description: I'm Max!
   dob: <%= 5.years.ago.to_s(:db) %>
-  sex: Male
+  gender: Male
   breed: bulldog
   
 parker:
@@ -29,7 +29,7 @@ parker:
   name: Parker
   description: I'm Parker!
   dob: <%= 11.years.ago.to_s(:db) %>
-  sex: Male
+  gender: Male
   breed: bulldog
   
 buba:
@@ -37,7 +37,7 @@ buba:
   name: Buba
   description: I'm Buba!
   dob: <%= 5.years.ago.to_s(:db) %>
-  sex: Male
+  gender: Male
   breed: bulldog
   
 sharik:
@@ -45,7 +45,7 @@ sharik:
   name: Sharik
   description: I'm Sharik!
   dob: <%= 2.weeks.ago.to_s(:db) %>
-  sex: Male
+  gender: Male
   breed: bulldog
   
 deactivated:
@@ -53,7 +53,7 @@ deactivated:
   name: Deactivated
   description: I've been deactivated.
   dob: <%= 2.years.ago.to_s :db %>
-  sex: Male
+  gender: Male
   breed: bulldog
   deactivated: true
   created_at: <%= 1.day.ago.to_s(:db) %>
@@ -63,5 +63,5 @@ deactivated_owner:
   name: Deactivated Owner
   description: My owner is deactivated.
   dob: <%= 1.year.ago.to_s :db %>
-  sex: Female
+  gender: Female
   breed: bulldog
