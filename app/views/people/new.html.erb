@@ -37,7 +37,7 @@
                          :value => "" %>
   </div>
   <div class="form_row">
-  	<%= check_box_tag :agree_to_tos, params[:agree_to_tos], false, { :autocomplete => "off", :class => "agree_to_tos" } %> <span class="small">I agree to the <%= link_to "Terms of Service", tos_path, :target => "_blank" %> and <%= link_to "Privacy Policy", privacy_path, :target => "_blank" %></span>
+  	<%= check_box_tag :agree_to_tos, params[:agree_to_tos], false, { :autocomplete => "off", :class => "agree_to_tos" } %> <span class="agree_to_tos">I agree to the <%= link_to "Terms of Service", tos_path, :target => "_blank" %> and <%= link_to "Privacy Policy", privacy_path, :target => "_blank" %></span><br /><br />
   </div>
   <div class="form_row">
     <%= submit_tag 'Sign up', :class => "button", :id => "submit" %>

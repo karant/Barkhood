@@ -149,6 +149,11 @@ body.blog .comments p, body.forum .reply p {
   font-size: 12px;
 }
 
+.agree_to_tos {
+  font-size: 12px;
+  margin: 0;
+}
+
 /* Have followed links change color (e.g., in forums). */
 a.show-follow:visited {
   color: #4A70B1;
@@ -258,6 +263,8 @@ body.single-col .col1 form input {
 }
 body.single-col .col1 form input.agree_to_tos {
   width: 20px;
+  margin: 0 0 0 0px;
+  padding: 0;
 }
 label.checkbox {float: left;margin-right: 12px; width: 120px;}
 body.single-col .col1 form input.checkbox {
