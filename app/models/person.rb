@@ -16,6 +16,11 @@ class Person < ActiveRecord::Base
   has_many :email_verifications
   has_many :_sent_messages, :through => :dogs
   has_many :_received_messages, :through => :dogs
+  has_many :feeds
+  has_many :activities, :through => :feeds, :order => 'activities.created_at DESC',
+                                            :limit => FEED_SIZE,
+                                            :conditions => ["dogs.deactivated = ?", false],
+                                            :include => :dog
  
   validates_presence_of     :email, :address
   validates_presence_of     :password,              :if => :password_required?
@@ -88,10 +93,6 @@ class Person < ActiveRecord::Base
 
   # Return a activity feed for all of person's dogs.
   def feed
-    activities = Activity.find(:all, :conditions => ["activities.dog_id IN (?) AND dogs.deactivated = ?", dog_ids, false],
-                                     :order => 'activities.created_at DESC',
-                                     :limit => Dog::FEED_SIZE,
-                                     :include => :dog)
     len = activities.length
     if len < FEED_SIZE
       # Mix in some global activities for smaller feeds.

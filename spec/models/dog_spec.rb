@@ -80,11 +80,14 @@ describe Dog do
 
     it "should disappear from other feeds if the dog is destroyed" do
       initial_dog = create_dog(:save => true)
-      dog         = create_dog(:email => "new@foo.com", :name => "Foo",
-                                     :save => true)
-      initial_dog.activities.length.should == 5
+      dog         = create_dog(:email => "new@foo.com", :name => "Foo")
+      dog.owner = people(:aaron)
+      dog.save
+      
+      Connection.connect(dog, initial_dog)
+      initial_dog.activities.length.should == 1
       dog.destroy
-      initial_dog.reload.activities.length.should == 2
+      initial_dog.reload.activities.length.should == 0
     end
   end
 

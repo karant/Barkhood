@@ -49,7 +49,7 @@ class SearchesController < ApplicationController
   def address
     @address = params[:address]
     location = Geokit::Geocoders::MultiGeocoder.geocode(@address)
-    @within = params[:within] == 'any' ? '' : params[:within]
+    @within = params[:within] == 'any' ? '99999' : params[:within]
     conditions = params[:breed_id] ? ["breed_id = ?", params[:breed_id]] : []
     
     all_dogs = Dog.mostly_active.find(:all, :conditions => conditions, :include => [:breed], :origin => @address, :within => @within, :order => 'distance')
