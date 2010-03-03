@@ -10,14 +10,14 @@ class PersonMailer < ActionMailer::Base
   end
   
   def password_reminder(person)
-    from         "Password reminder <password-reminder@#{domain}>"
+    from         "password_reminder@#{domain}"
     recipients   person.email
     subject      formatted_subject("Password reminder")
     body         "person" => person
   end
   
   def message_notification(message)
-    from         "Message notification <message@#{domain}>"
+    from         "message@#{domain}"
     recipients   message.recipient.owner.email
     subject      formatted_subject("New message")
     body         "server" => server, "message" => message,
@@ -25,7 +25,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def connection_request(connection)
-    from         "Contact request <connection@#{domain}>"
+    from         "connection@#{domain}"
     recipients   connection.dog.owner.email
     subject      formatted_subject("Contact request from #{connection.contact.name}")
     body         "server" => server,
@@ -35,7 +35,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def membership_public_group(membership)
-    from "Membership done <membership@#{domain}>"
+    from "membership@#{domain}"
     recipients membership.group.owner.owner.email
     subject formatted_subject("New member in group #{membership.group.name}")
     body "server" => server,
@@ -45,7 +45,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def membership_request(membership)
-    from "Membership request <membership@#{domain}>"
+    from "membership@#{domain}"
     recipients membership.group.owner.owner.email
     subject formatted_subject("Membership request for group #{membership.group.name}")
     body "server" => server,
@@ -55,7 +55,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def membership_accepted(membership)
-    from "Membership accepted <membership@#{domain}>"
+    from "membership@#{domain}"
     recipients membership.dog.owner.email
     subject formatted_subject("#{membership.dog.name} has been accepted to join #{membership.group.name}")
     body "server" => server,
@@ -65,7 +65,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def invitation_notification(membership)
-    from "Invitation notification <invitation#{domain}>"
+    from "invitation#{domain}"
     recipients membership.dog.owner.email
     subject formatted_subject("Invitation for #{membership.dog.name} from group #{membership.group.name}")
     body "server" => server,
@@ -75,7 +75,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def invitation_accepted(membership)
-    from "Invitation accepted <invitation@#{domain}>"
+    from "invitation@#{domain}"
     recipients membership.group.owner.owner.email
     subject formatted_subject("#{membership.dog.name} accepted the invitation")
     body "server" => server,
@@ -85,7 +85,7 @@ class PersonMailer < ActionMailer::Base
   end  
   
   def blog_comment_notification(comment)
-    from         "Comment notification <comment@#{domain}>"
+    from         "comment@#{domain}"
     recipients   comment.commented_dog.owner.email
     subject      formatted_subject("New blog comment")
     body         "server" => server, "comment" => comment,
@@ -96,7 +96,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def wall_comment_notification(comment)
-    from         "Comment notification <comment@#{domain}>"
+    from         "comment@#{domain}"
     recipients   comment.commented_dog.owner.email
     subject      formatted_subject("New wall comment")
     body         "server" => server, "comment" => comment,
@@ -106,7 +106,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def email_verification(ev)
-    from         "Email verification <email@#{domain}>"
+    from         "email@#{domain}"
     recipients   ev.person.email
     subject      formatted_subject("Email verification")
     body         "server_name" => server,
