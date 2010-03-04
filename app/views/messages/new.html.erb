@@ -15,6 +15,7 @@
 		<%= f.label :from %>
 		<% if controller.action_name == 'reply' %>
 			<%=h @dog.name %><br /><br />
+			<%= f.hidden_field :sender_id %>
 		<% else %>
 			<%= f.select :sender_id, @dogs.map{|d| [d.name, d.id]} %>
 		<% end %>
