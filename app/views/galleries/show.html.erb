@@ -15,7 +15,7 @@
       <% if current_person?(@gallery.person)%>
         <%= link_to "Edit gallery", edit_gallery_path %> |
       <% end %>
-      <%= link_to "All galleries", parent_path(@gallery.owner) %>
+      <%= link_to "All galleries", parent_galleries_path(@gallery.owner) %>
     </p>
   
     <%- if @photos.empty? -%>
