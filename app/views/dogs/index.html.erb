@@ -5,7 +5,7 @@
   	<br />
 	No dogs were found near this address!
   <% else -%>
-    <h2>Dogs (<%= @size %>)</h2>
+    <h2>Dogs (<%= @dogs.total_entries %>)</h2>
     <%= will_paginate %>
     <ul class="list dogs">
       <%= render :partial => @dogs %>

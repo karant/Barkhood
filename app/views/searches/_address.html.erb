@@ -2,7 +2,7 @@
 <h2>Search <%= search_type %> by Address</h2>
 <% form_tag address_searches_path, :method => :get, :id => "frmSearchAddress" do %>
   <fieldset title="Search Barkhood">
-  	Within <%= select_tag :within, options_for_select(within_distances, params[:within]) %> of
+  	Within <%= select_tag :within, options_for_select(within_distances, params[:within] || '10') %> of
     <%= text_field_tag :address, h(params[:address]), :id => "txtSearchAddress", :class => "txt",
                                           :maxlength => 100,
 										  :style => "color:#aaa;",

@@ -11,16 +11,14 @@ class DogsController < ApplicationController
   
   def index
 #    @dogs = Dog.mostly_active(params[:page])
-    if session[:geo_location]
-      location = session[:geo_location]
-    elsif logged_in?
-      location = Geokit::Geocoders::MultiGeocoder.geocode(current_person.address)
+    if logged_in? && !current_person.address.blank?
+      location = Geokit::Geocoders::MultiGeocoder.geocode(current_person.address) rescue Geokit::Geocoders::MultiGeocoder.geocode('Sacramento, CA')
+    elsif session[:geo_location]
+      location = session[:geo_location]      
     else
       location = Geokit::Geocoders::MultiGeocoder.geocode('Sacramento, CA')
     end
-    all_dogs = Dog.mostly_active.find(:all, :origin => location, :within => 10, :order => 'distance')
-    @size = all_dogs.size
-    @dogs = all_dogs.paginate(:page => params[:page], :per_page => RASTER_PER_PAGE)
+    @dogs = Dog.mostly_active.paginate(:all, :origin => location, :within => 10, :order => 'distance', :page => params[:page], :per_page => RASTER_PER_PAGE)
     @map = GMap.new("map_div")
     @map.control_init(:large_map => true,:map_type => true)
     @map.center_zoom_init([location.lat, location.lng], 15)
