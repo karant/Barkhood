@@ -48,20 +48,11 @@ module ActivitiesHelper
         end
       end
     when "Connection"
-      if activity.item.contact.owner.admin?
-        if recent
-          %(joined the system)
-        else
-          %(#{dog_link_with_image(activity.item.dog)}
-            has joined the system)
-        end
+      if recent
+        %(connected with #{dog_link_with_image(activity.item.contact)})
       else
-        if recent
-          %(connected with #{dog_link_with_image(activity.item.contact)})
-        else
-          %(#{dog_link_with_image(activity.item.dog)} and
-            #{dog_link_with_image(activity.item.contact)} have connected)
-        end
+        %(#{dog_link_with_image(activity.item.dog)} and
+          #{dog_link_with_image(activity.item.contact)} have connected)
       end
     when "ForumPost"
       post = activity.item
@@ -160,12 +151,8 @@ module ActivitiesHelper
           #{someones(event.dog, activity.item.commenter)} #{event_link("event", event)}.)
       end
     when "Connection"
-      if activity.item.contact.owner.admin?
-        %(#{dog_link(dog)} has joined the system)
-      else
-        %(#{dog_link(dog)} and
-          #{dog_link(activity.item.contact)} have connected)
-      end
+      %(#{dog_link(dog)} and
+        #{dog_link(activity.item.contact)} have connected)
     when "ForumPost"
       topic = activity.item.topic
       %(#{dog_link(dog)} made a
