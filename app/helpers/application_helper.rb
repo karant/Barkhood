@@ -165,7 +165,7 @@ module ApplicationHelper
       ['25 miles', '25'],
       ['50 miles', '50'],
       ['100 miles', '100'],
-      ['Any distance', 'any']]
+      ['Any distance', '999999']]
   end
 
   private

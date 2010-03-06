@@ -42,6 +42,7 @@ class Person < ActiveRecord::Base
                    :lng_column_name => :lng,
                    :auto_geocode => true
 
+  before_validation_on_update :auto_geocode_address
   before_create :check_config_for_deactivation
   before_save :encrypt_password
   before_validation :prepare_email

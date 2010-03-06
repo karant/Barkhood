@@ -5,7 +5,7 @@
   	<br />
   	No dogs were found!
   <% else -%>
-    <h2>Dogs (<%= @size %>)</h2>
+    <h2>Dogs (<%= @dogs.total_entries %>)</h2>
     <%= will_paginate @dogs %>
     <ul class="list dogs">
       <%= render :partial => @dogs %>
